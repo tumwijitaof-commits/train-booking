@@ -22,9 +22,301 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        :root {
+            --srt-navy: #0f2f5f;
+            --srt-blue: #1557a6;
+            --srt-blue-soft: #eaf3ff;
+            --srt-gold: #c99a2e;
+            --srt-red: #7b1e22;
+            --ink: #102033;
+            --muted: #64748b;
+            --card: rgba(255, 255, 255, 0.94);
+            --line: rgba(15, 47, 95, 0.12);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Sarabun', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 10% 8%, rgba(21, 87, 166, 0.16), transparent 30%),
+                radial-gradient(circle at 90% 12%, rgba(201, 154, 46, 0.16), transparent 26%),
+                linear-gradient(135deg, #f8fbff 0%, #eef5ff 45%, #f8fafc 100%);
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .5;
+            background-image:
+                linear-gradient(rgba(15, 47, 95, .035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 47, 95, .035) 1px, transparent 1px);
+            background-size: 38px 38px;
+            mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+        }
+        .loading-screen {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            text-align: center;
+            color: var(--srt-navy);
+            font-weight: 800;
+        }
+        .official-page { min-height: 100vh; position: relative; padding-bottom: 32px; }
+        .official-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(18px);
+            background: rgba(255, 255, 255, .82);
+            border-bottom: 1px solid rgba(15, 47, 95, .10);
+        }
+        .official-topbar-inner {
+            width: min(1440px, calc(100% - 32px));
+            margin: 0 auto;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .brand-mini { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            background: linear-gradient(135deg, var(--srt-navy), var(--srt-blue));
+            box-shadow: 0 14px 30px rgba(15, 47, 95, .22);
+            flex: 0 0 auto;
+        }
+        .brand-mini h2 { margin: 0; font-size: 15px; font-weight: 900; color: var(--srt-navy); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .brand-mini p { margin: 2px 0 0; font-size: 11px; font-weight: 700; color: var(--muted); }
+        .top-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(201, 154, 46, .35);
+            background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,250,235,.88));
+            color: #76520f;
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 12px;
+            font-weight: 900;
+            box-shadow: 0 12px 24px rgba(201, 154, 46, .12);
+            white-space: nowrap;
+        }
+        .official-layout {
+            width: min(1440px, calc(100% - 32px));
+            margin: 32px auto 0;
+            display: grid;
+            grid-template-columns: minmax(300px, .92fr) minmax(520px, 1.08fr);
+            gap: 24px;
+            align-items: start;
+        }
+        .official-intro-card,
+        .calculator-card {
+            background: var(--card);
+            border: 1px solid rgba(15, 47, 95, .10);
+            box-shadow: 0 24px 70px rgba(15, 47, 95, .13);
+            backdrop-filter: blur(18px);
+        }
+        .official-intro-card {
+            position: sticky;
+            top: 96px;
+            border-radius: 34px;
+            overflow: hidden;
+        }
+        .intro-hero {
+            padding: 30px;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            background:
+                linear-gradient(150deg, rgba(15,47,95,.97), rgba(21,87,166,.90) 55%, rgba(123,30,34,.86)),
+                radial-gradient(circle at 20% 10%, rgba(255,255,255,.20), transparent 34%);
+            position: relative;
+            overflow: hidden;
+        }
+        .intro-hero::after {
+            content: "";
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            right: -160px;
+            bottom: -170px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .10);
+            border: 1px solid rgba(255, 255, 255, .22);
+        }
+        .intro-badge {
+            width: fit-content;
+            padding: 8px 12px;
+            border: 1px solid rgba(255,255,255,.24);
+            background: rgba(255,255,255,.12);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: .02em;
+        }
+        .intro-title { margin: 22px 0 12px; font-size: clamp(30px, 4.2vw, 54px); font-weight: 900; letter-spacing: -0.06em; line-height: .98; }
+        .intro-subtitle { margin: 0; max-width: 560px; font-size: 15px; line-height: 1.8; color: rgba(255,255,255,.84); font-weight: 600; }
+        .intro-features {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 28px;
+            position: relative;
+            z-index: 1;
+        }
+        .intro-feature {
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 20px;
+            padding: 14px;
+        }
+        .intro-feature strong { display: block; font-size: 18px; font-weight: 900; }
+        .intro-feature span { display: block; margin-top: 3px; font-size: 11px; color: rgba(255,255,255,.78); font-weight: 700; }
+        .rule-stack { padding: 22px; display: grid; gap: 12px; }
+        .rule-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff;
+            border: 1px solid rgba(15, 47, 95, .09);
+            border-radius: 20px;
+            padding: 14px;
+            box-shadow: 0 12px 32px rgba(15, 47, 95, .07);
+        }
+        .rule-dot { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; background: var(--srt-blue-soft); color: var(--srt-blue); flex: 0 0 auto; }
+        .rule-card strong { display:block; font-size: 13px; font-weight: 900; color: var(--srt-navy); }
+        .rule-card span { display:block; margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.55; font-weight: 600; }
+        .calculator-card { border-radius: 34px; overflow: hidden; }
+        .calc-header {
+            position: relative;
+            overflow: hidden;
+            padding: 30px 32px;
+            color: #fff;
+            background:
+                linear-gradient(135deg, var(--srt-navy) 0%, var(--srt-blue) 62%, #0b3a78 100%);
+            box-shadow: inset 0 -1px 0 rgba(255,255,255,.12);
+            text-align: left;
+        }
+        .calc-header::before {
+            content: "";
+            position: absolute;
+            right: -110px;
+            top: -140px;
+            width: 330px;
+            height: 330px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.18);
+        }
+        .calc-header::after {
+            content: "SRT";
+            position: absolute;
+            right: 28px;
+            bottom: -10px;
+            font-size: 80px;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -.08em;
+            color: rgba(255,255,255,.08);
+        }
+        .official-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 24px;
+            background: #fff;
+            padding: 8px;
+            box-shadow: 0 18px 38px rgba(0,0,0,.25);
+            margin: 0 0 18px;
+            object-fit: contain;
+            position: relative;
+            z-index: 1;
+        }
+        .calc-title { position: relative; z-index: 1; margin: 0; font-size: clamp(24px, 3vw, 36px); line-height: 1.15; font-weight: 900; letter-spacing: -.04em; color: #fff; max-width: 620px; }
+        .calc-subtitle { position: relative; z-index: 1; margin: 10px 0 0; color: rgba(255,255,255,.78); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+        .calc-body { padding: 28px 32px 32px; }
+        .calc-body label { color: #21344e; }
+        .calc-body input,
+        .calc-body select {
+            min-height: 46px;
+            border-color: rgba(15, 47, 95, .14) !important;
+            box-shadow: 0 10px 26px rgba(15,47,95,.06);
+        }
+        .calc-body input:focus,
+        .calc-body select:focus {
+            border-color: rgba(21,87,166,.70) !important;
+            box-shadow: 0 0 0 4px rgba(21, 87, 166, .10), 0 12px 30px rgba(15,47,95,.09);
+        }
+        .notice-panel {
+            background: linear-gradient(180deg, #f8fbff, #fff);
+            border-top: 1px solid rgba(15,47,95,.10);
+            color: #475569;
+        }
+        .notice-panel h3 { color: var(--srt-navy); }
+        .calc-footer {
+            background: linear-gradient(135deg, #0b2447, var(--srt-navy));
+            padding: 22px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,.10);
+        }
+        .calc-footer p { color: rgba(255,255,255,.78) !important; }
+        .calc-footer span { color: rgba(255,255,255,.52) !important; }
+        .print-note {
+            width: min(1440px, calc(100% - 32px));
+            margin: 18px auto 0;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+        @media (max-width: 1100px) {
+            .official-layout { grid-template-columns: 1fr; }
+            .official-intro-card { position: relative; top: auto; }
+            .intro-hero { min-height: auto; }
+            .intro-features { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (max-width: 680px) {
+            .official-topbar-inner { width: min(100% - 24px, 1440px); height: 64px; }
+            .brand-mini h2 { font-size: 13px; }
+            .brand-mini p { display: none; }
+            .top-pill { display: none; }
+            .official-layout { width: min(100% - 20px, 1440px); margin-top: 14px; gap: 14px; }
+            .official-intro-card, .calculator-card { border-radius: 24px; }
+            .intro-hero { padding: 22px; }
+            .intro-title { font-size: 34px; }
+            .intro-subtitle { font-size: 13px; }
+            .intro-features { grid-template-columns: 1fr 1fr; }
+            .rule-stack { padding: 14px; }
+            .calc-header { padding: 24px 22px; text-align: center; }
+            .official-logo { margin-left: auto; margin-right: auto; width: 64px; height: 64px; border-radius: 20px; }
+            .calc-body { padding: 22px 16px 22px; }
+            .notice-panel { padding: 22px 16px !important; }
+            .print-note { width: min(100% - 20px, 1440px); }
+        }
+        @media print {
+            .official-topbar, .official-intro-card, .print-note { display: none; }
+            .official-layout { display: block; width: 100%; margin: 0; }
+            .calculator-card { box-shadow: none; border-radius: 0; border: none; }
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased pb-10">
-    <div id="root"></div>
+<body class="text-slate-800 antialiased">
+    <div id="root"><div class="loading-screen">กำลังโหลดเครื่องมือคำนวณวันจองตั๋วรถไฟ...</div></div>
+    <noscript><div class="loading-screen">กรุณาเปิดใช้งาน JavaScript เพื่อใช้เครื่องมือนี้</div></noscript>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
@@ -389,16 +681,51 @@
             const formatDate = (date) => date.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
 
             return (
-                <div className="min-h-screen py-10 px-4 font-sans bg-slate-100 flex items-center justify-center">
-                    <div className="w-full max-w-xl bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
+                <div className="official-page font-sans">
+                    <header className="official-topbar">
+                        <div className="official-topbar-inner">
+                            <div className="brand-mini">
+                                <div className="brand-mark"><Train size={22} /></div>
+                                <div>
+                                    <h2>SRT Booking Calculator</h2>
+                                    <p>เครื่องมือคำนวณวันเปิดจองตั๋วล่วงหน้า</p>
+                                </div>
+                            </div>
+                            <div className="top-pill"><Clock size={15} /> เริ่มจองได้ 08.30 น.</div>
+                        </div>
+                    </header>
+
+                    <main className="official-layout">
+                        <aside className="official-intro-card">
+                            <div className="intro-hero">
+                                <div>
+                                    <div className="intro-badge">ระบบช่วยคำนวณตามเกณฑ์ 90 / 30 / 1 วัน</div>
+                                    <h1 className="intro-title">คำนวณวันจองตั๋วรถไฟล่วงหน้า</h1>
+                                    <p className="intro-subtitle">กรอกวันที่เดินทาง เลือกสายรถไฟหรือกรอกระยะทาง ระบบจะคำนวณวันแรกที่สามารถจองตั๋วได้โดยอัตโนมัติ พร้อมสรุปเปอร์เซ็นต์ระยะทางให้เข้าใจง่าย</p>
+                                </div>
+                                <div className="intro-features">
+                                    <div className="intro-feature"><strong>90 วัน</strong><span>เดินทางตั้งแต่ 60%</span></div>
+                                    <div className="intro-feature"><strong>30 วัน</strong><span>เดินทางตั้งแต่ 25%</span></div>
+                                    <div className="intro-feature"><strong>1 วัน</strong><span>เดินทางต่ำกว่า 25%</span></div>
+                                    <div className="intro-feature"><strong>08.30</strong><span>เวลาเปิดจองโดยประมาณ</span></div>
+                                </div>
+                            </div>
+                            <div className="rule-stack">
+                                <div className="rule-card"><div className="rule-dot"><Calendar size={18} /></div><div><strong>เลือกวันที่เดินทาง</strong><span>ใส่วันที่เดินทางจริงก่อนเริ่มคำนวณ</span></div></div>
+                                <div className="rule-card"><div className="rule-dot"><Train size={18} /></div><div><strong>เลือกสาย/ขบวนรถ</strong><span>ระบบช่วยจำกัดสถานีตามสายและขบวนที่เลือก</span></div></div>
+                                <div className="rule-card"><div className="rule-dot"><CheckCircle size={18} /></div><div><strong>ได้ผลลัพธ์ทันที</strong><span>แสดงวันเริ่มจองและสัดส่วนการเดินทาง</span></div></div>
+                            </div>
+                        </aside>
+
+                        <section className="calculator-card">
                         
-                        <div className="bg-gradient-to-r from-srtblue-800 to-srtblue-900 text-white p-6 shadow-md relative text-center">
-                            <img src="https://i.postimg.cc/52XWNS0X/2023-03-07-104635-007734railway-Logo.png" alt="SRT Logo" className="w-16 h-16 mx-auto mb-3 drop-shadow-lg bg-white rounded-full p-1" />
-                            <h1 className="text-xl sm:text-2xl font-black mb-1 tracking-tight text-white leading-tight">เครื่องมือคำนวณวันจองตั๋วรถไฟล่วงหน้า</h1>
-                            <p className="text-srtblue-200 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-1">(อัปเดตเกณฑ์ใหม่ 90 วัน)</p>
+                        <div className="calc-header">
+                            <img src="https://i.postimg.cc/52XWNS0X/2023-03-07-104635-007734railway-Logo.png" alt="SRT Logo" className="official-logo" />
+                            <h1 className="calc-title">เครื่องมือคำนวณวันจองตั๋วรถไฟล่วงหน้า</h1>
+                            <p className="calc-subtitle">(อัปเดตเกณฑ์ใหม่ 90 วัน)</p>
                         </div>
 
-                        <div className="p-6 space-y-6">
+                        <div className="calc-body space-y-6">
                             <div className="space-y-4">
                                 <div>
                                     <label className="text-sm font-bold text-slate-700 mb-1.5 flex items-center"><Calendar size={18} className="mr-2 text-srtblue-600" /> วันที่ต้องการเดินทาง</label>
@@ -538,7 +865,7 @@
                             </div>
                         </div>
 
-                        <div className="bg-slate-50 p-6 sm:p-8 border-t-2 border-slate-100 text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                        <div className="notice-panel p-6 sm:p-8 text-[11px] sm:text-xs leading-relaxed">
                             <h3 className="font-black text-slate-800 mb-4 flex items-center text-sm uppercase tracking-wide border-b pb-2"><Info size={18} className="mr-2 text-srtblue-600" /> ข้อมูลและระเบียบที่ควรทราบ</h3>
                             <div className="space-y-6">
                                 <ul className="space-y-3 font-medium">
@@ -562,10 +889,12 @@
                             </div>
                         </div>
 
-                        <div className="bg-srtblue-900 p-5 text-center shadow-inner">
+                        <div className="calc-footer">
                             <p className="text-[10px] sm:text-[11px] text-srtblue-200 font-bold uppercase tracking-widest leading-loose">จัดทำโดย นายพชรวิชญ์ ตุ้มวิจิตร<br/><span className="text-srtblue-400">(นายสถานีคลองบางพระ)</span></p>
                         </div>
-                    </div>
+                        </section>
+                    </main>
+                    <p className="print-note">หมายเหตุ: ข้อมูลในระบบนี้ใช้เพื่อช่วยคำนวณเบื้องต้น โปรดตรวจสอบเงื่อนไขการจำหน่ายตั๋วกับการรถไฟแห่งประเทศไทยอีกครั้งก่อนออกตั๋ว</p>
                 </div>
             );
         }
