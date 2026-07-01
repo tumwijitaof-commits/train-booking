@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>เครื่องมือคำนวณวันจองตั๋วรถไฟล่วงหน้า | SRT Booking Calculator</title>
+  <title>เครื่องมือคำนวณตั๋วรถไฟ | SRT Ticket Tools</title>
   <style>
     :root{
       --navy:#0f2f5f; --blue:#1557a6; --blue2:#1d4ed8; --gold:#c99a2e;
@@ -65,6 +65,29 @@
     .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#102033;color:#fff;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;box-shadow:0 12px 32px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;bottom:28px}
     @media(max-width:980px){.hero{grid-template-columns:1fr;padding-top:22px}.layout{grid-template-columns:1fr}.result-shell{position:relative;top:auto}.hero-card{min-height:auto}.brand-title{white-space:normal}.badge{display:none}}
     @media(max-width:640px){.topbar-inner{padding:12px 14px}.hero,.layout,.notice{padding-left:14px;padding-right:14px}.hero-card{border-radius:24px;padding:24px}.hero-stats,.grid-2,.grid-3{grid-template-columns:1fr}.panel,.notice-card{border-radius:24px}.panel-head{padding:20px}.panel-body{padding:20px}.switch{grid-template-columns:1fr}.distance-box{grid-template-columns:1fr}.distance-box .sep{display:none}.result-card{min-height:300px}.rule{border-radius:20px}}
+
+    .tool-nav{max-width:1320px;margin:22px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .tool-tab{border:1px solid var(--line);background:rgba(255,255,255,.86);box-shadow:0 12px 30px rgba(15,47,95,.08);border-radius:22px;padding:15px 18px;font:900 16px Sarabun,Tahoma,sans-serif;color:var(--navy);cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center}
+    .tool-tab:hover{transform:translateY(-1px);box-shadow:0 18px 38px rgba(15,47,95,.12)}
+    .tool-tab.active{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-color:transparent}
+    .tool-page{display:none}.tool-page.active{display:block}
+    .tool-info{max-width:1320px;margin:14px auto 0;padding:0 20px}.tool-info-card{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:22px;padding:14px 18px;font-size:13px;font-weight:850;line-height:1.55;box-shadow:0 10px 24px rgba(15,47,95,.06)}
+    .monthly-hero{max-width:1320px;margin:0 auto;padding:38px 20px 18px;display:grid;grid-template-columns:1fr .9fr;gap:22px;align-items:stretch}
+    .monthly-card{position:relative;overflow:hidden;border-radius:32px;background:linear-gradient(135deg,#7b1e22,#9f2a2f 58%,#4f1013);color:#fff;box-shadow:var(--shadow);padding:34px;min-height:330px;display:flex;flex-direction:column;justify-content:space-between}
+    .monthly-card:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 42%);transform:translate(25%,-12%)}
+    .monthly-card>*{position:relative;z-index:1}.monthly-card p{margin:0;color:#ffe4e6;font-weight:650;line-height:1.65;max-width:720px}
+    .monthly-layout{max-width:1320px;margin:0 auto;padding:16px 20px 42px;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,.9fr);gap:22px;align-items:start}
+    .monthly-result{min-height:430px;display:grid;place-items:center;text-align:center;padding:28px}
+    .price-card{width:100%;border-radius:30px;padding:7px;background:linear-gradient(180deg,#fbbf24,#c2410c);box-shadow:0 22px 48px rgba(15,47,95,.16)}
+    .price-inner{background:#fff;border-radius:24px;padding:26px;text-align:left}.price-kicker{display:inline-flex;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;margin-bottom:14px}
+    .price-main{font-size:clamp(34px,5vw,58px);line-height:1;color:#9f2a2f;font-weight:900;letter-spacing:-.04em;margin:4px 0 18px;text-align:center}.price-main small{font-size:18px;letter-spacing:0;color:#64748b}
+    .price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.price-mini{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px;text-align:center}.price-mini span{display:block;font-size:11px;color:#64748b;font-weight:900}.price-mini strong{display:block;margin-top:4px;font-size:18px;color:#0f172a;font-weight:900}
+    .formula{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:18px;padding:14px;color:#475569;font-size:12px;font-weight:800;line-height:1.6;margin-top:14px;text-align:center}
+    .warning-note{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:18px;padding:13px 14px;font-size:12px;font-weight:900;line-height:1.55;margin-top:14px;text-align:center}
+    .quick-rules{display:grid;gap:12px}.quick-rule{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 14px 32px rgba(15,47,95,.08)}.quick-rule h3{margin:0 0 6px;color:var(--navy);font-size:17px;font-weight:900}.quick-rule p{margin:0;color:#64748b;font-size:13px;font-weight:700;line-height:1.55}
+    .summary-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #e2e8f0;padding:10px 0;font-size:13px;font-weight:800;color:#475569}.summary-row:last-child{border-bottom:0}.summary-row strong{color:#0f172a;text-align:right}
+    @media(max-width:980px){.monthly-hero,.monthly-layout{grid-template-columns:1fr}.tool-nav{grid-template-columns:1fr}.monthly-card{min-height:auto}}
+    @media(max-width:640px){.tool-nav,.tool-info,.monthly-hero,.monthly-layout{padding-left:14px;padding-right:14px}.tool-tab{font-size:14px;padding:13px 12px}.monthly-card{border-radius:24px;padding:24px}.price-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -73,14 +96,23 @@
       <div class="brand">
         <div class="seal">SRT</div>
         <div>
-          <div class="brand-title">เครื่องมือคำนวณวันจองตั๋วรถไฟล่วงหน้า</div>
-          <div class="brand-sub">SRT ADVANCE BOOKING CALCULATOR</div>
+          <div class="brand-title">เครื่องมือคำนวณตั๋วรถไฟ</div>
+          <div class="brand-sub">SRT BOOKING & MONTHLY PASS TOOLS</div>
         </div>
       </div>
-      <div class="badge">เกณฑ์ 90 / 30 / 1 วัน</div>
+      <div class="badge">จองล่วงหน้า / ตั๋วเดือน</div>
     </div>
   </header>
 
+  <nav class="tool-nav" aria-label="เมนูเครื่องมือ">
+    <button type="button" id="tabBooking" class="tool-tab active" data-tool="booking">📅 คำนวณการจองตั๋วล่วงหน้า</button>
+    <button type="button" id="tabMonthly" class="tool-tab" data-tool="monthly">🎟️ คำนวณราคาตั๋วเดือน</button>
+  </nav>
+  <div class="tool-info">
+    <div class="tool-info-card">หมายเหตุ: ผลลัพธ์จากเว็บนี้เป็นการคำนวณเบื้องต้นเท่านั้น บางทีราคาอาจจะคลาดเคลื่อน ตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋วทุกครั้งครับ</div>
+  </div>
+
+  <div id="toolBooking" class="tool-page active">
   <section class="hero">
     <div class="hero-card">
       <div>
@@ -173,9 +205,123 @@
     </div>
   </section>
 
+
+  </div>
+
+  <div id="toolMonthly" class="tool-page">
+    <section class="monthly-hero">
+      <div class="monthly-card">
+        <div>
+          <div class="eyebrow">🎟️ เครื่องมือคำนวณตั๋วเดือน</div>
+          <h1>คำนวณราคาตั๋วเดือน<br>แบบเร็วและเข้าใจง่าย</h1>
+          <p>กรอกค่าโดยสารเต็มราคาแบบเที่ยวเดียว เลือกรูปแบบเดินทาง ประเภทผู้โดยสาร และระยะเวลาที่ต้องการ ระบบจะคำนวณราคาประมาณการให้ทันที</p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><strong>6</strong><span>วัน สำหรับรายสัปดาห์</span></div>
+          <div class="stat"><strong>24</strong><span>วัน สำหรับ 1 เดือน</span></div>
+          <div class="stat"><strong>72</strong><span>วัน สำหรับ 3 เดือน</span></div>
+        </div>
+      </div>
+      <div class="quick-rules">
+        <div class="quick-rule"><h3>ประชาชนทั่วไป</h3><p>คิดจากค่าโดยสารเต็มราคา × จำนวนเที่ยว × จำนวนวัน แล้วหักส่วนลดตามแพ็กเกจที่เลือก</p></div>
+        <div class="quick-rule"><h3>ผู้มีสิทธิลดครึ่งราคา</h3><p>คิด 50% ของฐานค่าโดยสารตามจำนวนวันและจำนวนเที่ยว</p></div>
+        <div class="quick-rule"><h3>นักเรียน / นักศึกษาไป-กลับ</h3><p>ใช้จำนวนวันพิเศษ 5 / 20 / 40 / 60 วัน แล้วคิด 50% ตามโค้ดเดิม</p></div>
+        <div class="quick-rule"><h3>ตรวจสอบก่อนออกตั๋ว</h3><p>บางเส้นทาง ประเภทขบวน หรือเงื่อนไขเฉพาะ อาจทำให้ราคาจริงต่างจากที่คำนวณได้</p></div>
+      </div>
+    </section>
+
+    <main class="monthly-layout">
+      <section class="panel">
+        <div class="panel-head">
+          <div><h2>กรอกข้อมูลตั๋วเดือน</h2><p>ระบบคำนวณราคาประมาณการจากค่าโดยสารเต็มราคา</p></div>
+        </div>
+        <div class="panel-body grid">
+          <div class="grid grid-2">
+            <div>
+              <label for="monthlyFare">ค่าโดยสารเต็มราคา / เที่ยวเดียว (บาท)</label>
+              <input id="monthlyFare" type="number" min="0" step="1" placeholder="เช่น 10, 12, 24, 48" />
+              <div class="hint">ใส่ราคาตั๋วเต็มราคา 1 เที่ยว ก่อนหักส่วนลด</div>
+            </div>
+            <div>
+              <label for="monthlyTrips">รูปแบบการเดินทาง</label>
+              <select id="monthlyTrips">
+                <option value="1">เที่ยวเดียว วันละ 1 เที่ยว</option>
+                <option value="2">ไป-กลับ วันละ 2 เที่ยว</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-2">
+            <div>
+              <label for="monthlyPassenger">ประเภทผู้โดยสาร</label>
+              <select id="monthlyPassenger">
+                <option value="general">ประชาชนทั่วไป</option>
+                <option value="half">ผู้มีสิทธิลดครึ่งราคา</option>
+                <option value="student">นักเรียน / นักศึกษา</option>
+              </select>
+              <div class="hint">ผู้มีสิทธิลดครึ่งราคาคิด 50%; นักเรียน/นักศึกษาแบบไป-กลับใช้วันพิเศษ 5 / 20 / 40 / 60 วัน แล้วคิด 50%</div>
+            </div>
+            <div>
+              <label for="monthlyPeriod">ระยะเวลาตั๋วเดือน</label>
+              <select id="monthlyPeriod">
+                <option value="week">รายสัปดาห์ คิด 6 วัน</option>
+                <option value="m1">ราย 1 เดือน คิด 24 วัน</option>
+                <option value="m2">ราย 2 เดือน คิด 48 วัน</option>
+                <option value="m3">ราย 3 เดือน คิด 72 วัน</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="subcard grid">
+            <div class="grid grid-2">
+              <div>
+                <label for="monthlyRoundMode">การปัดเศษราคา</label>
+                <select id="monthlyRoundMode">
+                  <option value="round">ปัดเป็นบาทใกล้ที่สุด</option>
+                  <option value="ceil">ปัดขึ้นเป็นบาท</option>
+                  <option value="none">ไม่ปัดเศษ</option>
+                </select>
+              </div>
+              <div>
+                <label for="monthlyCustomRate">ส่วนลดกำหนดเอง (ไม่บังคับ)</label>
+                <input id="monthlyCustomRate" type="number" min="0" max="100" step="1" placeholder="เช่น 25 = ลด 25%" />
+                <div class="hint">ปล่อยว่างเพื่อใช้เกณฑ์อัตโนมัติ</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="warning-note">หมายเหตุ: บางทีราคาอาจจะคลาดเคลื่อน ตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนจำหน่ายตั๋วครับ</div>
+        </div>
+      </section>
+
+      <aside class="panel result-shell">
+        <div class="panel-head">
+          <div><h2>ผลคำนวณราคาตั๋วเดือน</h2><p>ราคาโดยประมาณจากข้อมูลที่กรอก</p></div>
+        </div>
+        <div id="monthlyResult" class="monthly-result">
+          <div class="empty"><div class="big">🎟️</div><p>กรุณากรอกค่าโดยสารเต็มราคา<br>เพื่อคำนวณตั๋วเดือน</p></div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="notice">
+      <div class="notice-card">
+        <h2>เกณฑ์คำนวณที่ใช้ในระบบนี้</h2>
+        <ul>
+          <li>เที่ยวเดียว / ประชาชนทั่วไป / ผู้มีสิทธิลดครึ่งราคา: รายสัปดาห์ 6 วัน, ราย 1 เดือน 24 วัน, ราย 2 เดือน 48 วัน, ราย 3 เดือน 72 วัน</li>
+          <li>ประชาชนทั่วไป: รายสัปดาห์และ 1 เดือน คิด 75% ของฐานราคา, 2 เดือน คิด 72%, 3 เดือน คิด 70%</li>
+          <li>ผู้มีสิทธิลดครึ่งราคา: คิด 50% ของฐานราคา</li>
+          <li>นักเรียน / นักศึกษาแบบไป-กลับ: รายสัปดาห์ 5 วัน, ราย 1 เดือน 20 วัน, ราย 2 เดือน 40 วัน, ราย 3 เดือน 60 วัน แล้วคิด 50%</li>
+          <li>หากเลือกนักเรียน / นักศึกษาแบบเที่ยวเดียว ระบบจะคิด 50% ด้วยจำนวนวันปกติ</li>
+          <li><strong>โปรดตรวจสอบราคาจริงกับเจ้าหน้าที่อีกครั้ง เพราะบางกรณีราคาอาจคลาดเคลื่อนได้</strong></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
   <footer class="footer">
     <strong>จัดทำโดย นายพชรวิชญ์ ตุ้มวิจิตร</strong><br>
-    นายสถานีคลองบางพระ | เครื่องมือนี้ใช้เพื่อช่วยคำนวณเบื้องต้น โปรดตรวจสอบเงื่อนไขกับการรถไฟแห่งประเทศไทยอีกครั้งก่อนออกตั๋ว
+    นายสถานีคลองบางพระ | เครื่องมือนี้ใช้เพื่อช่วยคำนวณเบื้องต้น บางทีราคาอาจจะคลาดเคลื่อน โปรดตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋ว
   </footer>
 
   <div id="toast" class="toast"></div>
@@ -588,6 +734,109 @@ const trainSchedules = {
   initLines(); renderEmpty();
   window.addEventListener('error', (e)=>{ console.error(e.error||e.message); showToast('พบข้อผิดพลาดในหน้าเว็บ โปรดตรวจสอบ Console'); });
 })();
+
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const pages = { booking: $('toolBooking'), monthly: $('toolMonthly') };
+  const tabs = { booking: $('tabBooking'), monthly: $('tabMonthly') };
+  function showTool(name){
+    Object.keys(pages).forEach(key => {
+      if(pages[key]) pages[key].classList.toggle('active', key === name);
+      if(tabs[key]) tabs[key].classList.toggle('active', key === name);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if(tabs.booking) tabs.booking.addEventListener('click', () => showTool('booking'));
+  if(tabs.monthly) tabs.monthly.addEventListener('click', () => showTool('monthly'));
+
+  const els = {
+    fare: $('monthlyFare'), trips: $('monthlyTrips'), passenger: $('monthlyPassenger'), period: $('monthlyPeriod'),
+    roundMode: $('monthlyRoundMode'), customRate: $('monthlyCustomRate'), result: $('monthlyResult')
+  };
+  const periods = {
+    week: { label:'รายสัปดาห์', days:6, studentRoundDays:5, generalPayRate:.75, discountText:'ลด 25%' },
+    m1: { label:'ราย 1 เดือน', days:24, studentRoundDays:20, generalPayRate:.75, discountText:'ลด 25%' },
+    m2: { label:'ราย 2 เดือน', days:48, studentRoundDays:40, generalPayRate:.72, discountText:'ลด 28%' },
+    m3: { label:'ราย 3 เดือน', days:72, studentRoundDays:60, generalPayRate:.70, discountText:'ลด 30%' }
+  };
+  const passengerLabels = { general:'ประชาชนทั่วไป', half:'ผู้มีสิทธิลดครึ่งราคา', student:'นักเรียน / นักศึกษา' };
+  function updatePeriodLabels(){
+    if(!els.period) return;
+    const passenger = els.passenger?.value || 'general';
+    const trips = parseInt(els.trips?.value || '1', 10);
+    const useStudentRoundDays = passenger === 'student' && trips === 2;
+    Object.entries(periods).forEach(([key, info]) => {
+      const opt = els.period.querySelector(`option[value="${key}"]`);
+      if(opt){
+        const days = useStudentRoundDays ? info.studentRoundDays : info.days;
+        opt.textContent = `${info.label} คิด ${days} วัน`;
+      }
+    });
+  }
+  function money(v){ return Number(v).toLocaleString('th-TH', { minimumFractionDigits: (Number.isInteger(v)?0:2), maximumFractionDigits: 2 }); }
+  function empty(){ if(els.result) els.result.innerHTML = '<div class="empty"><div class="big">🎟️</div><p>กรุณากรอกค่าโดยสารเต็มราคา<br>เพื่อคำนวณตั๋วเดือน</p></div>'; }
+  function applyRound(v){
+    const mode = els.roundMode?.value || 'round';
+    if(mode === 'ceil') return Math.ceil(v);
+    if(mode === 'none') return Math.round(v * 100) / 100;
+    return Math.round(v);
+  }
+  function calcMonthly(){
+    updatePeriodLabels();
+    if(!els.result) return;
+    const fare = parseFloat(els.fare?.value || '');
+    const trips = parseInt(els.trips?.value || '1', 10);
+    const passenger = els.passenger?.value || 'general';
+    const period = periods[els.period?.value || 'week'];
+    if(!Number.isFinite(fare) || fare <= 0){ empty(); return; }
+
+    // ใช้ตรรกะเดิมที่คำนวณถูกต้อง:
+    // - ประชาชนทั่วไป / ผู้มีสิทธิลดครึ่งราคา ใช้วันปกติ 6 / 24 / 48 / 72
+    // - นักเรียน / นักศึกษา แบบไป-กลับ ใช้วันพิเศษ 5 / 20 / 40 / 60 แล้วคิด 50%
+    const isStudentRoundTrip = passenger === 'student' && trips === 2;
+    const calcDays = isStudentRoundTrip ? period.studentRoundDays : period.days;
+    const dayNote = isStudentRoundTrip ? ' วัน (นักเรียน/นักศึกษาไป-กลับ)' : ' วัน';
+    const base = fare * trips * calcDays;
+
+    let payRate = passenger === 'general' ? period.generalPayRate : .50;
+    let discountLabel = passenger === 'general' ? period.discountText : 'คิด 50%';
+    const customDiscount = parseFloat(els.customRate?.value || '');
+    if(Number.isFinite(customDiscount) && customDiscount >= 0 && customDiscount <= 100){
+      payRate = (100 - customDiscount) / 100;
+      discountLabel = 'ลดกำหนดเอง ' + customDiscount + '%';
+    }
+    const finalPrice = applyRound(base * payRate);
+    const saving = Math.max(0, base - finalPrice);
+    const avgPerDay = finalPrice / calcDays;
+    const avgPerTrip = finalPrice / (calcDays * trips);
+    const tripText = trips === 2 ? 'ไป-กลับ วันละ 2 เที่ยว' : 'เที่ยวเดียว วันละ 1 เที่ยว';
+    const ruleNote = isStudentRoundTrip ? 'ใช้เกณฑ์นักเรียน/นักศึกษาไป-กลับจากโค้ดเดิม' : 'ใช้จำนวนวันปกติ';
+    els.result.innerHTML = `
+      <div class="price-card"><div class="price-inner">
+        <div class="price-kicker">${period.label} • ${passengerLabels[passenger]} • ${tripText}</div>
+        <div class="price-main">${money(finalPrice)} <small>บาท</small></div>
+        <div class="summary-row"><span>ฐานราคาก่อนส่วนลด</span><strong>${money(base)} บาท</strong></div>
+        <div class="summary-row"><span>เกณฑ์ที่ใช้</span><strong>${calcDays}${dayNote} / ${discountLabel}</strong></div>
+        <div class="summary-row"><span>หมายเหตุสูตร</span><strong>${ruleNote}</strong></div>
+        <div class="summary-row"><span>ประหยัดโดยประมาณ</span><strong>${money(saving)} บาท</strong></div>
+        <div class="price-grid">
+          <div class="price-mini"><span>เฉลี่ยต่อวัน</span><strong>${money(avgPerDay)} บาท</strong></div>
+          <div class="price-mini"><span>เฉลี่ยต่อเที่ยว</span><strong>${money(avgPerTrip)} บาท</strong></div>
+        </div>
+        <div class="formula">สูตร: ค่าโดยสารเต็มราคา ${money(fare)} × ${trips} เที่ยว/วัน × ${calcDays} วัน × อัตราที่ต้องจ่าย ${(payRate*100).toFixed(0)}%</div>
+        <div class="warning-note">ราคาเป็นเพียงการคำนวณเบื้องต้น บางทีราคาอาจจะคลาดเคลื่อน ตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋วครับ</div>
+      </div></div>`;
+  }
+  ['fare','trips','passenger','period','roundMode','customRate'].forEach(key => {
+    if(els[key]){
+      els[key].addEventListener('input', calcMonthly);
+      els[key].addEventListener('change', calcMonthly);
+    }
+  });
+  updatePeriodLabels();
+  empty();
+})();
+
 </script>
 </body>
 </html>
