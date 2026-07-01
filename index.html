@@ -1,841 +1,416 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>เครื่องมือคำนวณตั๋วรถไฟ | SRT Ticket Tools</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>เครื่องคำนวณตั๋วเหมาจ่ายรายสัปดาห์ / รายเดือน - สูตรใบแทรก 692</title>
   <style>
     :root{
-      --navy:#0f2f5f; --blue:#1557a6; --blue2:#1d4ed8; --gold:#c99a2e;
-      --red:#7b1e22; --green:#047857; --ink:#102033; --muted:#64748b;
-      --bg:#f5f8fc; --card:#ffffff; --line:rgba(15,47,95,.12);
-      --shadow:0 24px 70px rgba(15,47,95,.14); --radius:24px;
+      --maroon:#800000;
+      --maroon2:#a61b1b;
+      --gold:#f3c86a;
+      --cream:#fff8ef;
+      --ink:#241313;
+      --muted:#7a6767;
+      --line:#ead8c8;
+      --card:#ffffffd9;
+      --green:#137a42;
+      --red:#b3261e;
+      --shadow:0 22px 55px rgba(72, 16, 16, .18);
+      --radius:24px;
     }
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
     body{
-      margin:0; min-height:100vh; font-family:Sarabun, Tahoma, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      color:var(--ink); background:
-        radial-gradient(circle at 10% 6%, rgba(21,87,166,.16), transparent 28%),
-        radial-gradient(circle at 90% 10%, rgba(201,154,46,.14), transparent 26%),
-        linear-gradient(135deg,#fbfdff 0%,#edf5ff 44%,#f8fafc 100%);
-      overflow-x:hidden;
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(243,200,106,.45), transparent 34rem),
+        radial-gradient(circle at 80% 12%, rgba(128,0,0,.16), transparent 30rem),
+        linear-gradient(135deg,#fff7ec 0%,#fff 42%,#fff3e2 100%);
+      min-height:100vh;
     }
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;background-image:linear-gradient(rgba(15,47,95,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,47,95,.035) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,#000 0%,transparent 78%)}
-    a{color:inherit}
-    .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-    .topbar-inner{max-width:1320px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0}
-    .seal{width:44px;height:44px;border-radius:999px;background:linear-gradient(135deg,var(--navy),var(--blue));display:grid;place-items:center;color:white;font-weight:900;box-shadow:0 10px 22px rgba(15,47,95,.22);border:2px solid rgba(255,255,255,.9);flex:none}
-    .brand-title{font-size:16px;font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .brand-sub{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;letter-spacing:.04em}
-    .badge{display:inline-flex;align-items:center;gap:8px;background:#fff7e5;border:1px solid rgba(201,154,46,.34);color:#8a640f;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:900;white-space:nowrap}
-    .hero{max-width:1320px;margin:0 auto;padding:38px 20px 18px;display:grid;grid-template-columns:1.02fr .98fr;gap:22px;align-items:stretch}
-    .hero-card{position:relative;overflow:hidden;border-radius:32px;background:linear-gradient(135deg,var(--navy),#123e7d 62%,#0b2248);color:#fff;box-shadow:var(--shadow);padding:34px;min-height:330px;display:flex;flex-direction:column;justify-content:space-between}
-    .hero-card:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,255,255,.13),transparent 42%);transform:translate(30%,-10%)}
-    .hero-card>*{position:relative;z-index:1}
-    .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;width:max-content;backdrop-filter:blur(10px)}
-    h1{font-size:clamp(30px,4vw,58px);line-height:1.04;margin:22px 0 14px;letter-spacing:-.04em;font-weight:900}
-    .hero p{margin:0;color:#dbeafe;font-weight:600;line-height:1.65;max-width:680px}
-    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px}
-    .stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:14px 12px;backdrop-filter:blur(10px)}
-    .stat strong{display:block;font-size:22px;color:white;line-height:1;font-weight:900}.stat span{font-size:11px;color:#bfdbfe;font-weight:800}
-    .rule-panel{display:grid;gap:14px}
-    .rule{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 14px 32px rgba(15,47,95,.08);display:flex;gap:14px;align-items:flex-start}
-    .rule-icon{width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:24px;flex:none}.r1{background:#e8fff5}.r2{background:#eaf3ff}.r3{background:#f1f5f9}
-    .rule h3{margin:0 0 4px;font-size:18px;font-weight:900;color:var(--navy)}.rule p{margin:0;font-size:13px;color:var(--muted);font-weight:600;line-height:1.55}
-    .layout{max-width:1320px;margin:0 auto;padding:16px 20px 42px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:22px;align-items:start}
-    .panel{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:32px;box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(14px)}
-    .panel-head{padding:24px 26px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.74))}
-    .panel-head h2{margin:0;font-size:21px;font-weight:900;color:var(--navy);letter-spacing:-.02em}.panel-head p{margin:3px 0 0;font-size:12px;color:var(--muted);font-weight:700}
-    .panel-body{padding:26px}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-    label{display:block;font-size:12px;font-weight:900;color:#334155;margin:0 0 7px}.hint{font-size:11px;color:var(--muted);font-weight:700;margin-top:6px;line-height:1.55}
-    input,select{width:100%;border:2px solid #dbe5f2;border-radius:16px;background:#fff;padding:13px 14px;font:800 15px Sarabun,Tahoma,sans-serif;color:var(--ink);outline:none;transition:.18s;box-shadow:0 6px 14px rgba(15,47,95,.04)}
-    input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(21,87,166,.12),0 8px 18px rgba(15,47,95,.06)}
-    .switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#eef4fb;border:1px solid #dbeafe;border-radius:20px;padding:7px}
-    .switch button{border:0;border-radius:15px;padding:12px 10px;background:transparent;color:#64748b;font:900 14px Sarabun,Tahoma,sans-serif;cursor:pointer;transition:.18s}.switch button.active{background:#fff;color:var(--blue);box-shadow:0 8px 18px rgba(15,47,95,.1)}
-    .subcard{background:#f8fbff;border:1px solid #dbeafe;border-radius:24px;padding:18px}.hidden{display:none!important}.divider{height:1px;background:var(--line);margin:18px 0}
-    .distance-box{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center;background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:14px;margin-top:12px}.distance-box strong{font-size:18px;color:var(--blue)}.distance-box span{font-size:11px;color:var(--muted);font-weight:900}
-    .result-shell{position:sticky;top:88px}.result-card{min-height:360px;display:grid;place-items:center;text-align:center;padding:28px}.empty{color:#94a3b8}.empty .big{font-size:58px;opacity:.34;margin-bottom:10px}.empty p{font-weight:800;line-height:1.65;margin:0}
-    .error{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:22px;padding:18px;text-align:left;font-weight:900;line-height:1.55}.east{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:28px;padding:26px;width:100%}.east .icon{font-size:58px;margin-bottom:12px}.east h3{font-size:28px;margin:0 0 6px;font-weight:900}.east .main{background:#fff;border:1px solid #fed7aa;border-radius:22px;padding:20px;margin-top:18px;font-size:23px;font-weight:900;color:#c2410c}
-    .booking{border-radius:30px;padding:7px;width:100%;box-shadow:0 22px 48px rgba(15,47,95,.17)}.booking.green{background:linear-gradient(180deg,#34d399,#059669)}.booking.blue{background:linear-gradient(180deg,#60a5fa,#2563eb)}.booking.gray{background:linear-gradient(180deg,#94a3b8,#475569)}
-    .booking-inner{background:#fff;border-radius:24px;padding:28px}.pill{display:inline-flex;justify-content:center;align-items:center;background:#f1f5f9;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;color:#475569;margin-bottom:14px}.days{font-size:clamp(34px,5vw,56px);line-height:1;margin:4px 0 18px;font-weight:900;letter-spacing:-.04em}.days.green{color:#059669}.days.blue{color:#2563eb}.days.gray{color:#475569}
-    .datebox{background:#f8fafc;border:1px solid #e2e8f0;border-radius:22px;padding:20px}.datebox .label{font-size:11px;color:#64748b;font-weight:900;letter-spacing:.03em}.datebox .date{font-size:clamp(22px,3vw,32px);font-weight:900;color:#0f172a;margin:8px 0}.time{background:#eaf3ff;border:1px solid #bfdbfe;color:var(--blue);border-radius:15px;padding:11px 12px;font-size:13px;font-weight:900;margin-top:14px}
-    .notice{max-width:1320px;margin:0 auto 48px;padding:0 20px}.notice-card{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:30px;box-shadow:0 16px 44px rgba(15,47,95,.08);padding:24px}.notice h2{margin:0 0 14px;color:var(--navy);font-size:19px;font-weight:900}.notice ul{margin:0;padding-left:20px;display:grid;gap:9px;color:#475569;font-size:13px;font-weight:650;line-height:1.65}.footer{text-align:center;padding:28px 20px 46px;background:#0b2248;color:#bfdbfe;font-size:12px;font-weight:800;line-height:1.8}.footer strong{color:white}
-    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#102033;color:#fff;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;box-shadow:0 12px 32px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;bottom:28px}
-    @media(max-width:980px){.hero{grid-template-columns:1fr;padding-top:22px}.layout{grid-template-columns:1fr}.result-shell{position:relative;top:auto}.hero-card{min-height:auto}.brand-title{white-space:normal}.badge{display:none}}
-    @media(max-width:640px){.topbar-inner{padding:12px 14px}.hero,.layout,.notice{padding-left:14px;padding-right:14px}.hero-card{border-radius:24px;padding:24px}.hero-stats,.grid-2,.grid-3{grid-template-columns:1fr}.panel,.notice-card{border-radius:24px}.panel-head{padding:20px}.panel-body{padding:20px}.switch{grid-template-columns:1fr}.distance-box{grid-template-columns:1fr}.distance-box .sep{display:none}.result-card{min-height:300px}.rule{border-radius:20px}}
-
-    .tool-nav{max-width:1320px;margin:22px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .tool-tab{border:1px solid var(--line);background:rgba(255,255,255,.86);box-shadow:0 12px 30px rgba(15,47,95,.08);border-radius:22px;padding:15px 18px;font:900 16px Sarabun,Tahoma,sans-serif;color:var(--navy);cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center}
-    .tool-tab:hover{transform:translateY(-1px);box-shadow:0 18px 38px rgba(15,47,95,.12)}
-    .tool-tab.active{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-color:transparent}
-    .tool-page{display:none}.tool-page.active{display:block}
-    .tool-info{max-width:1320px;margin:14px auto 0;padding:0 20px}.tool-info-card{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:22px;padding:14px 18px;font-size:13px;font-weight:850;line-height:1.55;box-shadow:0 10px 24px rgba(15,47,95,.06)}
-    .monthly-hero{max-width:1320px;margin:0 auto;padding:38px 20px 18px;display:grid;grid-template-columns:1fr .9fr;gap:22px;align-items:stretch}
-    .monthly-card{position:relative;overflow:hidden;border-radius:32px;background:linear-gradient(135deg,#7b1e22,#9f2a2f 58%,#4f1013);color:#fff;box-shadow:var(--shadow);padding:34px;min-height:330px;display:flex;flex-direction:column;justify-content:space-between}
-    .monthly-card:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 42%);transform:translate(25%,-12%)}
-    .monthly-card>*{position:relative;z-index:1}.monthly-card p{margin:0;color:#ffe4e6;font-weight:650;line-height:1.65;max-width:720px}
-    .monthly-layout{max-width:1320px;margin:0 auto;padding:16px 20px 42px;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,.9fr);gap:22px;align-items:start}
-    .monthly-result{min-height:430px;display:grid;place-items:center;text-align:center;padding:28px}
-    .price-card{width:100%;border-radius:30px;padding:7px;background:linear-gradient(180deg,#fbbf24,#c2410c);box-shadow:0 22px 48px rgba(15,47,95,.16)}
-    .price-inner{background:#fff;border-radius:24px;padding:26px;text-align:left}.price-kicker{display:inline-flex;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;margin-bottom:14px}
-    .price-main{font-size:clamp(34px,5vw,58px);line-height:1;color:#9f2a2f;font-weight:900;letter-spacing:-.04em;margin:4px 0 18px;text-align:center}.price-main small{font-size:18px;letter-spacing:0;color:#64748b}
-    .price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.price-mini{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px;text-align:center}.price-mini span{display:block;font-size:11px;color:#64748b;font-weight:900}.price-mini strong{display:block;margin-top:4px;font-size:18px;color:#0f172a;font-weight:900}
-    .formula{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:18px;padding:14px;color:#475569;font-size:12px;font-weight:800;line-height:1.6;margin-top:14px;text-align:center}
-    .warning-note{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:18px;padding:13px 14px;font-size:12px;font-weight:900;line-height:1.55;margin-top:14px;text-align:center}
-    .quick-rules{display:grid;gap:12px}.quick-rule{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 14px 32px rgba(15,47,95,.08)}.quick-rule h3{margin:0 0 6px;color:var(--navy);font-size:17px;font-weight:900}.quick-rule p{margin:0;color:#64748b;font-size:13px;font-weight:700;line-height:1.55}
-    .summary-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #e2e8f0;padding:10px 0;font-size:13px;font-weight:800;color:#475569}.summary-row:last-child{border-bottom:0}.summary-row strong{color:#0f172a;text-align:right}
-    @media(max-width:980px){.monthly-hero,.monthly-layout{grid-template-columns:1fr}.tool-nav{grid-template-columns:1fr}.monthly-card{min-height:auto}}
-    @media(max-width:640px){.tool-nav,.tool-info,.monthly-hero,.monthly-layout{padding-left:14px;padding-right:14px}.tool-tab{font-size:14px;padding:13px 12px}.monthly-card{border-radius:24px;padding:24px}.price-grid{grid-template-columns:1fr}}
+    .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 46px}
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:32px;
+      padding:30px;
+      background:
+        linear-gradient(135deg,rgba(128,0,0,.96),rgba(128,0,0,.78)),
+        linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,0));
+      color:#fff;
+      box-shadow:var(--shadow);
+    }
+    .hero:after{
+      content:"";
+      position:absolute;right:-110px;top:-140px;width:360px;height:360px;border-radius:50%;
+      background:rgba(255,255,255,.11);
+      box-shadow:-95px 120px 0 rgba(255,255,255,.07);
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 13px;border-radius:999px;
+      background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.24);
+      font-size:14px;font-weight:700;letter-spacing:.1px;
+    }
+    h1{margin:16px 0 8px;font-size:clamp(28px,4vw,46px);line-height:1.08;letter-spacing:-.7px}
+    .lead{max-width:840px;margin:0;color:#ffeeda;font-size:17px;line-height:1.75}
+    .grid{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:18px;margin-top:18px}
+    .card{
+      background:var(--card);backdrop-filter:blur(8px);
+      border:1px solid rgba(234,216,200,.85);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:0 16px 40px rgba(90,24,24,.10);
+    }
+    .card h2{margin:0 0 14px;font-size:22px;color:var(--maroon)}
+    .form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .field{display:flex;flex-direction:column;gap:7px}
+    label{font-weight:800;font-size:14px;color:#4a2020}
+    input,select{
+      width:100%;border:1px solid var(--line);border-radius:16px;background:#fff;
+      padding:13px 14px;font-size:16px;color:var(--ink);outline:none;
+      transition:.18s ease;
+    }
+    input:focus,select:focus{border-color:var(--maroon);box-shadow:0 0 0 4px rgba(128,0,0,.10)}
+    .full{grid-column:1/-1}
+    .hint{font-size:13px;color:var(--muted);line-height:1.45}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{
+      border:0;border-radius:16px;padding:13px 16px;font-weight:900;font-size:15px;cursor:pointer;
+      transition:.18s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .primary{background:linear-gradient(135deg,var(--maroon),var(--maroon2));color:#fff;box-shadow:0 10px 22px rgba(128,0,0,.22)}
+    .primary:hover{transform:translateY(-1px)}
+    .ghost{background:#fff;color:var(--maroon);border:1px solid var(--line)}
+    .resultBox{
+      min-height:100%;display:flex;flex-direction:column;gap:14px;
+      background:linear-gradient(180deg,#fff,#fff8ef);
+    }
+    .priceCard{
+      border-radius:22px;background:#fff;border:1px solid var(--line);padding:18px;
+    }
+    .priceLabel{font-size:14px;color:var(--muted);font-weight:800}
+    .price{font-size:clamp(34px,5vw,52px);line-height:1.05;font-weight:1000;color:var(--maroon);letter-spacing:-1px;margin-top:6px}
+    .formula{
+      background:#fff7eb;border:1px dashed #d9b98a;border-radius:18px;padding:13px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      line-height:1.7;font-size:14px;white-space:pre-wrap;color:#4b2a13;
+    }
+    .pillrow{display:flex;flex-wrap:wrap;gap:8px}
+    .pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 11px;font-size:13px;color:#553838;font-weight:750}
+    .saving{color:var(--green);font-weight:1000}
+    .warn{color:var(--red);font-weight:850}
+    table{width:100%;border-collapse:collapse;border-radius:18px;overflow:hidden;background:#fff;border:1px solid var(--line)}
+    th,td{padding:12px 11px;border-bottom:1px solid #f1e4d8;text-align:left;vertical-align:top;font-size:14px}
+    th{background:#fff4e6;color:#5c2525;font-weight:900}
+    tr:last-child td{border-bottom:0}
+    .note{background:#fff;border-left:5px solid var(--gold);border-radius:16px;padding:14px 15px;color:#5a4646;line-height:1.65;font-size:14px}
+    .sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 10px}
+    .sectionTitle h2{margin:0;font-size:22px;color:var(--maroon)}
+    .tableWrap{overflow:auto;border-radius:20px}
+    .small{font-size:12.5px;color:var(--muted);line-height:1.55}
+    .footer{margin-top:16px;text-align:center;color:#7a6767;font-size:13px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}.form{grid-template-columns:1fr}.hero{padding:24px}.wrap{padding:16px 12px 34px}}
+    @media print{
+      body{background:#fff}.wrap{max-width:none;padding:0}.hero,.card{box-shadow:none}.btns,.formula button{display:none!important}
+      .grid{grid-template-columns:1fr 1fr}.card{break-inside:avoid}
+    }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="seal">SRT</div>
-        <div>
-          <div class="brand-title">เครื่องมือคำนวณตั๋วรถไฟ</div>
-          <div class="brand-sub">SRT BOOKING & MONTHLY PASS TOOLS</div>
-        </div>
-      </div>
-      <div class="badge">จองล่วงหน้า / ตั๋วเดือน</div>
-    </div>
-  </header>
-
-  <nav class="tool-nav" aria-label="เมนูเครื่องมือ">
-    <button type="button" id="tabBooking" class="tool-tab active" data-tool="booking">📅 คำนวณการจองตั๋วล่วงหน้า</button>
-    <button type="button" id="tabMonthly" class="tool-tab" data-tool="monthly">🎟️ คำนวณราคาตั๋วเดือน</button>
-  </nav>
-  <div class="tool-info">
-    <div class="tool-info-card">หมายเหตุ: ผลลัพธ์จากเว็บนี้เป็นการคำนวณเบื้องต้นเท่านั้น บางทีราคาอาจจะคลาดเคลื่อน ตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋วทุกครั้งครับ</div>
-  </div>
-
-  <div id="toolBooking" class="tool-page active">
-  <section class="hero">
-    <div class="hero-card">
-      <div>
-        <div class="eyebrow">🚆 ระบบช่วยคำนวณเบื้องต้น</div>
-        <h1>คำนวณวันเริ่มจองตั๋ว<br>ได้รวดเร็วและแม่นยำขึ้น</h1>
-        <p>เลือกสายทาง ขบวนรถ และสถานีที่เดินทาง หรือกรอกระยะทางด้วยตนเอง ระบบจะคำนวณสัดส่วนการเดินทางและวันจองล่วงหน้าให้อัตโนมัติ</p>
-      </div>
-      <div class="hero-stats">
-        <div class="stat"><strong>90</strong><span>วัน เมื่อเดินทาง ≥ 60%</span></div>
-        <div class="stat"><strong>30</strong><span>วัน เมื่อเดินทาง ≥ 25%</span></div>
-        <div class="stat"><strong>1</strong><span>วัน เมื่อเดินทาง &lt; 25%</span></div>
-      </div>
-    </div>
-    <div class="rule-panel">
-      <div class="rule"><div class="rule-icon r1">✅</div><div><h3>จองล่วงหน้า 90 วัน</h3><p>เมื่อระยะทางเดินทางจริงตั้งแต่ 60% ขึ้นไปของระยะทางขบวนรถ</p></div></div>
-      <div class="rule"><div class="rule-icon r2">📅</div><div><h3>จองล่วงหน้า 30 วัน</h3><p>เมื่อระยะทางเดินทางจริงตั้งแต่ 25% แต่ไม่ถึง 60% ของระยะทางขบวนรถ</p></div></div>
-      <div class="rule"><div class="rule-icon r3">🎫</div><div><h3>จองล่วงหน้า 1 วัน</h3><p>เมื่อระยะทางเดินทางจริงน้อยกว่า 25% ของระยะทางขบวนรถ</p></div></div>
-    </div>
-  </section>
-
-  <main class="layout">
-    <section class="panel">
-      <div class="panel-head">
-        <div><h2>กรอกข้อมูลการเดินทาง</h2><p>ระบบคำนวณให้อัตโนมัติเมื่อข้อมูลครบ</p></div>
-      </div>
-      <div class="panel-body grid">
-        <div>
-          <label for="travelDate">วันที่ต้องการเดินทาง</label>
-          <input id="travelDate" type="date" />
-          <div class="hint">ระบบจะนับย้อนหลังจากวันที่เดินทางตามจำนวนวันที่จองล่วงหน้า</div>
-        </div>
-
-        <div class="switch" role="tablist" aria-label="เลือกวิธีกรอกข้อมูล">
-          <button id="modeStation" class="active" type="button">เลือกจากสถานี</button>
-          <button id="modeManual" type="button">กรอกระยะทางเอง</button>
-        </div>
-
-        <div id="stationMode" class="subcard grid">
-          <div class="grid grid-2">
-            <div><label for="selectedLine">สายทาง</label><select id="selectedLine"><option value="">- เลือกสายทาง -</option></select></div>
-            <div><label for="selectedTrain">ขบวนรถ</label><select id="selectedTrain"><option value="">ไม่ระบุขบวน / เลือกเอง</option></select></div>
-          </div>
-
-          <div id="trainManualBox" class="grid grid-2">
-            <div><label for="trainOrigin">ต้นทางของขบวนรถ</label><select id="trainOrigin"><option value="">- เลือก -</option></select></div>
-            <div><label for="trainDest">ปลายทางของขบวนรถ</label><select id="trainDest"><option value="">- เลือก -</option></select></div>
-          </div>
-
-          <div class="divider"></div>
-          <div class="grid grid-2">
-            <div><label for="passOrigin">สถานีขึ้นของผู้โดยสาร</label><select id="passOrigin"><option value="">- เลือก -</option></select></div>
-            <div><label for="passDest">สถานีลงของผู้โดยสาร</label><select id="passDest"><option value="">- เลือก -</option></select></div>
-          </div>
-          <div id="distanceBox" class="distance-box hidden">
-            <div><span>ระยะทางขบวนรถ</span><strong id="showTotal">-</strong></div>
-            <div class="sep">|</div>
-            <div><span>ระยะทางเดินทางจริง</span><strong id="showPassenger">-</strong></div>
-          </div>
-        </div>
-
-        <div id="manualMode" class="subcard grid hidden">
-          <div class="grid grid-2">
-            <div><label for="totalDistance">ระยะทางวิ่งทั้งหมดของขบวนรถ (กม.)</label><input id="totalDistance" type="number" min="0" step="1" placeholder="เช่น 751" /></div>
-            <div><label for="passengerDistance">ระยะทางเดินทางจริงของผู้โดยสาร (กม.)</label><input id="passengerDistance" type="number" min="0" step="1" placeholder="เช่น 480" /></div>
-          </div>
-          <div class="hint">ใช้กรณีต้องการคำนวณเอง หรือกรณีสายทาง/สถานียังไม่มีในรายการ</div>
-        </div>
-      </div>
+  <main class="wrap">
+    <section class="hero">
+      <span class="badge">🚉 เริ่มใช้ตั้งแต่ 1 กรกฎาคม 2569</span>
+      <h1>เครื่องคำนวณตั๋วเหมาจ่าย<br>รายสัปดาห์ / 1 เดือน / 2 เดือน / 3 เดือน</h1>
+      <p class="lead">กรอกค่าโดยสารเต็มราคา “ต่อเที่ยว” จากต้นทางถึงปลายทาง แล้วเลือกประเภทบัตร ระยะเวลา และกลุ่มผู้โดยสาร ระบบจะคำนวณตามหลักเกณฑ์ใหม่ให้อัตโนมัติ</p>
     </section>
 
-    <aside class="panel result-shell">
-      <div class="panel-head">
-        <div><h2>ผลการคำนวณ</h2><p>แสดงวันเริ่มจองตั๋วและสัดส่วนการเดินทาง</p></div>
+    <section class="grid">
+      <div class="card">
+        <h2>คำนวณราคา</h2>
+        <div class="form">
+          <div class="field full">
+            <label for="fare">ค่าโดยสารเต็มราคา ต่อ 1 เที่ยว (บาท)</label>
+            <input id="fare" type="number" inputmode="decimal" min="0" step="0.01" placeholder="เช่น 4, 8, 10, 15" />
+            <div class="hint">ใช้ราคาตั๋วเต็มตามระยะทาง 1 เที่ยวเท่านั้น ถ้าเลือก “ไป-กลับ” ระบบจะคูณ 2 ให้เอง</div>
+          </div>
+
+          <div class="field">
+            <label for="ticketType">ประเภทบัตร</label>
+            <select id="ticketType">
+              <option value="oneway">เที่ยวเดียว — เดินทางวันละ 1 เที่ยว</option>
+              <option value="roundtrip">เที่ยวไป-กลับ — เดินทางวันละ 2 เที่ยว</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="passenger">กลุ่มผู้โดยสาร</label>
+            <select id="passenger">
+              <option value="general">ประชาชนทั่วไป</option>
+              <option value="half">ผู้มีสิทธิลดครึ่งราคาเป็นประจำ</option>
+              <option value="student">นักเรียน-นักศึกษา อายุไม่เกิน 25 ปี</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="duration">ระยะเวลาบัตร</label>
+            <select id="duration">
+              <option value="week">รายสัปดาห์</option>
+              <option value="m1">ราย 1 เดือน</option>
+              <option value="m2">ราย 2 เดือน</option>
+              <option value="m3">ราย 3 เดือน</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="startDate">วันเริ่มใช้บัตร</label>
+            <input id="startDate" type="date" />
+            <div class="hint">ใช้เพื่อช่วยแสดงช่วงวันใช้งาน</div>
+          </div>
+
+          <div class="field full">
+            <label>การยกเศษสตางค์ตามใบแทรก 692</label>
+            <div class="note" style="margin:0">
+              ระบบนี้ยกเศษเฉพาะขั้นสุดท้ายเท่านั้น: เศษต่ำกว่า 50 สตางค์ตัดทิ้ง และตั้งแต่ 50 สตางค์ขึ้นไปยกเป็น 1 บาท
+            </div>
+            <div class="hint">จุดนี้สำคัญ เพราะถ้าปัดเศษคนละแบบกับระบบขายตั๋ว ราคาจะคลาดเคลื่อนได้</div>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="primary" id="calcBtn">คำนวณราคา</button>
+          <button class="ghost" id="copyBtn">คัดลอกผลลัพธ์</button>
+          <button class="ghost" onclick="window.print()">พิมพ์ / บันทึก PDF</button>
+        </div>
+        <p class="small">หมายเหตุ: เครื่องมือนี้คำนวณจากค่าโดยสารเต็มต่อ 1 เที่ยวตามชั้นที่นั่ง แล้วคูณตามจำนวนเที่ยว จำนวนวันที่คิด อัตราร้อยละ และยกเศษครั้งสุดท้ายตามใบแทรก 692</p>
       </div>
-      <div id="result" class="result-card">
-        <div class="empty"><div class="big">🧮</div><p>กรุณาระบุข้อมูลให้ครบถ้วน<br>เพื่อคำนวณวันจองให้อัตโนมัติ</p></div>
-      </div>
-    </aside>
+
+      <aside class="card resultBox">
+        <div class="priceCard">
+          <div class="priceLabel">ราคาบัตรที่ต้องชำระ</div>
+          <div class="price" id="price">— บาท</div>
+        </div>
+        <div class="pillrow" id="summaryPills">
+          <span class="pill">กรอกข้อมูลแล้วกดคำนวณ</span>
+        </div>
+        <div class="formula" id="formula">สูตรจะแสดงที่นี่</div>
+        <div class="note" id="note">บัตรสามารถใช้ได้ทุกวันตามช่วงวันใช้งาน ช่วยประหยัดเวลา ไม่ต้องต่อแถวซื้อตั๋วทุกวัน และควรเคลือบตั๋วเดือนเพื่อสะดวกในการเก็บรักษา</div>
+      </aside>
+    </section>
+
+    <section class="sectionTitle">
+      <h2>ตารางหลักเกณฑ์ที่ระบบใช้คำนวณ</h2>
+    </section>
+    <div class="tableWrap card" style="padding:0">
+      <table>
+        <thead>
+          <tr>
+            <th>ประเภทบัตร</th>
+            <th>ระยะเวลา</th>
+            <th>ประชาชนทั่วไป</th>
+            <th>ผู้มีสิทธิลดครึ่งราคา</th>
+            <th>นักเรียน-นักศึกษา</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td rowspan="4"><b>เที่ยวเดียว</b><br><span class="small">วันละ 1 เที่ยว</span></td><td>รายสัปดาห์</td><td>6 วัน × 75%</td><td>6 วัน × 50%</td><td>—</td></tr>
+          <tr><td>ราย 1 เดือน</td><td>24 วัน × 75%</td><td>24 วัน × 50%</td><td>—</td></tr>
+          <tr><td>ราย 2 เดือน</td><td>48 วัน × 72%</td><td>48 วัน × 50%</td><td>—</td></tr>
+          <tr><td>ราย 3 เดือน</td><td>72 วัน × 70%</td><td>72 วัน × 50%</td><td>—</td></tr>
+          <tr><td rowspan="4"><b>เที่ยวไป-กลับ</b><br><span class="small">วันละ 2 เที่ยว</span></td><td>รายสัปดาห์</td><td>6 วัน × 2 เที่ยว × 75%</td><td>6 วัน × 2 เที่ยว × 50%</td><td>5 วัน × 2 เที่ยว × 50%</td></tr>
+          <tr><td>ราย 1 เดือน</td><td>24 วัน × 2 เที่ยว × 75%</td><td>24 วัน × 2 เที่ยว × 50%</td><td>20 วัน × 2 เที่ยว × 50%</td></tr>
+          <tr><td>ราย 2 เดือน</td><td>48 วัน × 2 เที่ยว × 72%</td><td>48 วัน × 2 เที่ยว × 50%</td><td>40 วัน × 2 เที่ยว × 47%</td></tr>
+          <tr><td>ราย 3 เดือน</td><td>72 วัน × 2 เที่ยว × 70%</td><td>72 วัน × 2 เที่ยว × 50%</td><td>60 วัน × 2 เที่ยว × 45%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">จัดทำสำหรับงานประชาสัมพันธ์ / ตรวจสอบราคาตั๋วเหมาจ่ายรายเดือน • สูตรปรับตามใบแทรก 692</div>
   </main>
 
-  <section class="notice">
-    <div class="notice-card">
-      <h2>ข้อมูลและระเบียบที่ควรทราบ</h2>
-      <ul>
-        <li>ตั๋วสำรองที่นั่งต้องระบุชื่อ-นามสกุล และเลขบัตรประชาชน หรือ Passport No. ให้ตรงกับผู้เดินทาง</li>
-        <li>รถธรรมดา รถชานเมือง และรถท้องถิ่นที่ไม่สำรองที่นั่ง โดยทั่วไปซื้อได้ในวันเดินทางก่อนรถออกไม่เกิน 2 ชั่วโมง</li>
-        <li>รถไฟสายตะวันออกในระบบนี้กำหนดให้ขบวน 997/998 เป็นขบวนที่จองล่วงหน้าได้ ส่วนขบวนธรรมดา/ชานเมืองให้ซื้อวันเดินทาง</li>
-        <li>โปรดตรวจสอบตั๋วทันทีเมื่อได้รับตั๋ว หากผิดพลาดควรแจ้งเจ้าหน้าที่ก่อนพ้นหน้าช่องจำหน่ายตั๋ว</li>
-      </ul>
-    </div>
-  </section>
+  <script>
+    const DATA = {
+      durations: {
+        week: { label:'รายสัปดาห์', nominalDays:6, studentDays:5, validType:'days', validValue:7, generalRate:.75, halfRate:.50, studentRate:.50 },
+        m1:   { label:'ราย 1 เดือน', nominalDays:24, studentDays:20, validType:'months', validValue:1, generalRate:.75, halfRate:.50, studentRate:.50 },
+        m2:   { label:'ราย 2 เดือน', nominalDays:48, studentDays:40, validType:'months', validValue:2, generalRate:.72, halfRate:.50, studentRate:.47 },
+        m3:   { label:'ราย 3 เดือน', nominalDays:72, studentDays:60, validType:'months', validValue:3, generalRate:.70, halfRate:.50, studentRate:.45 }
+      },
+      passengers: {
+        general: { label:'ประชาชนทั่วไป' },
+        half: { label:'ผู้มีสิทธิลดครึ่งราคาเป็นประจำ' },
+        student: { label:'นักเรียน-นักศึกษา อายุไม่เกิน 25 ปี' }
+      },
+      ticketTypes: {
+        oneway: { label:'เที่ยวเดียว', trips:1 },
+        roundtrip: { label:'เที่ยวไป-กลับ', trips:2 }
+      }
+    };
 
+    const els = {
+      fare: document.getElementById('fare'),
+      ticketType: document.getElementById('ticketType'),
+      passenger: document.getElementById('passenger'),
+      duration: document.getElementById('duration'),
+      startDate: document.getElementById('startDate'),
+      price: document.getElementById('price'),
+      formula: document.getElementById('formula'),
+      pills: document.getElementById('summaryPills'),
+      note: document.getElementById('note'),
+      calcBtn: document.getElementById('calcBtn'),
+      copyBtn: document.getElementById('copyBtn')
+    };
 
-  </div>
-
-  <div id="toolMonthly" class="tool-page">
-    <section class="monthly-hero">
-      <div class="monthly-card">
-        <div>
-          <div class="eyebrow">🎟️ เครื่องมือคำนวณตั๋วเดือน</div>
-          <h1>คำนวณราคาตั๋วเดือน<br>แบบเร็วและเข้าใจง่าย</h1>
-          <p>กรอกค่าโดยสารเต็มราคาแบบเที่ยวเดียว เลือกรูปแบบเดินทาง ประเภทผู้โดยสาร และระยะเวลาที่ต้องการ ระบบจะคำนวณราคาประมาณการให้ทันที</p>
-        </div>
-        <div class="hero-stats">
-          <div class="stat"><strong>6</strong><span>วัน สำหรับรายสัปดาห์</span></div>
-          <div class="stat"><strong>24</strong><span>วัน สำหรับ 1 เดือน</span></div>
-          <div class="stat"><strong>72</strong><span>วัน สำหรับ 3 เดือน</span></div>
-        </div>
-      </div>
-      <div class="quick-rules">
-        <div class="quick-rule"><h3>ประชาชนทั่วไป</h3><p>คิดจากค่าโดยสารเต็มราคา × จำนวนเที่ยว × จำนวนวัน แล้วหักส่วนลดตามแพ็กเกจที่เลือก</p></div>
-        <div class="quick-rule"><h3>ผู้มีสิทธิลดครึ่งราคา</h3><p>คิด 50% ของฐานค่าโดยสารตามจำนวนวันและจำนวนเที่ยว</p></div>
-        <div class="quick-rule"><h3>นักเรียน / นักศึกษาไป-กลับ</h3><p>ใช้จำนวนวันพิเศษ 5 / 20 / 40 / 60 วัน แล้วคิด 50% </p></div>
-        <div class="quick-rule"><h3>ตรวจสอบก่อนออกตั๋ว</h3><p>บางเส้นทาง ประเภทขบวน หรือเงื่อนไขเฉพาะ อาจทำให้ราคาจริงต่างจากที่คำนวณได้</p></div>
-      </div>
-    </section>
-
-    <main class="monthly-layout">
-      <section class="panel">
-        <div class="panel-head">
-          <div><h2>กรอกข้อมูลตั๋วเดือน</h2><p>ระบบคำนวณราคาประมาณการจากค่าโดยสารเต็มราคา</p></div>
-        </div>
-        <div class="panel-body grid">
-          <div class="grid grid-2">
-            <div>
-              <label for="monthlyFare">ค่าโดยสารเต็มราคา / เที่ยวเดียว (บาท)</label>
-              <input id="monthlyFare" type="number" min="0" step="1" placeholder="เช่น 10, 12, 24, 48" />
-              <div class="hint">ใส่ราคาตั๋วเต็มราคา 1 เที่ยว ก่อนหักส่วนลด</div>
-            </div>
-            <div>
-              <label for="monthlyTrips">รูปแบบการเดินทาง</label>
-              <select id="monthlyTrips">
-                <option value="1">เที่ยวเดียว วันละ 1 เที่ยว</option>
-                <option value="2">ไป-กลับ วันละ 2 เที่ยว</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-2">
-            <div>
-              <label for="monthlyPassenger">ประเภทผู้โดยสาร</label>
-              <select id="monthlyPassenger">
-                <option value="general">ประชาชนทั่วไป</option>
-                <option value="half">ผู้มีสิทธิลดครึ่งราคา</option>
-                <option value="student">นักเรียน / นักศึกษา</option>
-              </select>
-            </div>
-            <div>
-              <label for="monthlyPeriod">ระยะเวลาตั๋วเดือน</label>
-              <select id="monthlyPeriod">
-                <option value="week">รายสัปดาห์ คิด 6 วัน</option>
-                <option value="m1">ราย 1 เดือน คิด 24 วัน</option>
-                <option value="m2">ราย 2 เดือน คิด 48 วัน</option>
-                <option value="m3">ราย 3 เดือน คิด 72 วัน</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="subcard grid">
-            <div class="grid grid-2">
-              <div>
-                <label for="monthlyRoundMode">การปัดเศษราคา</label>
-                <select id="monthlyRoundMode">
-                  <option value="round">ปัดเป็นบาทใกล้ที่สุด</option>
-                  <option value="ceil">ปัดขึ้นเป็นบาท</option>
-                  <option value="none">ไม่ปัดเศษ</option>
-                </select>
-              </div>
-              <div>
-                <label for="monthlyCustomRate">ส่วนลดกำหนดเอง (ไม่บังคับ)</label>
-                <input id="monthlyCustomRate" type="number" min="0" max="100" step="1" placeholder="เช่น 25 = ลด 25%" />
-                <div class="hint">ปล่อยว่างเพื่อใช้เกณฑ์อัตโนมัติ</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="warning-note">หมายเหตุ: บางทีราคาอาจจะคลาดเคลื่อน ตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนจำหน่ายตั๋วครับ</div>
-        </div>
-      </section>
-
-      <aside class="panel result-shell">
-        <div class="panel-head">
-          <div><h2>ผลคำนวณราคาตั๋วเดือน</h2><p>ราคาโดยประมาณจากข้อมูลที่กรอก</p></div>
-        </div>
-        <div id="monthlyResult" class="monthly-result">
-          <div class="empty"><div class="big">🎟️</div><p>กรุณากรอกค่าโดยสารเต็มราคา<br>เพื่อคำนวณตั๋วเดือน</p></div>
-        </div>
-      </aside>
-    </main>
-
-    <section class="notice">
-      <div class="notice-card">
-        <h2>เกณฑ์คำนวณที่ใช้ในระบบนี้</h2>
-        <ul>
-          <li>เที่ยวเดียว / ประชาชนทั่วไป / ผู้มีสิทธิลดครึ่งราคา: รายสัปดาห์ 6 วัน, ราย 1 เดือน 24 วัน, ราย 2 เดือน 48 วัน, ราย 3 เดือน 72 วัน</li>
-          <li>ประชาชนทั่วไป: รายสัปดาห์และ 1 เดือน คิด 75% ของฐานราคา, 2 เดือน คิด 72%, 3 เดือน คิด 70%</li>
-          <li>ผู้มีสิทธิลดครึ่งราคา: คิด 50% ของฐานราคา</li>
-          <li>นักเรียน / นักศึกษาแบบไป-กลับ: รายสัปดาห์ 5 วัน, ราย 1 เดือน 20 วัน, ราย 2 เดือน 40 วัน, ราย 3 เดือน 60 วัน แล้วคิด 50%</li>
-          <li>หากเลือกนักเรียน / นักศึกษาแบบเที่ยวเดียว ระบบจะคิด 50% ด้วยจำนวนวันปกติ</li>
-          <li><strong>โปรดตรวจสอบราคาจริงกับเจ้าหน้าที่อีกครั้ง เพราะบางกรณีราคาอาจคลาดเคลื่อนได้</strong></li>
-        </ul>
-      </div>
-    </section>
-  </div>
-
-  <footer class="footer">
-    <strong>จัดทำโดย นายพชรวิชญ์ ตุ้มวิจิตร</strong><br>
-    นายสถานีคลองบางพระ | เครื่องมือนี้ใช้เพื่อช่วยคำนวณเบื้องต้น บางทีราคาอาจจะคลาดเคลื่อน โปรดตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋ว
-  </footer>
-
-  <div id="toast" class="toast"></div>
-
-<script>
-const trainData = {
-                north: {
-                    name: "สายเหนือ (กทม.-เชียงใหม่)",
-                    stations: [
-                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "สามเสน", km: 5 }, { name: "ชุมทางบางซื่อ", km: 7 }, 
-                        { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
-                        { name: "ดอนเมือง", km: 22 }, { name: "หลักหก", km: 26 }, { name: "รังสิต", km: 30 }, 
-                        { name: "คลองหนึ่ง", km: 34 }, { name: "เชียงราก", km: 37 }, { name: "มหาวิทยาลัยธรรมศาสตร์", km: 40 },
-                        { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, { name: "คลองพุทรา", km: 51 }, 
-                        { name: "บางปะอิน", km: 58 }, { name: "บ้านโพ", km: 62 }, { name: "อยุธยา", km: 71 }, 
-                        { name: "บ้านม้า", km: 74 }, { name: "มาบพระจันทร์", km: 78 }, { name: "พระแก้ว", km: 85 }, 
-                        { name: "ชุมทางบ้านภาชี", km: 90 }, { name: "หนองวิวัฒน์", km: 96 }, { name: "ท่าเรือ", km: 103 }, 
-                        { name: "บ้านหมอ", km: 109 }, { name: "หนองโดน", km: 116 }, { name: "บ้านกลับ", km: 122 }, 
-                        { name: "บ้านป่าหวาย", km: 128 }, { name: "ลพบุรี", km: 133 }, { name: "ลพบุรี 2 (ท่าวุ้ง)", km: 134 }, 
-                        { name: "โคกกะเทียม", km: 140 }, { name: "หนองเต่า", km: 150 }, { name: "หนองทรายขาว", km: 154 }, 
-                        { name: "บ้านหมี่", km: 161 }, { name: "ห้วยแก้ว", km: 166 }, { name: "จันเสน", km: 174 }, 
-                        { name: "ช่องแค", km: 180 }, { name: "ทะเลหว้า", km: 188 }, { name: "บ้านตาคลี", km: 193 }, 
-                        { name: "หนองโพ", km: 211 }, { name: "หัวงิ้ว", km: 217 }, { name: "เนินมะกอก", km: 224 },
-                        { name: "เขาทอง", km: 235 }, { name: "นครสวรรค์", km: 246 }, { name: "ปากน้ำโพ", km: 250 }, 
-                        { name: "ทับกฤช", km: 263 }, { name: "คลองปลากด", km: 271 }, { name: "ชุมแสง", km: 280 }, 
-                        { name: "วังกระพี้", km: 290 }, { name: "บางมูลนาก", km: 297 }, { name: "หอไกร", km: 303 }, 
-                        { name: "ดงตะขบ", km: 309 }, { name: "ตะพานหิน", km: 319 }, { name: "ห้วยเกตุ", km: 324 }, 
-                        { name: "หัวดง", km: 332 }, { name: "วังกรด", km: 339 }, { name: "พิจิตร", km: 347 }, 
-                        { name: "บางกระทุ่ม", km: 362 }, { name: "แม่เทียบ", km: 370 }, { name: "บ้านใหม่", km: 375 }, 
-                        { name: "บึงพระ", km: 381 }, { name: "พิษณุโลก", km: 389 }, { name: "บ้านเต็งหนาม", km: 393 }, 
-                        { name: "บ้านตูม", km: 400 }, { name: "พรหมพิราม", km: 417 }, { name: "หนองตม", km: 423 }, 
-                        { name: "บ้านโคน", km: 432 }, { name: "พิชัย", km: 447 }, { name: "ชุมทางบ้านดารา", km: 458 }, 
-                        { name: "ท่าสัก", km: 461 }, { name: "ตรอน", km: 469 }, { name: "อุตรดิตถ์", km: 485 }, 
-                        { name: "ศิลาอาสน์", km: 488 }, { name: "บ้านด่าน", km: 491 }, { name: "ปางต้นผึ้ง", km: 497 }, 
-                        { name: "เขาพลึง", km: 517 }, { name: "ห้วยไร่", km: 528 }, { name: "เด่นชัย", km: 534 }, 
-                        { name: "ปากปาน", km: 538 }, { name: "แก่งหลวง", km: 546 }, { name: "บ้านปิน", km: 563 }, 
-                        { name: "ผาคัน", km: 578 }, { name: "ปางป๋วย", km: 591 }, { name: "แม่จาง", km: 600 }, 
-                        { name: "แม่เมาะ", km: 609 }, { name: "ศาลาผาลาด", km: 622 }, { name: "แม่ทะ", km: 628 }, 
-                        { name: "หนองวัวเฒ่า", km: 637 }, { name: "นครลำปาง", km: 642 }, { name: "บ่อแฮ้ว", km: 647 }, 
-                        { name: "ห้างฉัตร", km: 658 }, { name: "ปางม่วง", km: 663 }, { name: "แม่ตานน้อย", km: 671 }, 
-                        { name: "ขุนตาน", km: 683 }, { name: "ทาชมภู", km: 688 }, { name: "แม่ทา", km: 692 }, 
-                        { name: "ศาลาแม่ทา", km: 700 }, { name: "หนองหล่ม", km: 713 }, { name: "ลำพูน", km: 729 }, 
-                        { name: "ป่าแดด", km: 736 }, { name: "สารภี", km: 743 }, { name: "เชียงใหม่", km: 751 }
-                    ]
-                },
-                south: {
-                    name: "สายใต้ (กทม.-สุไหงโก-ลก/ปาดังเบซาร์)",
-                    stations: [
-                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, 
-                        { name: "ธนบุรี", km: 16 }, { name: "บางบำหรุ", km: 18 }, { name: "ชุมทางตลิ่งชัน", km: 22 }, 
-                        { name: "ศาลายา", km: 35 }, { name: "วัดสุวรรณ", km: 39 }, { name: "คลองมหาสวัสดิ์", km: 43 }, 
-                        { name: "วัดงิ้วราย", km: 47 }, { name: "นครชัยศรี", km: 51 }, { name: "ท่าแฉลบ", km: 56 }, 
-                        { name: "ต้นสำโรง", km: 61 }, { name: "นครปฐม", km: 64 }, { name: "พระราชวังสนามจันทร์", km: 66 }, 
-                        { name: "โพรงมะเดื่อ", km: 71 }, { name: "คลองบางตาล", km: 75 }, { name: "ชุมทางหนองปลาดุก", km: 80 }, 
-                        { name: "บ้านโป่ง", km: 84 }, { name: "นครชุมน์", km: 90 }, { name: "คลองตาคด", km: 93 }, 
-                        { name: "โพธาราม", km: 98 }, { name: "เจ็ดเสมียน", km: 105 }, { name: "บ้านกล้วย", km: 111 }, 
-                        { name: "ราชบุรี", km: 117 }, { name: "บ้านคูบัว", km: 121 }, { name: "บ่อตะคร้อ", km: 127 }, 
-                        { name: "บ้านป่าไก่", km: 131 }, { name: "ปากท่อ", km: 135 }, { name: "ห้วยโรง", km: 139 }, 
-                        { name: "บางเค็ม", km: 143 }, { name: "เขาย้อย", km: 150 }, { name: "หนองปลาไหล", km: 155 }, 
-                        { name: "บางจาก", km: 160 }, { name: "เพชรบุรี", km: 167 }, { name: "เขาทโมน", km: 176 }, 
-                        { name: "หนองไม้เหลือง", km: 180 }, { name: "หนองจอก", km: 186 }, { name: "หนองศาลา", km: 191 }, 
-                        { name: "ชะอำ", km: 203 }, { name: "ห้วยทรายเหนือ", km: 214 }, { name: "ห้วยทรายใต้", km: 218 }, 
-                        { name: "หัวหิน", km: 229 }, { name: "หนองแก", km: 233 }, { name: "สวนสนประดิพัทธ์", km: 237 }, 
-                        { name: "เขาเต่า", km: 241 }, { name: "วังก์พง", km: 249 }, { name: "ปราณบุรี", km: 252 }, 
-                        { name: "ห้วยขวาง", km: 258 }, { name: "หนองคาง", km: 263 }, { name: "สามร้อยยอด", km: 271 }, 
-                        { name: "สามกระทาย", km: 277 }, { name: "กุยบุรี", km: 287 }, { name: "บ่อนอก", km: 295 }, 
-                        { name: "ทุ่งมะเม่า", km: 305 }, { name: "คั่นกระได", km: 311 }, { name: "ประจวบคีรีขันธ์", km: 318 }, 
-                        { name: "หนองหิน", km: 326 }, { name: "หว้ากอ", km: 329 }, { name: "วังด้วน", km: 334 }, 
-                        { name: "ห้วยยาง", km: 345 }, { name: "ทุ่งประดู่", km: 355 }, { name: "ทับสะแก", km: 358 }, 
-                        { name: "ดอนทราย", km: 363 }, { name: "โคกตาหอม", km: 369 }, { name: "บ้านกรูด", km: 377 }, 
-                        { name: "หนองมงคล", km: 382 }, { name: "นาผักขวง", km: 387 }, { name: "บางสะพานใหญ่", km: 393 }, 
-                        { name: "หินกอง", km: 400 }, { name: "ชะม่วง", km: 402 }, { name: "บางสะพานน้อย", km: 409 }, 
-                        { name: "ห้วยสัก", km: 416 }, { name: "บ้านทรายทอง", km: 420 }, { name: "เขาไชยราช", km: 426 }, 
-                        { name: "มาบอำมฤต", km: 437 }, { name: "บ้านทรัพย์สมบูรณ์", km: 444 }, { name: "คลองวังช้าง", km: 450 }, 
-                        { name: "ปะทิว", km: 455 }, { name: "บ้านคอกม้า", km: 463 }, { name: "สะพลี", km: 470 }, 
-                        { name: "หนองเนียน", km: 474 }, { name: "นาชะอัง", km: 479 }, { name: "ชุมพร", km: 485 }, 
-                        { name: "แสงแดด", km: 489 }, { name: "ทุ่งคา", km: 497 }, { name: "วิสัย", km: 506 }, 
-                        { name: "บ้านครน", km: 512 }, { name: "สวี", km: 517 }, { name: "เขาสวนทุเรียน", km: 525 }, 
-                        { name: "เขาปีบ", km: 528 }, { name: "ปากตะโก", km: 533 }, { name: "ท่าทอง", km: 538 }, 
-                        { name: "ควนหินมุ้ย", km: 542 }, { name: "หลังสวน", km: 549 }, { name: "คลองขนาน", km: 557 }, 
-                        { name: "หัวมาด", km: 563 }, { name: "ละแม", km: 570 }, { name: "บ้านดวด", km: 576 }, 
-                        { name: "คันธุลี", km: 582 }, { name: "ดอนธูป", km: 586 }, { name: "ท่าชนะ", km: 594 }, 
-                        { name: "บ้านเกาะมุกข์", km: 600 }, { name: "เขาพนมแบก", km: 604 }, { name: "ไชยา", km: 614 }, 
-                        { name: "ท่าฉาง", km: 627 }, { name: "คลองขุด", km: 630 }, { name: "คลองไทร", km: 635 }, 
-                        { name: "มะลวน", km: 640 }, { name: "ชุมทางบ้านทุ่งโพธิ์", km: 647 }, { name: "สุราษฎร์ธานี", km: 651 }, 
-                        { name: "เขาหัวควาย", km: 658 }, { name: "บ่อกรัง", km: 663 }, { name: "เขาพลู", km: 668 }, 
-                        { name: "คลองยา", km: 674 }, { name: "บ้านนา", km: 678 }, { name: "ห้วยมุด", km: 686 }, 
-                        { name: "นาสาร", km: 690 }, { name: "คลองปราบ", km: 696 }, { name: "พรุพี", km: 700 }, 
-                        { name: "คลองสูญ", km: 704 }, { name: "บ้านส้อง", km: 709 }, { name: "บ้านพรุกระแชง", km: 716 }, 
-                        { name: "ห้วยปริก", km: 721 }, { name: "กระเบียด", km: 726 }, { name: "ทานพอ", km: 733 }, 
-                        { name: "ฉวาง", km: 738 }, { name: "คลองจันดี", km: 744 }, { name: "พ่อท่านคล้ายวาจาสิทธิ์", km: 745 }, 
-                        { name: "หลักช้าง", km: 751 }, { name: "คลองกุย", km: 755 }, { name: "นาบอน", km: 759 }, 
-                        { name: "คลองจัง", km: 763 }, { name: "บ้านเกาะปริง", km: 767 }, { name: "ชุมทางทุ่งสง", km: 773 }, 
-                        { name: "ใสใหญ่", km: 778 }, { name: "ช่องเขา", km: 784 }, { name: "ที่วัง", km: 789 }, 
-                        { name: "ร่อนพิบูลย์", km: 792 }, { name: "ชุมทางเขาชุมทอง", km: 797 }, { name: "บ้านทุ่งหล่อ", km: 806 }, 
-                        { name: "กะปาง", km: 806 }, { name: "ควนหนองคว้า", km: 805 }, { name: "บ้านตูล", km: 811 }, 
-                        { name: "โคกคราม", km: 820 }, { name: "บ้านทุ่งค่าย", km: 819 }, { name: "ชะอวด", km: 822 }, 
-                        { name: "หนองจิก", km: 827 }, { name: "ห้วยยอด", km: 830 }, { name: "บ้านนางหลง", km: 829 }, 
-                        { name: "บ้านตรอกแค", km: 832 }, { name: "นครศรีธรรมราช", km: 832 }, { name: "บ้านขอนหาด", km: 835 }, 
-                        { name: "แหลมโตนด", km: 840 }, { name: "ตรัง", km: 844 }, { name: "บ้านสุนทรา", km: 844 }, 
-                        { name: "ปากคลอง", km: 849 }, { name: "บ้านมะกอกใต้", km: 853 }, { name: "ชัยบุรี", km: 856 }, 
-                        { name: "พัทลุง", km: 862 }, { name: "นาปรือ", km: 865 }, { name: "กันตัง", km: 866 }, 
-                        { name: "บ้านค่ายไทย", km: 869 }, { name: "บ้านต้นโดน", km: 872 }, { name: "บ้านห้วยแตน", km: 875 }, 
-                        { name: "เขาชัยสน", km: 881 }, { name: "บางแก้ว", km: 886 }, { name: "ควนพระ", km: 893 }, 
-                        { name: "ควนเคี่ยม", km: 897 }, { name: "หารกง", km: 901 }, { name: "หารเทา", km: 905 }, 
-                        { name: "วัดควนเผยอ", km: 909 }, { name: "โคกทราย", km: 912 }, { name: "ควนเนียง", km: 919 }, 
-                        { name: "บ้านเกาะใหญ่", km: 926 }, { name: "บางกล่ำ", km: 933 }, { name: "บ้านดินลาน", km: 938 }, 
-                        { name: "ชุมทางหาดใหญ่", km: 945 }, { name: "นาม่วง", km: 956 }, { name: "คลองแงะ", km: 968 }, 
-                        { name: "วัดควนมีด", km: 970 }, { name: "จะนะ", km: 981 }, { name: "ท่าแมงลัก", km: 988 }, 
-                        { name: "ปาดังเบซาร์", km: 990 }, { name: "เกาะสะบ้า", km: 997 }, { name: "เทพา", km: 1008 }, 
-                        { name: "ตาแปด", km: 1016 }, { name: "บ้านนิคม", km: 1019 }, { name: "ปัตตานี (โคกโพธิ์)", km: 1025 }, 
-                        { name: "นาประดู่", km: 1033 }, { name: "วัดช้างให้", km: 1036 }, { name: "ป่าไร่", km: 1037 }, 
-                        { name: "คลองทราย", km: 1042 }, { name: "ตาเซะ", km: 1048 }, { name: "ยะลา", km: 1055 }, 
-                        { name: "ไม้แก่น", km: 1065 }, { name: "บ้านปาแต", km: 1068 }, { name: "รามัน", km: 1073 }, 
-                        { name: "บาลอ", km: 1078 }, { name: "รือเสาะ", km: 1087 }, { name: "สะโลว์บูกิ๊ตยือแร", km: 1092 }, 
-                        { name: "ลาโละ", km: 1098 }, { name: "มะรือโบ", km: 1106 }, { name: "กะแด๊ะ", km: 1110 }, 
-                        { name: "ตันหยงมัส", km: 1116 }, { name: "ป่าไผ่", km: 1121 }, { name: "เจาะไอร้อง", km: 1127 }, 
-                        { name: "บูกิต", km: 1132 }, { name: "ไอสะเตีย", km: 1136 }, { name: "โต๊ะเด็ง", km: 1142 }, 
-                        { name: "สุไหงปาดี", km: 1146 }, { name: "โคกสยา", km: 1153 }, { name: "สุไหงโก-ลก", km: 1159 }
-                    ]
-                },
-                esanNongkhai: {
-                    name: "สายอีสาน (ไปหนองคาย)",
-                    stations: [
-                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "สามเสน", km: 5 }, { name: "ชุมทางบางซื่อ", km: 7 }, 
-                        { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
-                        { name: "ดอนเมือง", km: 22 }, { name: "รังสิต", km: 30 }, { name: "เชียงราก", km: 37 }, 
-                        { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, { name: "บางปะอิน", km: 58 },
-                        { name: "อยุธยา", km: 71 }, { name: "ชุมทางบ้านภาชี", km: 90 }, { name: "สระบุรี", km: 113 }, 
-                        { name: "ชุมทางแก่งคอย", km: 125 }, { name: "แก่งเสือเต้น", km: 132 }, { name: "ทับกวาง", km: 138 }, 
-                        { name: "มวกเหล็ก", km: 152 }, { name: "ปางอโศก", km: 165 }, { name: "บันไดม้า", km: 173 }, 
-                        { name: "โคกสลุง", km: 176 }, { name: "ปากช่อง", km: 180 }, { name: "คลองขนานจิตร", km: 202 }, 
-                        { name: "คลองไผ่", km: 206 }, { name: "ลำนารายณ์", km: 209 }, { name: "สีคิ้ว", km: 223 }, 
-                        { name: "สูงเนิน", km: 234 }, { name: "กุดจิก", km: 241 }, { name: "โคกกรวด", km: 249 }, 
-                        { name: "ภูเขาลาด", km: 254 }, { name: "บ้านวะตะแบก (เทพสถิต)", km: 263 }, { name: "นครราชสีมา", km: 264 }, 
-                        { name: "ชุมทางถนนจิระ", km: 267 }, { name: "บ้านเกาะ", km: 274 }, { name: "บำเหน็จณรงค์", km: 291 }, 
-                        { name: "โนนสูง", km: 295 }, { name: "จัตุรัส", km: 310 }, { name: "คง", km: 311 }, 
-                        { name: "เมืองคง", km: 326 }, { name: "โนนทองหลาง", km: 332 }, { name: "บ้านเหลื่อม", km: 341 }, 
-                        { name: "ชุมทางบัวใหญ่", km: 376 }, { name: "หนองบัวลาย", km: 387 }, { name: "หนองแวง", km: 396 }, 
-                        { name: "เมืองพล", km: 408 }, { name: "บ้านแฮด", km: 449 }, { name: "บ้านไผ่", km: 438 }, 
-                        { name: "ท่าพระ", km: 470 }, { name: "ขอนแก่น", km: 480 }, { name: "สำราญ", km: 490 }, 
-                        { name: "โนนพยอม", km: 504 }, { name: "น้ำพอง", km: 514 }, { name: "ห้วยเสียว", km: 519 }, 
-                        { name: "เขาสวนกวาง", km: 531 }, { name: "โนนสะอาด", km: 544 }, { name: "ห้วยเกิ้ง", km: 553 }, 
-                        { name: "กุมภวาปี", km: 563 }, { name: "ห้วยสามพาด", km: 573 }, { name: "หนองตะไก้", km: 578 }, 
-                        { name: "อุดรธานี", km: 599 }, { name: "หนองขอนกว้าง", km: 605 }, { name: "นาทา", km: 647 }, 
-                        { name: "หนองคาย", km: 651 }, { name: "เวียงจันทน์ (คำสะหวาด)", km: 662 }
-                    ]
-                },
-                esanUbon: {
-                    name: "สายอีสาน (ไปอุบลราชธานี)",
-                    stations: [
-                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "รพ.รามาธิบดี", km: 3 }, { name: "สามเสน", km: 5 }, 
-                        { name: "ชุมทางบางซื่อ", km: 7 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, { name: "บางเขน", km: 13 }, 
-                        { name: "หลักสี่", km: 18 }, { name: "ดอนเมือง", km: 22 }, { name: "รังสิต", km: 30 }, 
-                        { name: "เชียงราก", km: 37 }, { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, 
-                        { name: "บางปะอิน", km: 58 }, { name: "อยุธยา", km: 71 }, { name: "บ้านดอนกลาง", km: 82 },
-                        { name: "ชุมทางบ้านภาชี", km: 90 }, { name: "หนองกวย", km: 93 }, { name: "หนองแซง", km: 96 }, 
-                        { name: "หนองสีดา", km: 100 }, { name: "บ้านป๊อกแป๊ก", km: 104 }, { name: "สระบุรี", km: 113 }, 
-                        { name: "ชุมทางหนองบัว", km: 119 }, { name: "ชุมทางแก่งคอย", km: 125 }, { name: "มาบกะเบา", km: 134 }, 
-                        { name: "มวกเหล็ก", km: 152 }, { name: "กลางดง", km: 160 }, { name: "ปางอโศก", km: 165 }, 
-                        { name: "บันไดม้า", km: 173 }, { name: "ปากช่อง", km: 180 }, { name: "ซับม่วง", km: 186 }, 
-                        { name: "จันทึก", km: 195 }, { name: "คลองขนานจิตร", km: 202 }, { name: "คลองไผ่", km: 206 }, 
-                        { name: "ลาดบัวขาว", km: 209 }, { name: "บ้านใหม่สำโรง", km: 214 }, { name: "หนองน้ำขุ่น", km: 218 }, 
-                        { name: "สีคิ้ว", km: 223 }, { name: "โคกสะอาด", km: 228 }, { name: "สูงเนิน", km: 234 }, 
-                        { name: "กุดจิก", km: 241 }, { name: "โคกกรวด", km: 249 }, { name: "ภูเขาลาด", km: 254 }, 
-                        { name: "นครราชสีมา", km: 264 }, { name: "ชุมทางถนนจิระ", km: 267 }, { name: "บ้านพะเนา", km: 271 }, 
-                        { name: "บ้านพระพุทธ", km: 276 }, { name: "ท่าช้าง", km: 285 }, { name: "หนองมโนรมย์", km: 292 }, 
-                        { name: "จักราช", km: 300 }, { name: "ห้วยแถลง", km: 314 }, { name: "บ้านหินโคน", km: 319 }, 
-                        { name: "หินดาษ", km: 326 }, { name: "หนองกระทิง", km: 330 }, { name: "ลำปลายมาศ", km: 345 }, 
-                        { name: "ทะเมนชัย", km: 354 }, { name: "บ้านแสลงพัน", km: 363 }, { name: "บ้านหนองตาด", km: 368 }, 
-                        { name: "บุรีรัมย์", km: 376 }, { name: "บ้านตะโก", km: 380 }, { name: "ห้วยราช", km: 385 }, 
-                        { name: "กระสัง", km: 400 }, { name: "หนองเต็ง", km: 407 }, { name: "ลำชี", km: 412 }, 
-                        { name: "สุรินทร์", km: 420 }, { name: "บุฤาษี", km: 428 }, { name: "เมืองที", km: 437 }, 
-                        { name: "ศีขรภูมิ", km: 452 }, { name: "สำโรงทาบ", km: 471 }, { name: "ห้วยทับทัน", km: 481 }, 
-                        { name: "หนองแคน", km: 489 }, { name: "อุทุมพรพิสัย", km: 494 }, { name: "ศรีสะเกษ", km: 515 }, 
-                        { name: "หนองแวง", km: 527 }, { name: "กันทรารมย์", km: 542 }, { name: "ห้วยขยุง", km: 554 }, 
-                        { name: "บุ่งหวาย", km: 566 }, { name: "อุบลราชธานี", km: 575 }
-                    ]
-                },
-                east: {
-                    name: "สายตะวันออก",
-                    stations: [
-                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "มักกะสัน", km: 5 }, { name: "คลองตัน", km: 10 },
-                        { name: "หัวหมาก", km: 15 }, { name: "บ้านทับช้าง", km: 21 }, { name: "ลาดกระบัง", km: 27 },
-                        { name: "หัวตะเข้", km: 31 }, { name: "คลองหลวงแพ่ง", km: 40 }, { name: "คลองเปรง", km: 47 }, { name: "คลองบางพระ", km: 54 },
-                        { name: "ชุมทางฉะเชิงเทรา", km: 61 }, { name: "ดอนสีนนท์", km: 76 }, { name: "พานทอง", km: 92 }, 
-                        { name: "ชลบุรี", km: 108 }, { name: "บางพระ", km: 121 }, { name: "ชุมทางศรีราชา", km: 131 }, 
-                        { name: "บางละมุง", km: 144 }, { name: "พัทยา", km: 155 }, { name: "พัทยาใต้", km: 159 },
-                        { name: "ตลาดน้ำ 4 ภาค", km: 163 }, { name: "ญาณสังวราราม", km: 171 }, { name: "สวนนงนุช", km: 174 }, 
-                        { name: "บ้านพลูตาหลวง", km: 184 }, { name: "อู่ตะเภา", km: 189 }, { name: "จุกเสม็ด", km: 196 },
-                        { name: "โพรงอากาศ", km: 68 }, { name: "บางน้ำเปรี้ยว", km: 79 }, { name: "ชุมทางคลองสิบเก้า", km: 86 }, 
-                        { name: "บ้านสร้าง", km: 102 }, { name: "บ้านปากพลี", km: 115 }, { name: "ปราจีนบุรี", km: 122 }, 
-                        { name: "ประจันตคาม", km: 138 }, { name: "กบินทร์บุรี", km: 161 }, { name: "บ้านแก้ง", km: 190 }, 
-                        { name: "ศาลาลำดวน", km: 196 }, { name: "สระแก้ว", km: 205 }, { name: "ท่าเกษม", km: 216 }, 
-                        { name: "ห้วยโจด", km: 223 }, { name: "วัฒนานคร", km: 234 }, { name: "อรัญประเทศ", km: 255 }, 
-                        { name: "ด่านพรมแดนบ้านคลองลึก", km: 260 }
-                    ]
-                }
-            };
-
-const trainSchedules = {
-                north: [
-                    { id: "7/8", name: "7/8 ด่วนพิเศษ (ดีเซลราง)", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เชียงใหม่",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ลพบุรี 2 (ท่าวุ้ง)", "นครสวรรค์", "ปากน้ำโพ", "ตะพานหิน", "พิจิตร", "พิษณุโลก", "อุตรดิตถ์", "ศิลาอาสน์", "เด่นชัย", "บ้านปิน", "นครลำปาง", "ขุนตาน", "ลำพูน", "เชียงใหม่"] },
-                    { id: "9/10", name: "9/10 ด่วนพิเศษอุตราวิถี", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เชียงใหม่",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ลพบุรี 2 (ท่าวุ้ง)", "นครสวรรค์", "พิษณุโลก", "ศิลาอาสน์", "เด่นชัย", "นครลำปาง", "ขุนตาน", "ลำพูน", "เชียงใหม่"] },
-                    { id: "13/14", name: "13/14 ด่วนพิเศษ", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เชียงใหม่",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ลพบุรี 2 (ท่าวุ้ง)", "นครสวรรค์", "พิจิตร", "พิษณุโลก", "อุตรดิตถ์", "ศิลาอาสน์", "เด่นชัย", "บ้านปิน", "นครลำปาง", "ขุนตาน", "ลำพูน", "เชียงใหม่"] },
-                    { id: "51/52", name: "51/52 ด่วน", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เชียงใหม่",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ลพบุรี 2 (ท่าวุ้ง)", "นครสวรรค์", "ตะพานหิน", "พิจิตร", "พิษณุโลก", "หนองตม", "พิชัย", "อุตรดิตถ์", "ศิลาอาสน์", "เด่นชัย", "บ้านปิน", "แม่เมาะ", "นครลำปาง", "ขุนตาน", "ลำพูน", "เชียงใหม่"] },
-                    { id: "107/108", name: "107/108 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เด่นชัย",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ชุมทางบ้านภาชี", "ลพบุรี 2 (ท่าวุ้ง)", "บ้านตาคลี", "นครสวรรค์", "ปากน้ำโพ", "ชุมแสง", "บางมูลนาก", "ตะพานหิน", "หัวดง", "พิจิตร", "บางกระทุ่ม", "บ้านใหม่", "พิษณุโลก", "พรหมพิราม", "หนองตม", "บ้านโคน", "พิชัย", "ชุมทางบ้านดารา", "ท่าสัก", "ตรอน", "อุตรดิตถ์", "ศิลาอาสน์", "เด่นชัย"] },
-                    { id: "109/102", name: "109/102 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เชียงใหม่",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ชุมทางบ้านภาชี", "ท่าเรือ", "บ้านหมอ", "ลพบุรี 2 (ท่าวุ้ง)", "บ้านหมี่", "จันเสน", "ช่องแค", "บ้านตาคลี", "หนองโพ", "นครสวรรค์", "ปากน้ำโพ", "ชุมแสง", "บางมูลนาก", "ตะพานหิน", "พิจิตร", "บางกระทุ่ม", "พิษณุโลก", "พรหมพิราม", "หนองตม", "พิชัย", "ชุมทางบ้านดารา", "ท่าสัก", "ตรอน", "อุตรดิตถ์", "ศิลาอาสน์", "เด่นชัย", "บ้านปิน", "แม่เมาะ", "นครลำปาง", "ขุนตาน", "ลำพูน", "เชียงใหม่"] },
-                    { id: "111/112", name: "111/112 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เด่นชัย",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "เชียงราก", "บางปะอิน", "อยุธยา", "มาบพระจันทร์", "พระแก้ว", "ชุมทางบ้านภาชี", "หนองวิวัฒน์", "ท่าเรือ", "บ้านหมอ", "หนองโดน", "ลพบุรี 2 (ท่าวุ้ง)", "บ้านหมี่", "จันเสน", "ช่องแค", "บ้านตาคลี", "หนองโพ", "นครสวรรค์", "ทับกฤช", "ปากน้ำโพ", "ชุมแสง", "บางมูลนาก", "ตะพานหิน", "หัวดง", "วังกรด", "พิจิตร", "บางกระทุ่ม", "พิษณุโลก", "พรหมพิราม", "หนองตม", "พิชัย", "ชุมทางบ้านดารา", "ท่าสัก", "ตรอน", "อุตรดิตถ์", "ศิลาอาสน์", "บ้านด่าน", "ปางต้นผึ้ง", "ห้วยไร่", "เด่นชัย"] },
-                    { id: "201/202", name: "201/202 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "พิษณุโลก" },
-                    { id: "207/208", name: "207/208 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "นครสวรรค์" },
-                    { id: "209/210", name: "209/210 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "บ้านตาคลี" }
-                ],
-                esanNongkhai: [
-                    { id: "25/26", name: "25/26 ด่วนพิเศษอีสานมรรคา", origin: "กรุงเทพ (อภิวัฒน์)", dest: "หนองคาย",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "สระบุรี", "ชุมทางแก่งคอย", "ลำนารายณ์", "ชุมทางบัวใหญ่", "เมืองพล", "บ้านไผ่", "ขอนแก่น", "น้ำพอง", "กุมภวาปี", "อุดรธานี", "หนองคาย"] },
-                    { id: "75/76", name: "75/76 ด่วน (ดีเซลราง)", origin: "กรุงเทพ (อภิวัฒน์)", dest: "หนองคาย",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ชุมทางบ้านภาชี", "สระบุรี", "ชุมทางแก่งคอย", "แก่งเสือเต้น", "โคกสลุง", "ลำนารายณ์", "บ้านวะตะแบก (เทพสถิต)", "บำเหน็จณรงค์", "จัตุรัส", "บ้านเหลื่อม", "ชุมทางบัวใหญ่", "หนองบัวลาย", "เมืองพล", "บ้านไผ่", "ขอนแก่น", "น้ำพอง", "เขาสวนกวาง", "โนนสะอาด", "กุมภวาปี", "ห้วยสามพาด", "อุดรธานี", "หนองคาย"] },
-                    { id: "133/134", name: "133/134 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เวียงจันทน์ (คำสะหวาด)",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ชุมทางบ้านภาชี", "สระบุรี", "ชุมทางแก่งคอย", "ลำนารายณ์", "บำเหน็จณรงค์", "จัตุรัส", "บ้านเหลื่อม", "ชุมทางบัวใหญ่", "หนองบัวลาย", "เมืองพล", "บ้านไผ่", "ท่าพระ", "ขอนแก่น", "น้ำพอง", "เขาสวนกวาง", "โนนสะอาด", "ห้วยเกิ้ง", "กุมภวาปี", "ห้วยสามพาด", "อุดรธานี", "หนองคาย", "เวียงจันทน์ (คำสะหวาด)"] }
-                ],
-                esanUbon: [
-                    { id: "23/24", name: "23/24 ด่วนพิเศษอีสานวัตนา", origin: "กรุงเทพ (อภิวัฒน์)", dest: "อุบลราชธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "สระบุรี", "ปากช่อง", "นครราชสีมา", "ลำปลายมาศ", "บุรีรัมย์", "สุรินทร์", "ศีขรภูมิ", "อุทุมพรพิสัย", "ศรีสะเกษ", "กันทรารมย์", "อุบลราชธานี"] },
-                    { id: "21/22", name: "21/22 ด่วนพิเศษ (ดีเซลราง)", origin: "กรุงเทพ (อภิวัฒน์)", dest: "อุบลราชธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "สระบุรี", "ชุมทางแก่งคอย", "ปากช่อง", "นครราชสีมา", "ชุมทางถนนจิระ", "ลำปลายมาศ", "บุรีรัมย์", "กระสัง", "สุรินทร์", "ศีขรภูมิ", "อุทุมพรพิสัย", "ศรีสะเกษ", "กันทรารมย์", "อุบลราชธานี"] },
-                    { id: "71/72", name: "71/72 ด่วน (ดีเซลราง)", origin: "กรุงเทพ (อภิวัฒน์)", dest: "อุบลราชธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ชุมทางบ้านภาชี", "สระบุรี", "ชุมทางแก่งคอย", "ปากช่อง", "นครราชสีมา", "ชุมทางถนนจิระ", "จักราช", "ห้วยแถลง", "ลำปลายมาศ", "บุรีรัมย์", "ห้วยราช", "กระสัง", "ลำชี", "สุรินทร์", "ศีขรภูมิ", "สำโรงทาบ", "ห้วยทับทัน", "อุทุมพรพิสัย", "ศรีสะเกษ", "กันทรารมย์", "อุบลราชธานี"] },
-                    { id: "135/136", name: "135/136 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "อุบลราชธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "เชียงราก", "อยุธยา", "ชุมทางบ้านภาชี", "หนองแซง", "สระบุรี", "ชุมทางแก่งคอย", "มวกเหล็ก", "ปากช่อง", "สีคิ้ว", "สูงเนิน", "นครราชสีมา", "ชุมทางถนนจิระ", "ท่าช้าง", "จักราช", "ห้วยแถลง", "ลำปลายมาศ", "ทะเมนชัย", "บุรีรัมย์", "ห้วยราช", "กระสัง", "ลำชี", "สุรินทร์", "ศีขรภูมิ", "สำโรงทาบ", "ห้วยทับทัน", "อุทุมพรพิสัย", "ศรีสะเกษ", "กันทรารมย์", "ห้วยขยุง", "อุบลราชธานี"] },
-                    { id: "139/140", name: "139/140 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "อุบลราชธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "บางปะอิน", "อยุธยา", "ชุมทางบ้านภาชี", "สระบุรี", "ชุมทางแก่งคอย", "ปากช่อง", "สีคิ้ว", "นครราชสีมา", "ชุมทางถนนจิระ", "ห้วยแถลง", "ลำปลายมาศ", "บุรีรัมย์", "กระสัง", "ลำชี", "สุรินทร์", "ศีขรภูมิ", "สำโรงทาบ", "ห้วยทับทัน", "อุทุมพรพิสัย", "ศรีสะเกษ", "กันทรารมย์", "อุบลราชธานี"] },
-                    { id: "141/142", name: "141/142 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "อุบลราชธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "บางปะอิน", "อยุธยา", "ชุมทางบ้านภาชี", "สระบุรี", "ชุมทางแก่งคอย", "มวกเหล็ก", "ปากช่อง", "สีคิ้ว", "สูงเนิน", "กุดจิก", "นครราชสีมา", "ชุมทางถนนจิระ", "จักราช", "ห้วยแถลง", "ลำปลายมาศ", "ทะเมนชัย", "บุรีรัมย์", "ห้วยราช", "กระสัง", "หนองเต็ง", "ลำชี", "สุรินทร์", "ศีขรภูมิ", "สำโรงทาบ", "ห้วยทับทัน", "อุทุมพรพิสัย", "ศรีสะเกษ", "กันทรารมย์", "ห้วยขยุง", "อุบลราชธานี"] },
-                    { id: "233/234", name: "233/234 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "สุรินทร์",
-                      stops: ["กรุงเทพ (หัวลำโพง)", "รพ.รามาธิบดี", "สามเสน", "ชุมทางบางซื่อ", "ดอนเมือง", "รังสิต", "เชียงรากน้อย", "บางปะอิน", "อยุธยา", "บ้านดอนกลาง", "ชุมทางบ้านภาชี", "หนองกวย", "หนองแซง", "หนองสีดา", "บ้านป๊อกแป๊ก", "สระบุรี", "ชุมทางหนองบัว", "ชุมทางแก่งคอย", "มาบกะเบา", "มวกเหล็ก", "กลางดง", "ปางอโศก", "บันไดม้า", "ปากช่อง", "ซับม่วง", "จันทึก", "คลองขนานจิตร", "คลองไผ่", "ลาดบัวขาว", "บ้านใหม่สำโรง", "หนองน้ำขุ่น", "สีคิ้ว", "โคกสะอาด", "สูงเนิน", "กุดจิก", "โคกกรวด", "ภูเขาลาด", "นครราชสีมา", "ชุมทางถนนจิระ", "บ้านพะเนา", "บ้านพระพุทธ", "ท่าช้าง", "หนองมโนรมย์", "จักราช", "บ้านหินโคน", "หินดาษ", "ห้วยแถลง", "หนองกระทิง", "ลำปลายมาศ", "ทะเมนชัย", "บ้านแสลงพัน", "บ้านหนองตาด", "บุรีรัมย์", "บ้านตะโก", "ห้วยราช", "กระสัง", "หนองเต็ง", "ลำชี", "สุรินทร์"] }
-                ],
-                south: [
-                    { id: "31/32", name: "31/32 ด่วนพิเศษทักษิณารัถย์", origin: "กรุงเทพ (อภิวัฒน์)", dest: "ชุมทางหาดใหญ่",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "บางสะพานใหญ่", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "พัทลุง", "ชุมทางหาดใหญ่"] },
-                    { id: "37/38", name: "37/38 ด่วนพิเศษทักษิณ", origin: "กรุงเทพ (อภิวัฒน์)", dest: "สุไหงโก-ลก",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "ประจวบคีรีขันธ์", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "เขาชัยสน", "พัทลุง", "ชุมทางหาดใหญ่", "จะนะ", "เทพา", "ปัตตานี (โคกโพธิ์)", "ยะลา", "รือเสาะ", "ตันหยงมัส", "สุไหงปาดี", "สุไหงโก-ลก"] },
-                    { id: "45/46", name: "45/46 ด่วนพิเศษอินเตอร์เนชั่นแนล", origin: "กรุงเทพ (อภิวัฒน์)", dest: "ปาดังเบซาร์",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "ประจวบคีรีขันธ์", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "พัทลุง", "ชุมทางหาดใหญ่", "คลองแงะ", "ปาดังเบซาร์"] },
-                    { id: "39/40", name: "39/40 ด่วนพิเศษ (ดีเซลราง)", origin: "กรุงเทพ (อภิวัฒน์)", dest: "สุราษฎร์ธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "ชะอำ", "หัวหิน", "ปราณบุรี", "ประจวบคีรีขันธ์", "ทับสะแก", "บ้านกรูด", "บางสะพานใหญ่", "ชุมพร", "สวี", "หลังสวน", "ไชยา", "สุราษฎร์ธานี"] },
-                    { id: "43/44", name: "43/44 ด่วนพิเศษ (ดีเซลราง)", origin: "กรุงเทพ (อภิวัฒน์)", dest: "สุราษฎร์ธานี",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "ชะอำ", "หัวหิน", "ปราณบุรี", "ประจวบคีรีขันธ์", "ทับสะแก", "บ้านกรูด", "บางสะพานใหญ่", "ชุมพร", "สวี", "หลังสวน", "ไชยา", "สุราษฎร์ธานี"] },
-                    { id: "83/84", name: "83/84 ด่วน", origin: "กรุงเทพ (อภิวัฒน์)", dest: "ตรัง",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "ประจวบคีรีขันธ์", "บางสะพานใหญ่", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "ตรัง"] },
-                    { id: "85/86", name: "85/86 ด่วน", origin: "กรุงเทพ (อภิวัฒน์)", dest: "นครศรีธรรมราช",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "ประจวบคีรีขันธ์", "บางสะพานใหญ่", "มาบอำมฤต", "ปะทิว", "ชุมพร", "หลังสวน", "ไชยา", "สุราษฎร์ธานี", "นาสาร", "บ้านส้อง", "ทานพอ", "ฉวาง", "คลองจันดี", "นาบอน", "ชุมทางทุ่งสง", "ชุมทางเขาชุมทอง", "บ้านทุ่งหล่อ", "โคกคราม", "นครศรีธรรมราช"] },
-                    { id: "167/168", name: "167/168 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "กันตัง",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "บ้านโป่ง", "ราชบุรี", "เพชรบุรี", "ชะอำ", "หัวหิน", "วังก์พง", "กุยบุรี", "ประจวบคีรีขันธ์", "ทับสะแก", "บ้านกรูด", "บางสะพานใหญ่", "บางสะพานน้อย", "มาบอำมฤต", "ปะทิว", "ชุมพร", "สวี", "ปากตะโก", "หลังสวน", "ละแม", "ท่าชนะ", "ไชยา", "ท่าฉาง", "สุราษฎร์ธานี", "บ้านนา", "นาสาร", "บ้านส้อง", "ห้วยปริก", "กระเบียด", "ทานพอ", "ฉวาง", "คลองจันดี", "นาบอน", "คลองจัง", "ชุมทางทุ่งสง", "ที่วัง", "กะปาง", "ห้วยยอด", "ตรัง", "กันตัง"] },
-                    { id: "169/170", name: "169/170 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "ยะลา",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "บ้านโป่ง", "โพธาราม", "ราชบุรี", "ปากท่อ", "เพชรบุรี", "ชะอำ", "หัวหิน", "วังก์พง", "ปราณบุรี", "ประจวบคีรีขันธ์", "ทับสะแก", "บ้านกรูด", "บางสะพานใหญ่", "มาบอำมฤต", "ปะทิว", "ชุมพร", "หลังสวน", "ละแม", "ไชยา", "สุราษฎร์ธานี", "ทานพอ", "ฉวาง", "คลองจันดี", "นาบอน", "ชุมทางทุ่งสง", "ชุมทางเขาชุมทอง", "ชะอวด", "บ้านขอนหาด", "แหลมโตนด", "ปากคลอง", "พัทลุง", "เขาชัยสน", "บางแก้ว", "หารเทา", "ควนเนียง", "ชุมทางหาดใหญ่", "จะนะ", "เทพา", "ปัตตานี (โคกโพธิ์)", "นาประดู่", "ยะลา"] },
-                    { id: "171/172", name: "171/172 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "สุไหงโก-ลก",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "บ้านโป่ง", "ราชบุรี", "เพชรบุรี", "หัวหิน", "วังก์พง", "ประจวบคีรีขันธ์", "บ้านกรูด", "บางสะพานใหญ่", "ปะทิว", "ชุมพร", "สวี", "หลังสวน", "ละแม", "ท่าชนะ", "ไชยา", "สุราษฎร์ธานี", "นาสาร", "บ้านส้อง", "ชุมทางทุ่งสง", "ชะอวด", "พัทลุง", "ชุมทางหาดใหญ่", "จะนะ", "เทพา", "ปัตตานี (โคกโพธิ์)", "นาประดู่", "วัดช้างให้", "ยะลา", "รามัน", "รือเสาะ", "มะรือโบ", "ตันหยงมัส", "เจาะไอร้อง", "สุไหงปาดี", "สุไหงโก-ลก"] },
-                    { id: "173/174", name: "173/174 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "นครศรีธรรมราช",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "บ้านโป่ง", "ราชบุรี", "เพชรบุรี", "หัวหิน", "วังก์พง", "ประจวบคีรีขันธ์", "ทับสะแก", "บ้านกรูด", "บางสะพานใหญ่", "บางสะพานน้อย", "มาบอำมฤต", "ปะทิว", "ชุมพร", "สวี", "หลังสวน", "ละแม", "ท่าชนะ", "ไชยา", "สุราษฎร์ธานี", "บ้านนา", "นาสาร", "พรุพี", "บ้านส้อง", "ทานพอ", "ฉวาง", "คลองจันดี", "นาบอน", "ชุมทางทุ่งสง", "ชุมทางเขาชุมทอง", "บ้านทุ่งหล่อ", "โคกคราม", "นครศรีธรรมราช"] },
-                    { id: "255/254", name: "255/254 ธรรมดา", origin: "ธนบุรี", dest: "หลังสวน" },
-                    { id: "251/252", name: "251/252 ธรรมดา", origin: "ธนบุรี", dest: "ประจวบคีรีขันธ์" },
-                    { id: "351/352", name: "351/352 ธรรมดา", origin: "ธนบุรี", dest: "ราชบุรี" },
-                    { id: "261/262", name: "261/262 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "หัวหิน" }
-                ],
-                east: [
-                    { id: "997/998", name: "997/998 พิเศษโดยสาร (จองล่วงหน้าได้)", origin: "กรุงเทพ (หัวลำโพง)", dest: "จุกเสม็ด",
-                      stops: ["กรุงเทพ (หัวลำโพง)", "มักกะสัน", "คลองตัน", "หัวหมาก", "ลาดกระบัง", "หัวตะเข้", "ชุมทางฉะเชิงเทรา", "ชลบุรี", "ชุมทางศรีราชา", "พัทยา", "ตลาดน้ำ 4 ภาค", "ญาณสังวราราม", "สวนนงนุช", "บ้านพลูตาหลวง", "อู่ตะเภา", "จุกเสม็ด"] }
-                ]
-            };
-
-(function(){
-  const $ = (id) => document.getElementById(id);
-  const els = {
-    travelDate: $('travelDate'), modeStation: $('modeStation'), modeManual: $('modeManual'),
-    stationMode: $('stationMode'), manualMode: $('manualMode'), selectedLine: $('selectedLine'), selectedTrain: $('selectedTrain'),
-    trainManualBox: $('trainManualBox'), trainOrigin: $('trainOrigin'), trainDest: $('trainDest'), passOrigin: $('passOrigin'), passDest: $('passDest'),
-    totalDistance: $('totalDistance'), passengerDistance: $('passengerDistance'), distanceBox: $('distanceBox'), showTotal: $('showTotal'), showPassenger: $('showPassenger'), result: $('result'), toast: $('toast')
-  };
-  let inputMode = 'station';
-
-  function option(value, text){ const o=document.createElement('option'); o.value=value; o.textContent=text; return o; }
-  function clearSelect(sel, placeholder){ sel.innerHTML=''; sel.appendChild(option('', placeholder)); }
-  function getLine(){ return els.selectedLine.value; }
-  function getTrain(){ const line=getLine(); const id=els.selectedTrain.value; return (trainSchedules[line]||[]).find(t=>t.id===id)||null; }
-  function getKm(stationName){ const line=getLine(); const st=(trainData[line]?.stations||[]).find(s=>s.name===stationName); return st ? Number(st.km) : null; }
-  function formatDate(date){ return date.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}); }
-  function parseLocalDate(value){ const [y,m,d]=value.split('-').map(Number); return new Date(y, m-1, d); }
-  function showToast(msg){ els.toast.textContent=msg; els.toast.classList.add('show'); setTimeout(()=>els.toast.classList.remove('show'),1800); }
-
-  function initLines(){
-    Object.keys(trainData).forEach(key=> els.selectedLine.appendChild(option(key, trainData[key].name)));
-  }
-
-  function activeStations(){
-    const line=getLine(); if(!line) return [];
-    const all=trainData[line].stations || [];
-    const train=getTrain();
-    if(train){
-      if(train.stops && train.stops.length){ return all.filter(s=>train.stops.includes(s.name)); }
-      const start=all.findIndex(s=>s.name===train.origin), end=all.findIndex(s=>s.name===train.dest);
-      if(start !== -1 && end !== -1){ return all.slice(Math.min(start,end), Math.max(start,end)+1); }
+    function todayISO(){
+      const d = new Date();
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      return d.toISOString().slice(0,10);
     }
-    return all;
-  }
+    els.startDate.value = todayISO();
 
-  function fillSelects(){
-    const line=getLine();
-    clearSelect(els.selectedTrain, 'ไม่ระบุขบวน / เลือกเอง');
-    if(line){ (trainSchedules[line]||[]).forEach(t=> els.selectedTrain.appendChild(option(t.id, t.name))); }
-    fillStationSelects();
-  }
+    function money(n){
+      const hasDecimal = Math.abs(n - Math.round(n)) > 0.000001;
+      return n.toLocaleString('th-TH', { minimumFractionDigits: hasDecimal ? 2 : 0, maximumFractionDigits: 2 });
+    }
 
-  function fillStationSelects(){
-    const stations=activeStations();
-    const saved={to:els.trainOrigin.value, td:els.trainDest.value, po:els.passOrigin.value, pd:els.passDest.value};
-    [els.trainOrigin, els.trainDest, els.passOrigin, els.passDest].forEach((sel)=> clearSelect(sel, '- เลือก -'));
-    stations.forEach(s=>{
-      els.trainOrigin.appendChild(option(s.name, s.name));
-      els.trainDest.appendChild(option(s.name, s.name));
-      els.passOrigin.appendChild(option(s.name, s.name));
-      els.passDest.appendChild(option(s.name, s.name));
+    function roundFinalBaht(n){
+      // ใบแทรก 692: มีเศษต่ำกว่า 50 สตางค์ให้ตัดทิ้ง ตั้งแต่ 50 สตางค์ขึ้นไปยกเป็น 1 บาท และยกเศษครั้งสุดท้าย
+      return Math.floor(n + 0.5 + 1e-9);
+    }
+
+    function percentText(rate){
+      const pct = rate * 100;
+      return Number.isInteger(pct) ? `${pct}%` : `${pct.toFixed(2)}%`;
+    }
+
+    function thaiDate(d){
+      return new Intl.DateTimeFormat('th-TH-u-ca-buddhist', { day:'numeric', month:'long', year:'numeric' }).format(d);
+    }
+
+    function addMonthsEndDate(date, months){
+      const startDay = date.getDate();
+      const targetMonthIndex = date.getMonth() + months;
+      const targetYear = date.getFullYear() + Math.floor(targetMonthIndex / 12);
+      const targetMonth = ((targetMonthIndex % 12) + 12) % 12;
+      const lastDayTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+      // ถ้าเดือนปลายทางมีวันที่ตรงกับวันเริ่มใช้ ให้สิ้นสุดก่อนวันนั้น 1 วัน
+      // ถ้าไม่มีวันนั้น เช่น เริ่ม 31 ม.ค. ให้สิ้นสุดวันสุดท้ายของเดือนปลายทาง
+      if(startDay <= lastDayTargetMonth){
+        const sameDayNextPeriod = new Date(targetYear, targetMonth, startDay);
+        sameDayNextPeriod.setDate(sameDayNextPeriod.getDate() - 1);
+        return sameDayNextPeriod;
+      }
+      return new Date(targetYear, targetMonth, lastDayTargetMonth);
+    }
+
+    function addValidity(startISO, duration){
+      if(!startISO) return '';
+      const [y,m,day] = startISO.split('-').map(Number);
+      const start = new Date(y, m-1, day);
+      let end;
+      if(duration.validType === 'days'){
+        end = new Date(start);
+        end.setDate(end.getDate() + duration.validValue - 1);
+      } else {
+        end = addMonthsEndDate(start, duration.validValue);
+      }
+      return `${thaiDate(start)} ถึง ${thaiDate(end)}`;
+    }
+
+    function updatePassengerOptions(){
+      const type = els.ticketType.value;
+      [...els.passenger.options].forEach(opt => {
+        opt.disabled = (opt.value === 'student' && type !== 'roundtrip');
+      });
+      if(type !== 'roundtrip' && els.passenger.value === 'student') els.passenger.value = 'general';
+    }
+
+    function calculate(){
+      updatePassengerOptions();
+      const fare = parseFloat(els.fare.value);
+      if(isNaN(fare) || fare < 0){
+        els.price.textContent = '— บาท';
+        els.formula.textContent = 'กรุณากรอกค่าโดยสารเต็มราคา ต่อ 1 เที่ยว';
+        els.pills.innerHTML = '<span class="pill warn">ยังไม่ได้กรอกค่าโดยสาร</span>';
+        return null;
+      }
+
+      const type = DATA.ticketTypes[els.ticketType.value];
+      const duration = DATA.durations[els.duration.value];
+      const passengerKey = els.passenger.value;
+      const passenger = DATA.passengers[passengerKey];
+
+      const days = (passengerKey === 'student' && els.ticketType.value === 'roundtrip') ? duration.studentDays : duration.nominalDays;
+      let rate = duration.generalRate;
+      if(passengerKey === 'half') rate = duration.halfRate;
+      if(passengerKey === 'student') rate = duration.studentRate;
+
+      const baseBeforePercent = fare * type.trips * days;
+      const rawPrice = baseBeforePercent * rate;
+      const finalPrice = roundFinalBaht(rawPrice);
+      const saving = baseBeforePercent - rawPrice;
+      const savingPct = baseBeforePercent > 0 ? (saving / baseBeforePercent) * 100 : 0;
+      const validity = addValidity(els.startDate.value, duration);
+      const rateText = percentText(rate);
+
+      els.price.textContent = `${money(finalPrice)} บาท`;
+      els.pills.innerHTML = `
+        <span class="pill">${type.label}</span>
+        <span class="pill">${duration.label}</span>
+        <span class="pill">${passenger.label}</span>
+        <span class="pill">คิด ${days} วัน</span>
+        <span class="pill">${type.trips} เที่ยว/วัน</span>
+      `;
+
+      els.formula.textContent = `สูตร: ค่าโดยสารเต็มต่อเที่ยว × จำนวนเที่ยวต่อวัน × จำนวนวันที่คิด × อัตราที่ต้องจ่าย
+` +
+        `${money(fare)} × ${type.trips} × ${days} × ${rateText} = ${money(rawPrice)} บาท` +
+        (finalPrice !== rawPrice ? `
+ยกเศษครั้งสุดท้ายตามใบแทรก 692 = ${money(finalPrice)} บาท` : `
+ไม่มีเศษสตางค์ ต้องชำระ = ${money(finalPrice)} บาท`);
+
+      els.note.innerHTML = `
+        <b>ช่วงวันใช้งาน:</b> ${validity || 'ยังไม่ได้เลือกวันเริ่มใช้'}<br>
+        <b>ฐานก่อนคิดอัตราร้อยละ:</b> ${money(baseBeforePercent)} บาท<br>
+        <span class="saving">ส่วนลดจากฐานนี้ประมาณ ${money(Math.max(saving,0))} บาท (${money(Math.max(savingPct,0))}%)</span><br>
+        <span class="small">นักเรียน-นักศึกษามีสิทธิเฉพาะบัตรไป-กลับ และกรณีราย 2 เดือนใช้ 47% / ราย 3 เดือนใช้ 45%</span><br>
+        <span class="small">ควรเคลือบตั๋วเดือนเพื่อสะดวกในการเก็บรักษา</span>
+      `;
+
+      return { fare, type:type.label, duration:duration.label, passenger:passenger.label, days, trips:type.trips, rateText, rawPrice, finalPrice, baseBeforePercent, saving, savingPct, validity };
+    }
+
+    els.calcBtn.addEventListener('click', calculate);
+    [els.fare, els.ticketType, els.passenger, els.duration, els.startDate].forEach(el => {
+      el.addEventListener('input', calculate);
+      el.addEventListener('change', calculate);
     });
-    els.trainOrigin.value=saved.to; els.trainDest.value=saved.td; els.passOrigin.value=saved.po; els.passDest.value=saved.pd;
-    const train=getTrain();
-    if(train){
-      els.trainManualBox.classList.add('hidden');
-      els.trainOrigin.value=train.origin || '';
-      els.trainDest.value=train.dest || '';
-    }else{
-      els.trainManualBox.classList.remove('hidden');
-    }
-  }
 
-  function setMode(mode){
-    inputMode=mode;
-    els.modeStation.classList.toggle('active', mode==='station');
-    els.modeManual.classList.toggle('active', mode==='manual');
-    els.stationMode.classList.toggle('hidden', mode!=='station');
-    els.manualMode.classList.toggle('hidden', mode!=='manual');
-    calculate();
-  }
-
-  function distances(){
-    if(inputMode==='manual'){
-      return {total:parseFloat(els.totalDistance.value), passenger:parseFloat(els.passengerDistance.value)};
-    }
-    const t1=getKm(els.trainOrigin.value), t2=getKm(els.trainDest.value), p1=getKm(els.passOrigin.value), p2=getKm(els.passDest.value);
-    const total=(t1!==null && t2!==null) ? Math.abs(t2-t1) : NaN;
-    const passenger=(p1!==null && p2!==null) ? Math.abs(p2-p1) : NaN;
-    return {total, passenger};
-  }
-
-  function renderEmpty(){
-    els.result.innerHTML='<div class="empty"><div class="big">🧮</div><p>กรุณาระบุข้อมูลให้ครบถ้วน<br>เพื่อคำนวณวันจองให้อัตโนมัติ</p></div>';
-  }
-  function renderError(msg){ els.result.innerHTML='<div class="error">⚠️ '+msg+'</div>'; }
-  function renderEast(){
-    els.result.innerHTML = '<div class="east"><div class="icon">🚆</div><h3>รถไฟสายตะวันออก</h3><p><b>ขบวนรถธรรมดา / ชานเมือง</b></p><div class="main">ซื้อได้ในวันเดินทาง</div><p style="font-weight:800;margin:12px 0 0;color:#9a3412">ก่อนรถออกไม่เกิน 2 ชั่วโมง</p></div>';
-  }
-  function renderBooking({percentage, days, bookingDate, travelDate}){
-    const color=days===90?'green':days===30?'blue':'gray';
-    els.result.innerHTML = `
-      <div class="booking ${color}"><div class="booking-inner">
-        <div class="pill">เดินทาง ${percentage}% ของระยะทางขบวนรถ</div>
-        <div class="days ${color}">จองล่วงหน้า ${days} วัน</div>
-        <div class="datebox">
-          <div class="label">วันที่เริ่มจองตั๋วได้คือ</div>
-          <div class="date">${formatDate(bookingDate)}</div>
-          <div style="font-size:12px;color:#64748b;font-weight:800">สำหรับการเดินทางวันที่ ${formatDate(travelDate)}</div>
-          <div class="time">⏰ เริ่มจองได้ตั้งแต่เวลา 08.30 น. เป็นต้นไป</div>
-        </div>
-      </div></div>`;
-  }
-
-  function updateDistanceBox(total, passenger){
-    const ok=Number.isFinite(total) && Number.isFinite(passenger) && total>0 && passenger>0;
-    els.distanceBox.classList.toggle('hidden', !ok || inputMode!=='station');
-    if(ok){ els.showTotal.textContent=total+' กม.'; els.showPassenger.textContent=passenger+' กม.'; }
-  }
-
-  function calculate(){
-    const {total, passenger}=distances();
-    updateDistanceBox(total, passenger);
-    if(!els.travelDate.value || !Number.isFinite(total) || !Number.isFinite(passenger)){ renderEmpty(); return; }
-    if(total<=0 || passenger<=0 || passenger>total){ renderError('กรุณาระบุระยะทางให้ถูกต้อง ระยะทางที่เดินทางต้องไม่เกินระยะทางขบวนรถ'); return; }
-    const line=getLine(); const trainId=els.selectedTrain.value;
-    if(inputMode==='station' && line==='east' && trainId !== '997/998'){ renderEast(); return; }
-    const percentage=(passenger/total)*100;
-    const days=percentage>=60 ? 90 : (percentage>=25 ? 30 : 1);
-    const travelDate=parseLocalDate(els.travelDate.value);
-    const bookingDate=new Date(travelDate);
-    bookingDate.setDate(bookingDate.getDate()-days);
-    renderBooking({percentage:percentage.toFixed(2), days, bookingDate, travelDate});
-  }
-
-  els.modeStation.addEventListener('click',()=>setMode('station'));
-  els.modeManual.addEventListener('click',()=>setMode('manual'));
-  els.selectedLine.addEventListener('change',()=>{ fillSelects(); calculate(); });
-  els.selectedTrain.addEventListener('change',()=>{ fillStationSelects(); calculate(); });
-  [els.travelDate, els.trainOrigin, els.trainDest, els.passOrigin, els.passDest, els.totalDistance, els.passengerDistance].forEach(el=> el.addEventListener('input', calculate));
-  [els.trainOrigin, els.trainDest, els.passOrigin, els.passDest].forEach(el=> el.addEventListener('change', calculate));
-  initLines(); renderEmpty();
-  window.addEventListener('error', (e)=>{ console.error(e.error||e.message); showToast('พบข้อผิดพลาดในหน้าเว็บ โปรดตรวจสอบ Console'); });
-})();
-
-(function(){
-  const $ = (id) => document.getElementById(id);
-  const pages = { booking: $('toolBooking'), monthly: $('toolMonthly') };
-  const tabs = { booking: $('tabBooking'), monthly: $('tabMonthly') };
-  function showTool(name){
-    Object.keys(pages).forEach(key => {
-      if(pages[key]) pages[key].classList.toggle('active', key === name);
-      if(tabs[key]) tabs[key].classList.toggle('active', key === name);
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-  if(tabs.booking) tabs.booking.addEventListener('click', () => showTool('booking'));
-  if(tabs.monthly) tabs.monthly.addEventListener('click', () => showTool('monthly'));
-
-  const els = {
-    fare: $('monthlyFare'), trips: $('monthlyTrips'), passenger: $('monthlyPassenger'), period: $('monthlyPeriod'),
-    roundMode: $('monthlyRoundMode'), customRate: $('monthlyCustomRate'), result: $('monthlyResult')
-  };
-  const periods = {
-    week: { label:'รายสัปดาห์', days:6, studentRoundDays:5, generalPayRate:.75, discountText:'ลด 25%' },
-    m1: { label:'ราย 1 เดือน', days:24, studentRoundDays:20, generalPayRate:.75, discountText:'ลด 25%' },
-    m2: { label:'ราย 2 เดือน', days:48, studentRoundDays:40, generalPayRate:.72, discountText:'ลด 28%' },
-    m3: { label:'ราย 3 เดือน', days:72, studentRoundDays:60, generalPayRate:.70, discountText:'ลด 30%' }
-  };
-  const passengerLabels = { general:'ประชาชนทั่วไป', half:'ผู้มีสิทธิลดครึ่งราคา', student:'นักเรียน / นักศึกษา' };
-  function updatePeriodLabels(){
-    if(!els.period) return;
-    const passenger = els.passenger?.value || 'general';
-    const trips = parseInt(els.trips?.value || '1', 10);
-    const useStudentRoundDays = passenger === 'student' && trips === 2;
-    Object.entries(periods).forEach(([key, info]) => {
-      const opt = els.period.querySelector(`option[value="${key}"]`);
-      if(opt){
-        const days = useStudentRoundDays ? info.studentRoundDays : info.days;
-        opt.textContent = `${info.label} คิด ${days} วัน`;
+    els.copyBtn.addEventListener('click', async () => {
+      const r = calculate();
+      if(!r) return;
+      const text = `ผลคำนวณตั๋วเหมาจ่าย
+ประเภท: ${r.type}
+ระยะเวลา: ${r.duration}
+กลุ่มผู้โดยสาร: ${r.passenger}
+ค่าโดยสารเต็มต่อเที่ยว: ${money(r.fare)} บาท
+สูตร: ${money(r.fare)} × ${r.trips} × ${r.days} × ${r.rateText}
+ราคาตามสูตรก่อนยกเศษ: ${money(r.rawPrice)} บาท
+ราคาบัตรหลังยกเศษครั้งสุดท้าย: ${money(r.finalPrice)} บาท
+ช่วงวันใช้งาน: ${r.validity}`;
+      try{
+        await navigator.clipboard.writeText(text);
+        els.copyBtn.textContent = 'คัดลอกแล้ว';
+        setTimeout(() => els.copyBtn.textContent = 'คัดลอกผลลัพธ์', 1400);
+      }catch(e){
+        alert(text);
       }
     });
-  }
-  function money(v){ return Number(v).toLocaleString('th-TH', { minimumFractionDigits: (Number.isInteger(v)?0:2), maximumFractionDigits: 2 }); }
-  function empty(){ if(els.result) els.result.innerHTML = '<div class="empty"><div class="big">🎟️</div><p>กรุณากรอกค่าโดยสารเต็มราคา<br>เพื่อคำนวณตั๋วเดือน</p></div>'; }
-  function applyRound(v){
-    const mode = els.roundMode?.value || 'round';
-    if(mode === 'ceil') return Math.ceil(v);
-    if(mode === 'none') return Math.round(v * 100) / 100;
-    return Math.round(v);
-  }
-  function calcMonthly(){
-    updatePeriodLabels();
-    if(!els.result) return;
-    const fare = parseFloat(els.fare?.value || '');
-    const trips = parseInt(els.trips?.value || '1', 10);
-    const passenger = els.passenger?.value || 'general';
-    const period = periods[els.period?.value || 'week'];
-    if(!Number.isFinite(fare) || fare <= 0){ empty(); return; }
 
-    // ใช้ตรรกะเดิมที่คำนวณถูกต้อง:
-    // - ประชาชนทั่วไป / ผู้มีสิทธิลดครึ่งราคา ใช้วันปกติ 6 / 24 / 48 / 72
-    // - นักเรียน / นักศึกษา แบบไป-กลับ ใช้วันพิเศษ 5 / 20 / 40 / 60 แล้วคิด 50%
-    const isStudentRoundTrip = passenger === 'student' && trips === 2;
-    const calcDays = isStudentRoundTrip ? period.studentRoundDays : period.days;
-    const dayNote = isStudentRoundTrip ? ' วัน (นักเรียน/นักศึกษาไป-กลับ)' : ' วัน';
-    const base = fare * trips * calcDays;
-
-    let payRate = passenger === 'general' ? period.generalPayRate : .50;
-    let discountLabel = passenger === 'general' ? period.discountText : 'คิด 50%';
-    const customDiscount = parseFloat(els.customRate?.value || '');
-    if(Number.isFinite(customDiscount) && customDiscount >= 0 && customDiscount <= 100){
-      payRate = (100 - customDiscount) / 100;
-      discountLabel = 'ลดกำหนดเอง ' + customDiscount + '%';
-    }
-    const finalPrice = applyRound(base * payRate);
-    const saving = Math.max(0, base - finalPrice);
-    const avgPerDay = finalPrice / calcDays;
-    const avgPerTrip = finalPrice / (calcDays * trips);
-    const tripText = trips === 2 ? 'ไป-กลับ วันละ 2 เที่ยว' : 'เที่ยวเดียว วันละ 1 เที่ยว';
-    const ruleNote = isStudentRoundTrip ? 'ใช้เกณฑ์นักเรียน/นักศึกษาไป-กลับจากโค้ดเดิม' : 'ใช้จำนวนวันปกติ';
-    els.result.innerHTML = `
-      <div class="price-card"><div class="price-inner">
-        <div class="price-kicker">${period.label} • ${passengerLabels[passenger]} • ${tripText}</div>
-        <div class="price-main">${money(finalPrice)} <small>บาท</small></div>
-        <div class="summary-row"><span>ฐานราคาก่อนส่วนลด</span><strong>${money(base)} บาท</strong></div>
-        <div class="summary-row"><span>เกณฑ์ที่ใช้</span><strong>${calcDays}${dayNote} / ${discountLabel}</strong></div>
-        <div class="summary-row"><span>หมายเหตุสูตร</span><strong>${ruleNote}</strong></div>
-        <div class="summary-row"><span>ประหยัดโดยประมาณ</span><strong>${money(saving)} บาท</strong></div>
-        <div class="price-grid">
-          <div class="price-mini"><span>เฉลี่ยต่อวัน</span><strong>${money(avgPerDay)} บาท</strong></div>
-          <div class="price-mini"><span>เฉลี่ยต่อเที่ยว</span><strong>${money(avgPerTrip)} บาท</strong></div>
-        </div>
-        <div class="formula">สูตร: ค่าโดยสารเต็มราคา ${money(fare)} × ${trips} เที่ยว/วัน × ${calcDays} วัน × อัตราที่ต้องจ่าย ${(payRate*100).toFixed(0)}%</div>
-        <div class="warning-note">ราคาเป็นเพียงการคำนวณเบื้องต้น บางทีราคาอาจจะคลาดเคลื่อน ตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋วครับ</div>
-      </div></div>`;
-  }
-  ['fare','trips','passenger','period','roundMode','customRate'].forEach(key => {
-    if(els[key]){
-      els[key].addEventListener('input', calcMonthly);
-      els[key].addEventListener('change', calcMonthly);
-    }
-  });
-  updatePeriodLabels();
-  empty();
-})();
-
-</script>
+    updatePassengerOptions();
+    calculate();
+  </script>
 </body>
 </html>
