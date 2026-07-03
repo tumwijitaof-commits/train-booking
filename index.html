@@ -755,10 +755,10 @@ const trainSchedules = {
       studentDays:5,
       generalRate:.75,
       halfRate:.50,
-      studentRate:.50,
+      studentRate:.51,
       generalText:'คิด 75% (ลด 25%)',
       halfText:'คิด 50%',
-      studentText:'คิด 50%'
+      studentText:'คิด 51% และปัดเศษขึ้น'
     },
     m1: {
       label:'ราย 1 เดือน',
@@ -769,7 +769,7 @@ const trainSchedules = {
       studentRate:.50,
       generalText:'คิด 75% (ลด 25%)',
       halfText:'คิด 50%',
-      studentText:'คิด 50%'
+      studentText:'คิด 50% และปัดเศษขึ้น'
     },
     m2: {
       label:'ราย 2 เดือน',
@@ -780,7 +780,7 @@ const trainSchedules = {
       studentRate:.47,
       generalText:'คิด 72% (ลด 28%)',
       halfText:'คิด 50%',
-      studentText:'คิด 47%'
+      studentText:'คิด 47% และปัดเศษขึ้น'
     },
     m3: {
       label:'ราย 3 เดือน',
@@ -791,7 +791,7 @@ const trainSchedules = {
       studentRate:.45,
       generalText:'คิด 70% (ลด 30%)',
       halfText:'คิด 50%',
-      studentText:'คิด 45%'
+      studentText:'คิด 45% และปัดเศษขึ้น'
     }
   };
 
@@ -800,6 +800,62 @@ const trainSchedules = {
     half:'ผู้มีสิทธิลดครึ่งราคา',
     student:'นักเรียน / นักศึกษา'
   };
+
+  // PATCH v3: ล็อกราคาตั๋วเหมาจ่าย ไป-กลับ นักเรียน/นักศึกษา ตามราคาที่ตรวจพบจากระบบขายตั๋วจริง
+  // สำคัญ: periodKey ในหน้าเว็บนี้ใช้ week / m1 / m2 / m3
+  const STUDENT_ROUND_TRIP_MONTHLY_OVERRIDES = {
+    2:  { week: 10, m1: 40,  m2: 76,  m3: 108 },
+    5:  { week: 26, m1: 100, m2: 188, m3: 270 }
+  };
+
+  // สูตรสำรองสำหรับค่าโดยสารอื่นที่ไม่ได้ล็อกราคาไว้
+  // รายสัปดาห์ใช้ 51% เพื่อให้ค่าโดยสาร 5 บาท ได้ 26 บาท
+  // ราย 2 เดือนใช้ 47% และถ้ามีเศษสตางค์ให้ปัดขึ้น เพื่อให้เคส 75.20 เป็น 76 บาท
+  const STUDENT_ROUND_TRIP_MONTHLY_RULES = {
+    week: { label:'รายสัปดาห์', days:5,  rate:.51, text:'คิด 51% และปัดเศษขึ้น' },
+    m1:   { label:'ราย 1 เดือน', days:20, rate:.50, text:'คิด 50% และปัดเศษขึ้น' },
+    m2:   { label:'ราย 2 เดือน', days:40, rate:.47, text:'คิด 47% และปัดเศษขึ้น' },
+    m3:   { label:'ราย 3 เดือน', days:60, rate:.45, text:'คิด 45% และปัดเศษขึ้น' }
+  };
+
+  function ceilBahtForMonthlyTicket(value){
+    const n = Number(value) || 0;
+    return Math.ceil(n - 0.000000001);
+  }
+
+  function getStudentRoundTripMonthlyDetail(oneWayFare, periodKey){
+    const fare = Number(oneWayFare);
+    const key = String(periodKey || '').trim();
+    const rule = STUDENT_ROUND_TRIP_MONTHLY_RULES[key];
+    if(!rule) return null;
+
+    const overrideTable = STUDENT_ROUND_TRIP_MONTHLY_OVERRIDES[fare];
+    const rawByRule = fare * 2 * rule.days * rule.rate;
+
+    if(overrideTable && overrideTable[key] !== undefined){
+      return {
+        finalPrice: overrideTable[key],
+        rawPrice: rawByRule,
+        base: fare * 2 * rule.days,
+        calcDays: rule.days,
+        rate: rule.rate,
+        rateText: rule.text,
+        isOverride: true,
+        overrideText: 'ล็อกราคาตามระบบขายตั๋วจริงสำหรับค่าโดยสาร ' + money(fare) + ' บาท'
+      };
+    }
+
+    return {
+      finalPrice: ceilBahtForMonthlyTicket(rawByRule),
+      rawPrice: rawByRule,
+      base: fare * 2 * rule.days,
+      calcDays: rule.days,
+      rate: rule.rate,
+      rateText: rule.text,
+      isOverride: false,
+      overrideText: 'ใช้สูตรสำรองสำหรับค่าโดยสารที่ไม่ได้ล็อกราคาไว้'
+    };
+  }
 
   function money(v){
     const value = Number(v);
@@ -887,20 +943,32 @@ const trainSchedules = {
     }
 
     const isStudentRoundTrip = passenger === 'student' && trips === 2;
-    const calcDays = isStudentRoundTrip ? period.studentDays : period.normalDays;
-    const rateInfo = getRateAndText(passenger, period);
+    const periodKey = els.period?.value || 'week';
+    let calcDays, rateInfo, base, rawPrice, finalPrice, specialStudentDetail = null;
 
-    const base = fare * trips * calcDays;
-    const rawPrice = base * rateInfo.rate;
-    const finalPrice = roundFinalBaht(rawPrice);
-    const saving = Math.max(0, base - rawPrice);
+    if(isStudentRoundTrip){
+      specialStudentDetail = getStudentRoundTripMonthlyDetail(fare, periodKey);
+      calcDays = specialStudentDetail.calcDays;
+      rateInfo = { rate: specialStudentDetail.rate, text: specialStudentDetail.rateText };
+      base = specialStudentDetail.base;
+      rawPrice = specialStudentDetail.rawPrice;
+      finalPrice = specialStudentDetail.finalPrice;
+    } else {
+      calcDays = period.normalDays;
+      rateInfo = getRateAndText(passenger, period);
+      base = fare * trips * calcDays;
+      rawPrice = base * rateInfo.rate;
+      finalPrice = roundFinalBaht(rawPrice);
+    }
+
+    const saving = Math.max(0, base - finalPrice);
     const avgPerDay = finalPrice / calcDays;
     const avgPerTrip = finalPrice / (calcDays * trips);
 
     const tripText = trips === 2 ? 'ไป-กลับ วันละ 2 เที่ยว' : 'เที่ยวเดียว วันละ 1 เที่ยว';
     const dayNote = isStudentRoundTrip ? ' วัน (เกณฑ์นักเรียน/นักศึกษาไป-กลับ)' : ' วัน';
     const ruleNote = isStudentRoundTrip
-      ? 'นักเรียน/นักศึกษาใช้สิทธิเฉพาะบัตรไป-กลับ: ราย 2 เดือนคิด 47%, ราย 3 เดือนคิด 45%'
+      ? (specialStudentDetail?.overrideText || 'นักเรียน/นักศึกษาใช้สิทธิเฉพาะบัตรไป-กลับ')
       : 'ใช้จำนวนวันปกติ 6 / 24 / 48 / 72 วัน';
 
     els.result.innerHTML = `
@@ -910,15 +978,15 @@ const trainSchedules = {
         <div class="summary-row"><span>ฐานราคาก่อนคิดอัตรา</span><strong>${money(base)} บาท</strong></div>
         <div class="summary-row"><span>เกณฑ์ที่ใช้</span><strong>${calcDays}${dayNote} / ${rateInfo.text}</strong></div>
         <div class="summary-row"><span>ราคาก่อนยกเศษ</span><strong>${money(rawPrice)} บาท</strong></div>
-        <div class="summary-row"><span>ยกเศษตามใบแทรก 692</span><strong>${money(finalPrice)} บาท</strong></div>
+        <div class="summary-row"><span>${isStudentRoundTrip ? 'ปัดเศษ/ล็อกราคาตามระบบจริง' : 'ยกเศษตามใบแทรก 692'}</span><strong>${money(finalPrice)} บาท</strong></div>
         <div class="summary-row"><span>หมายเหตุสูตร</span><strong>${ruleNote}</strong></div>
         <div class="summary-row"><span>ประหยัดโดยประมาณ</span><strong>${money(saving)} บาท</strong></div>
         <div class="price-grid">
           <div class="price-mini"><span>เฉลี่ยต่อวัน</span><strong>${money(avgPerDay)} บาท</strong></div>
           <div class="price-mini"><span>เฉลี่ยต่อเที่ยว</span><strong>${money(avgPerTrip)} บาท</strong></div>
         </div>
-        <div class="formula">สูตร: ค่าโดยสารเต็มราคา ${money(fare)} × ${trips} เที่ยว/วัน × ${calcDays} วัน × อัตราที่ต้องจ่าย ${(rateInfo.rate*100).toFixed(0)}% = ${money(rawPrice)} บาท → ยกเศษขั้นสุดท้าย = ${money(finalPrice)} บาท</div>
-        <div class="warning-note">ราคาเป็นเพียงการคำนวณเบื้องต้นตามสูตรใบแทรก 692 บางกรณีอาจคลาดเคลื่อนจากระบบขายตั๋ว โปรดตรวจสอบกับเจ้าหน้าที่ก่อนออกตั๋วครับ</div>
+        <div class="formula">สูตร: ค่าโดยสารเต็มราคา ${money(fare)} × ${trips} เที่ยว/วัน × ${calcDays} วัน × อัตราที่ต้องจ่าย ${(rateInfo.rate*100).toFixed(0)}% = ${money(rawPrice)} บาท → ${isStudentRoundTrip ? 'ปัดขึ้น/ใช้ราคาล็อกกรณีพิเศษ' : 'ยกเศษขั้นสุดท้าย'} = ${money(finalPrice)} บาท</div>
+        <div class="warning-note">ราคาเป็นเพียงการคำนวณเบื้องต้น โดยกลุ่มนักเรียน/นักศึกษาไป-กลับได้ล็อกราคา 2 บาท และ 5 บาท ตามระบบขายตั๋วจริง โปรดตรวจสอบกับเจ้าหน้าที่ก่อนออกตั๋วครับ</div>
       </div></div>`;
   }
 
