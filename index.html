@@ -1,320 +1,298 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>เครื่องมือคำนวณตั๋วรถไฟ | SRT Ticket Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#082a4c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="เครื่องมือช่วยคำนวณวันเริ่มจองตั๋วรถไฟและราคาตั๋วเดือน ใช้เพื่อการคำนวณเบื้องต้น" />
+  <title>SRT Ticket Tools Premium</title>
   <style>
     :root{
-      --navy:#0f2f5f; --blue:#1557a6; --blue2:#1d4ed8; --gold:#c99a2e;
-      --red:#7b1e22; --green:#047857; --ink:#102033; --muted:#64748b;
-      --bg:#f5f8fc; --card:#ffffff; --line:rgba(15,47,95,.12);
-      --shadow:0 24px 70px rgba(15,47,95,.14); --radius:24px;
+      --navy:#082a4c;--navy-2:#0b3768;--blue:#1557a6;--blue-2:#2563eb;--gold:#c89a32;
+      --success:#067647;--success-bg:#ecfdf3;--warning:#b54708;--warning-bg:#fffaeb;
+      --danger:#b42318;--danger-bg:#fff1f0;--ink:#122033;--muted:#667085;--muted-2:#98a2b3;
+      --bg:#f4f7fb;--surface:#ffffff;--surface-2:#f8fafc;--surface-3:#eef4fa;
+      --line:#dfe7f0;--line-strong:#c9d6e4;--shadow-sm:0 6px 18px rgba(8,42,76,.06);
+      --shadow:0 18px 50px rgba(8,42,76,.10);--radius:22px;--radius-sm:14px;
+      --focus:0 0 0 4px rgba(21,87,166,.14);--topbar:76px;
+    }
+    html[data-theme="dark"]{
+      --ink:#eef4fb;--muted:#a7b6c7;--muted-2:#7f91a5;--bg:#08121f;--surface:#0d1b2b;
+      --surface-2:#101f31;--surface-3:#14283e;--line:#20364d;--line-strong:#31506f;
+      --shadow-sm:0 6px 18px rgba(0,0,0,.18);--shadow:0 18px 50px rgba(0,0,0,.28);
+      --success-bg:#0a2b22;--warning-bg:#31230a;--danger-bg:#351414;
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{
-      margin:0; min-height:100vh; font-family:Sarabun, Tahoma, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      color:var(--ink); background:
-        radial-gradient(circle at 10% 6%, rgba(21,87,166,.16), transparent 28%),
-        radial-gradient(circle at 90% 10%, rgba(201,154,46,.14), transparent 26%),
-        linear-gradient(135deg,#fbfdff 0%,#edf5ff 44%,#f8fafc 100%);
-      overflow-x:hidden;
-    }
-    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;background-image:linear-gradient(rgba(15,47,95,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,47,95,.035) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,#000 0%,transparent 78%)}
+    body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Sarabun","Noto Sans Thai",Tahoma,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
     a{color:inherit}
-    .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-    .topbar-inner{max-width:1320px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .hidden{display:none!important}
+    .app-shell{min-height:100vh}
+    .topbar{position:sticky;top:0;z-index:100;height:var(--topbar);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+    .topbar-inner{max-width:1240px;height:100%;margin:auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
     .brand{display:flex;align-items:center;gap:12px;min-width:0}
-    .seal{width:44px;height:44px;border-radius:999px;background:linear-gradient(135deg,var(--navy),var(--blue));display:grid;place-items:center;color:white;font-weight:900;box-shadow:0 10px 22px rgba(15,47,95,.22);border:2px solid rgba(255,255,255,.9);flex:none}
-    .brand-title{font-size:16px;font-weight:900;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .brand-sub{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;letter-spacing:.04em}
-    .badge{display:inline-flex;align-items:center;gap:8px;background:#fff7e5;border:1px solid rgba(201,154,46,.34);color:#8a640f;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:900;white-space:nowrap}
-    .hero{max-width:1320px;margin:0 auto;padding:38px 20px 18px;display:grid;grid-template-columns:1.02fr .98fr;gap:22px;align-items:stretch}
-    .hero-card{position:relative;overflow:hidden;border-radius:32px;background:linear-gradient(135deg,var(--navy),#123e7d 62%,#0b2248);color:#fff;box-shadow:var(--shadow);padding:34px;min-height:330px;display:flex;flex-direction:column;justify-content:space-between}
-    .hero-card:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,255,255,.13),transparent 42%);transform:translate(30%,-10%)}
-    .hero-card>*{position:relative;z-index:1}
-    .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;width:max-content;backdrop-filter:blur(10px)}
-    h1{font-size:clamp(30px,4vw,58px);line-height:1.04;margin:22px 0 14px;letter-spacing:-.04em;font-weight:900}
-    .hero p{margin:0;color:#dbeafe;font-weight:600;line-height:1.65;max-width:680px}
-    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px}
-    .stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:14px 12px;backdrop-filter:blur(10px)}
-    .stat strong{display:block;font-size:22px;color:white;line-height:1;font-weight:900}.stat span{font-size:11px;color:#bfdbfe;font-weight:800}
-    .rule-panel{display:grid;gap:14px}
-    .rule{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 14px 32px rgba(15,47,95,.08);display:flex;gap:14px;align-items:flex-start}
-    .rule-icon{width:48px;height:48px;border-radius:18px;display:grid;place-items:center;font-size:24px;flex:none}.r1{background:#e8fff5}.r2{background:#eaf3ff}.r3{background:#f1f5f9}
-    .rule h3{margin:0 0 4px;font-size:18px;font-weight:900;color:var(--navy)}.rule p{margin:0;font-size:13px;color:var(--muted);font-weight:600;line-height:1.55}
-    .layout{max-width:1320px;margin:0 auto;padding:16px 20px 42px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:22px;align-items:start}
-    .panel{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:32px;box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(14px)}
-    .panel-head{padding:24px 26px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.74))}
-    .panel-head h2{margin:0;font-size:21px;font-weight:900;color:var(--navy);letter-spacing:-.02em}.panel-head p{margin:3px 0 0;font-size:12px;color:var(--muted);font-weight:700}
-    .panel-body{padding:26px}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-    label{display:block;font-size:12px;font-weight:900;color:#334155;margin:0 0 7px}.hint{font-size:11px;color:var(--muted);font-weight:700;margin-top:6px;line-height:1.55}
-    input,select{width:100%;border:2px solid #dbe5f2;border-radius:16px;background:#fff;padding:13px 14px;font:800 15px Sarabun,Tahoma,sans-serif;color:var(--ink);outline:none;transition:.18s;box-shadow:0 6px 14px rgba(15,47,95,.04)}
-    input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(21,87,166,.12),0 8px 18px rgba(15,47,95,.06)}
-    .switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#eef4fb;border:1px solid #dbeafe;border-radius:20px;padding:7px}
-    .switch button{border:0;border-radius:15px;padding:12px 10px;background:transparent;color:#64748b;font:900 14px Sarabun,Tahoma,sans-serif;cursor:pointer;transition:.18s}.switch button.active{background:#fff;color:var(--blue);box-shadow:0 8px 18px rgba(15,47,95,.1)}
-    .subcard{background:#f8fbff;border:1px solid #dbeafe;border-radius:24px;padding:18px}.hidden{display:none!important}.divider{height:1px;background:var(--line);margin:18px 0}
-    .distance-box{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;text-align:center;background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:14px;margin-top:12px}.distance-box strong{font-size:18px;color:var(--blue)}.distance-box span{font-size:11px;color:var(--muted);font-weight:900}
-    .result-shell{position:sticky;top:88px}.result-card{min-height:360px;display:grid;place-items:center;text-align:center;padding:28px}.empty{color:#94a3b8}.empty .big{font-size:58px;opacity:.34;margin-bottom:10px}.empty p{font-weight:800;line-height:1.65;margin:0}
-    .error{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:22px;padding:18px;text-align:left;font-weight:900;line-height:1.55}.east{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:28px;padding:26px;width:100%}.east .icon{font-size:58px;margin-bottom:12px}.east h3{font-size:28px;margin:0 0 6px;font-weight:900}.east .main{background:#fff;border:1px solid #fed7aa;border-radius:22px;padding:20px;margin-top:18px;font-size:23px;font-weight:900;color:#c2410c}
-    .booking{border-radius:30px;padding:7px;width:100%;box-shadow:0 22px 48px rgba(15,47,95,.17)}.booking.green{background:linear-gradient(180deg,#34d399,#059669)}.booking.blue{background:linear-gradient(180deg,#60a5fa,#2563eb)}.booking.gray{background:linear-gradient(180deg,#94a3b8,#475569)}
-    .booking-inner{background:#fff;border-radius:24px;padding:28px}.pill{display:inline-flex;justify-content:center;align-items:center;background:#f1f5f9;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;color:#475569;margin-bottom:14px}.days{font-size:clamp(34px,5vw,56px);line-height:1;margin:4px 0 18px;font-weight:900;letter-spacing:-.04em}.days.green{color:#059669}.days.blue{color:#2563eb}.days.gray{color:#475569}
-    .datebox{background:#f8fafc;border:1px solid #e2e8f0;border-radius:22px;padding:20px}.datebox .label{font-size:11px;color:#64748b;font-weight:900;letter-spacing:.03em}.datebox .date{font-size:clamp(22px,3vw,32px);font-weight:900;color:#0f172a;margin:8px 0}.time{background:#eaf3ff;border:1px solid #bfdbfe;color:var(--blue);border-radius:15px;padding:11px 12px;font-size:13px;font-weight:900;margin-top:14px}
-    .notice{max-width:1320px;margin:0 auto 48px;padding:0 20px}.notice-card{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:30px;box-shadow:0 16px 44px rgba(15,47,95,.08);padding:24px}.notice h2{margin:0 0 14px;color:var(--navy);font-size:19px;font-weight:900}.notice ul{margin:0;padding-left:20px;display:grid;gap:9px;color:#475569;font-size:13px;font-weight:650;line-height:1.65}.footer{text-align:center;padding:28px 20px 46px;background:#0b2248;color:#bfdbfe;font-size:12px;font-weight:800;line-height:1.8}.footer strong{color:white}
-    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#102033;color:#fff;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;box-shadow:0 12px 32px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;bottom:28px}
-    @media(max-width:980px){.hero{grid-template-columns:1fr;padding-top:22px}.layout{grid-template-columns:1fr}.result-shell{position:relative;top:auto}.hero-card{min-height:auto}.brand-title{white-space:normal}.badge{display:none}}
-    @media(max-width:640px){.topbar-inner{padding:12px 14px}.hero,.layout,.notice{padding-left:14px;padding-right:14px}.hero-card{border-radius:24px;padding:24px}.hero-stats,.grid-2,.grid-3{grid-template-columns:1fr}.panel,.notice-card{border-radius:24px}.panel-head{padding:20px}.panel-body{padding:20px}.switch{grid-template-columns:1fr}.distance-box{grid-template-columns:1fr}.distance-box .sep{display:none}.result-card{min-height:300px}.rule{border-radius:20px}}
-
-    .tool-nav{max-width:1320px;margin:22px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .tool-tab{border:1px solid var(--line);background:rgba(255,255,255,.86);box-shadow:0 12px 30px rgba(15,47,95,.08);border-radius:22px;padding:15px 18px;font:900 16px Sarabun,Tahoma,sans-serif;color:var(--navy);cursor:pointer;transition:.18s;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center}
-    .tool-tab:hover{transform:translateY(-1px);box-shadow:0 18px 38px rgba(15,47,95,.12)}
-    .tool-tab.active{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-color:transparent}
-    .tool-page{display:none}.tool-page.active{display:block}
-    .tool-info{max-width:1320px;margin:14px auto 0;padding:0 20px}.tool-info-card{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:22px;padding:14px 18px;font-size:13px;font-weight:850;line-height:1.55;box-shadow:0 10px 24px rgba(15,47,95,.06)}
-    .monthly-hero{max-width:1320px;margin:0 auto;padding:38px 20px 18px;display:grid;grid-template-columns:1fr .9fr;gap:22px;align-items:stretch}
-    .monthly-card{position:relative;overflow:hidden;border-radius:32px;background:linear-gradient(135deg,#7b1e22,#9f2a2f 58%,#4f1013);color:#fff;box-shadow:var(--shadow);padding:34px;min-height:330px;display:flex;flex-direction:column;justify-content:space-between}
-    .monthly-card:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 42%);transform:translate(25%,-12%)}
-    .monthly-card>*{position:relative;z-index:1}.monthly-card p{margin:0;color:#ffe4e6;font-weight:650;line-height:1.65;max-width:720px}
-    .monthly-layout{max-width:1320px;margin:0 auto;padding:16px 20px 42px;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,.9fr);gap:22px;align-items:start}
-    .monthly-result{min-height:430px;display:grid;place-items:center;text-align:center;padding:28px}
-    .price-card{width:100%;border-radius:30px;padding:7px;background:linear-gradient(180deg,#fbbf24,#c2410c);box-shadow:0 22px 48px rgba(15,47,95,.16)}
-    .price-inner{background:#fff;border-radius:24px;padding:26px;text-align:left}.price-kicker{display:inline-flex;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;margin-bottom:14px}
-    .price-main{font-size:clamp(34px,5vw,58px);line-height:1;color:#9f2a2f;font-weight:900;letter-spacing:-.04em;margin:4px 0 18px;text-align:center}.price-main small{font-size:18px;letter-spacing:0;color:#64748b}
-    .price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.price-mini{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:14px;text-align:center}.price-mini span{display:block;font-size:11px;color:#64748b;font-weight:900}.price-mini strong{display:block;margin-top:4px;font-size:18px;color:#0f172a;font-weight:900}
-    .formula{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:18px;padding:14px;color:#475569;font-size:12px;font-weight:800;line-height:1.6;margin-top:14px;text-align:center}
-    .warning-note{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:18px;padding:13px 14px;font-size:12px;font-weight:900;line-height:1.55;margin-top:14px;text-align:center}
-    .quick-rules{display:grid;gap:12px}.quick-rule{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 14px 32px rgba(15,47,95,.08)}.quick-rule h3{margin:0 0 6px;color:var(--navy);font-size:17px;font-weight:900}.quick-rule p{margin:0;color:#64748b;font-size:13px;font-weight:700;line-height:1.55}
-    .summary-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #e2e8f0;padding:10px 0;font-size:13px;font-weight:800;color:#475569}.summary-row:last-child{border-bottom:0}.summary-row strong{color:#0f172a;text-align:right}
-    @media(max-width:980px){.monthly-hero,.monthly-layout{grid-template-columns:1fr}.tool-nav{grid-template-columns:1fr}.monthly-card{min-height:auto}}
-    @media(max-width:640px){.tool-nav,.tool-info,.monthly-hero,.monthly-layout{padding-left:14px;padding-right:14px}.tool-tab{font-size:14px;padding:13px 12px}.monthly-card{border-radius:24px;padding:24px}.price-grid{grid-template-columns:1fr}}
+    .brand-mark{width:46px;height:46px;border-radius:14px;background:var(--navy);color:white;display:grid;place-items:center;font-weight:950;letter-spacing:-.03em;box-shadow:var(--shadow-sm);border:1px solid rgba(255,255,255,.18)}
+    .brand-text{min-width:0}.brand-title{font-size:16px;font-weight:950;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand-sub{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.06em;margin-top:2px}
+    .top-actions{display:flex;align-items:center;gap:8px}.icon-btn{height:40px;min-width:40px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 12px;font-weight:850;box-shadow:var(--shadow-sm)}
+    .icon-btn:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+    .hero{max-width:1240px;margin:0 auto;padding:22px 20px 10px}
+    .hero-card{border:1px solid var(--line);background:var(--surface);border-radius:28px;padding:22px 24px;box-shadow:var(--shadow);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;overflow:hidden;position:relative}
+    .hero-card:before{content:"";position:absolute;width:280px;height:280px;border-radius:999px;right:-120px;top:-140px;background:rgba(200,154,50,.12)}
+    .hero-copy{position:relative}.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.03em}.hero h1{font-size:clamp(24px,3vw,38px);line-height:1.15;letter-spacing:-.03em;margin:8px 0 7px}.hero p{margin:0;color:var(--muted);font-size:13px;font-weight:700;max-width:780px}
+    .version-badge{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:6px}.version-badge strong{font-size:12px;color:var(--navy);background:#fff7e6;border:1px solid #ead6a0;border-radius:999px;padding:7px 11px}.version-badge span{font-size:10px;color:var(--muted);font-weight:800}
+    html[data-theme="dark"] .version-badge strong{background:#2e240c;color:#f5d98f;border-color:#5b481d}
+    .trustbar{max-width:1240px;margin:10px auto 0;padding:0 20px}.trustbar-inner{display:flex;align-items:flex-start;gap:10px;background:var(--warning-bg);border:1px solid color-mix(in srgb,var(--warning) 28%,var(--line));color:var(--warning);border-radius:16px;padding:11px 14px;font-size:12px;font-weight:800}.trustbar-inner b{font-weight:950}
+    .tabs{max-width:1240px;margin:14px auto 0;padding:0 20px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.tab{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:15px;padding:12px 16px;font-weight:900;box-shadow:var(--shadow-sm)}.tab.active{background:var(--navy);border-color:var(--navy);color:white}.tab:hover{transform:translateY(-1px)}
+    .page{display:none}.page.active{display:block}
+    .workspace{max-width:1240px;margin:0 auto;padding:14px 20px 46px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:18px;align-items:start}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}.card-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.card-head h2{margin:0;font-size:17px;font-weight:950;letter-spacing:-.02em}.card-head p{margin:2px 0 0;font-size:11px;color:var(--muted);font-weight:750}.card-body{padding:20px}
+    .step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;padding:2px 0 18px;position:relative}.step:not(:last-child):before{content:"";position:absolute;left:16px;top:38px;bottom:0;width:2px;background:var(--line)}.step-no{width:34px;height:34px;border-radius:11px;background:var(--navy);color:white;display:grid;place-items:center;font-weight:950;font-size:13px;z-index:1}.step-content h3{margin:5px 0 12px;font-size:14px;font-weight:950}.grid{display:grid;gap:12px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .field label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 6px;font-size:11px;color:var(--muted);font-weight:900}.field small{display:block;margin-top:6px;color:var(--muted);font-size:10px;font-weight:700}.control-wrap{position:relative;display:flex;gap:7px}.control{width:100%;min-height:46px;border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:13px;padding:10px 12px;outline:none;font-weight:800;transition:.15s}.control:focus{border-color:var(--blue);box-shadow:var(--focus)}.control::placeholder{color:var(--muted-2);font-weight:650}.mini-btn{width:46px;min-width:46px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:13px;font-size:17px}.mini-btn.active{color:var(--gold);border-color:#e4c56d;background:#fff9e9}.mini-btn:hover{border-color:var(--line-strong)}
+    .mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:7px;background:var(--surface-3);border:1px solid var(--line);border-radius:14px;padding:6px}.mode-switch button{border:0;background:transparent;color:var(--muted);border-radius:10px;padding:9px 10px;font-weight:900}.mode-switch button.active{background:var(--surface);color:var(--blue);box-shadow:var(--shadow-sm)}
+    .advanced{margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px}.advanced-title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);font-weight:900;margin-bottom:11px}.swap-row{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:8px;align-items:end}.swap-btn{height:46px;border:1px solid var(--line);background:var(--surface-2);color:var(--blue);border-radius:13px;font-weight:950;font-size:17px}.swap-btn:hover{transform:rotate(180deg);transition:.2s}
+    .favorite-strip{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}.favorite-strip-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;font-size:10px;color:var(--muted);font-weight:900}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:6px 9px;font-size:10px;font-weight:850}.chip:hover{border-color:var(--blue);color:var(--blue)}
+    .distance-summary{margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.metric{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}.metric span{display:block;color:var(--muted);font-size:9px;font-weight:850}.metric strong{display:block;margin-top:3px;font-size:14px;font-weight:950}
+    .sticky{position:sticky;top:calc(var(--topbar) + 14px)}.result-body{padding:18px;min-height:390px;display:flex;flex-direction:column}.empty{margin:auto;text-align:center;color:var(--muted)}.empty-icon{width:64px;height:64px;border-radius:20px;background:var(--surface-3);display:grid;place-items:center;margin:0 auto 12px;font-size:28px}.empty h3{margin:0 0 5px;color:var(--ink);font-size:16px}.empty p{margin:0;font-size:11px;font-weight:750;line-height:1.7}
+    .result-card{border:1px solid var(--line);border-radius:20px;background:var(--surface);overflow:hidden}.result-top{padding:16px;background:var(--navy);color:white;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.result-top .kicker{font-size:10px;color:#cfe0f3;font-weight:900}.result-top h3{margin:3px 0 0;font-size:18px;font-weight:950}.status{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;font-size:9px;font-weight:950;white-space:nowrap}.status.waiting{background:#fff3d6;color:#8b5a00}.status.open{background:#dff8e8;color:#05603a}.status.info{background:#e5efff;color:#1d4ed8}.result-main{padding:18px}.route-line{display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);gap:8px;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:11px}.route-line .station{font-size:11px;font-weight:900}.route-line .station:last-child{text-align:right}.route-line .arrow{text-align:center;color:var(--muted)}.big-result{text-align:center;padding:20px 8px 14px}.big-result span{display:block;color:var(--muted);font-size:11px;font-weight:900}.big-result strong{display:block;margin:4px 0;font-size:clamp(38px,6vw,58px);letter-spacing:-.05em;color:var(--blue);line-height:1;font-weight:950}.big-result small{color:var(--muted);font-size:10px;font-weight:800}.date-panel{border:1px solid var(--line);background:var(--surface-2);border-radius:16px;padding:13px}.date-panel .label{font-size:9px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.04em}.date-panel .date{font-size:19px;font-weight:950;margin-top:4px}.date-panel .time{font-size:11px;color:var(--blue);font-weight:900;margin-top:3px}.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.result-mini{border:1px solid var(--line);border-radius:13px;padding:10px;background:var(--surface)}.result-mini span{display:block;font-size:9px;color:var(--muted);font-weight:850}.result-mini strong{display:block;margin-top:3px;font-size:12px;font-weight:950}.note{margin-top:10px;border-radius:13px;padding:10px 11px;font-size:10px;font-weight:800;line-height:1.6}.note.warning{background:var(--warning-bg);color:var(--warning);border:1px solid color-mix(in srgb,var(--warning) 25%,var(--line))}.note.error{background:var(--danger-bg);color:var(--danger);border:1px solid color-mix(in srgb,var(--danger) 25%,var(--line))}.note.info{background:var(--surface-3);color:var(--muted);border:1px solid var(--line)}
+    .result-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}.action-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:9px 6px;font-size:9px;font-weight:900}.action-btn.primary{background:var(--navy);color:white;border-color:var(--navy)}.action-btn:hover{transform:translateY(-1px)}
+    .side-section{margin-top:14px}.side-section h3{font-size:11px;margin:0 0 8px;color:var(--muted);font-weight:950;display:flex;justify-content:space-between;align-items:center}.history-list{display:grid;gap:7px}.history-item{border:1px solid var(--line);background:var(--surface);border-radius:13px;padding:9px 10px;text-align:left}.history-item:hover{border-color:var(--blue)}.history-item b{display:block;font-size:10px;color:var(--ink)}.history-item span{display:block;margin-top:2px;font-size:9px;color:var(--muted);font-weight:750}.text-btn{border:0;background:none;color:var(--blue);padding:0;font-size:9px;font-weight:900}
+    .monthly-intro{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:14px}.monthly-intro b{display:block;font-size:12px}.monthly-intro span{display:block;color:var(--muted);font-size:10px;font-weight:750;margin-top:3px}
+    .price-main{text-align:center;padding:18px 8px 12px}.price-main span{font-size:10px;color:var(--muted);font-weight:900}.price-main strong{display:block;font-size:clamp(42px,6vw,64px);line-height:1;color:var(--gold);font-weight:950;letter-spacing:-.05em;margin:5px 0}.summary-table{display:grid;margin-top:10px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.summary-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:9px 11px;background:var(--surface);font-size:10px;border-bottom:1px solid var(--line)}.summary-row:last-child{border-bottom:0}.summary-row span{color:var(--muted);font-weight:800}.summary-row strong{text-align:right;font-weight:950}
+    .footer{border-top:1px solid var(--line);background:var(--surface);padding:24px 20px 40px;text-align:center;color:var(--muted);font-size:10px;font-weight:750;line-height:1.8}.footer strong{color:var(--ink)}
+    .toast{position:fixed;left:50%;bottom:22px;z-index:1000;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#101828;color:white;border-radius:999px;padding:10px 14px;box-shadow:0 14px 34px rgba(0,0,0,.25);font-size:10px;font-weight:900;transition:.2s;max-width:min(88vw,520px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+    .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+    @media(max-width:980px){.workspace{grid-template-columns:1fr}.sticky{position:relative;top:auto}.hero-card{grid-template-columns:1fr}.version-badge{align-items:flex-start}.result-body{min-height:320px}}
+    @media(max-width:680px){:root{--topbar:68px}.topbar-inner,.hero,.trustbar,.tabs,.workspace{padding-left:13px;padding-right:13px}.brand-mark{width:42px;height:42px}.brand-title{font-size:14px}.brand-sub{font-size:9px}.icon-btn .label{display:none}.hero{padding-top:14px}.hero-card{border-radius:20px;padding:17px}.hero h1{font-size:24px}.tabs{grid-template-columns:1fr 1fr}.workspace{padding-top:10px}.card{border-radius:18px}.card-head,.card-body{padding:15px}.grid-2,.grid-3{grid-template-columns:1fr}.step{grid-template-columns:30px minmax(0,1fr);gap:10px}.step-no{width:30px;height:30px}.step:not(:last-child):before{left:14px;top:34px}.swap-row{grid-template-columns:1fr}.swap-btn{width:100%;height:38px}.distance-summary{grid-template-columns:1fr 1fr}.distance-summary .metric:last-child{grid-column:1/-1}.result-grid{grid-template-columns:1fr}.result-actions{grid-template-columns:1fr 1fr}.route-line{grid-template-columns:1fr 24px 1fr}.top-actions{gap:5px}.icon-btn{height:38px;min-width:38px;padding:0 10px}}
+    @media print{
+      body{background:#fff!important}
+      body *{visibility:hidden!important}
+      body[data-print-target="booking"] #bookingResult,body[data-print-target="booking"] #bookingResult *,body[data-print-target="monthly"] #monthlyResult,body[data-print-target="monthly"] #monthlyResult *{visibility:visible!important}
+      body[data-print-target="booking"] #bookingResult,body[data-print-target="monthly"] #monthlyResult{position:absolute!important;left:0!important;top:0!important;width:100%!important;padding:24px!important;background:white!important;color:#111!important}
+      .result-actions{display:none!important}
+    }
   </style>
 </head>
 <body>
+<div class="app-shell">
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="seal">SRT</div>
-        <div>
-          <div class="brand-title">เครื่องมือคำนวณตั๋วรถไฟ</div>
-          <div class="brand-sub">SRT BOOKING & MONTHLY PASS TOOLS</div>
+        <div class="brand-mark" aria-hidden="true">SRT</div>
+        <div class="brand-text">
+          <div class="brand-title">SRT Ticket Tools</div>
+          <div class="brand-sub">PREMIUM CALCULATOR</div>
         </div>
       </div>
-      <div class="badge">จองล่วงหน้า / ตั๋วเดือน</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="installBtn" type="button" title="ติดตั้งเป็นแอป"><span>＋</span><span class="label">ติดตั้ง</span></button>
+        <button class="icon-btn" id="themeBtn" type="button" title="สลับโหมดสี"><span id="themeIcon">☾</span><span class="label">โหมดสี</span></button>
+      </div>
     </div>
   </header>
 
-  <nav class="tool-nav" aria-label="เมนูเครื่องมือ">
-    <button type="button" id="tabBooking" class="tool-tab active" data-tool="booking">📅 คำนวณการจองตั๋วล่วงหน้า</button>
-    <button type="button" id="tabMonthly" class="tool-tab" data-tool="monthly">🎟️ คำนวณราคาตั๋วเดือน</button>
-  </nav>
-  <div class="tool-info">
-    <div class="tool-info-card">หมายเหตุ: ผลลัพธ์จากเว็บนี้เป็นการคำนวณเบื้องต้นเท่านั้น บางทีราคาอาจจะคลาดเคลื่อน ตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋วทุกครั้งครับ</div>
-  </div>
-
-  <div id="toolBooking" class="tool-page active">
   <section class="hero">
     <div class="hero-card">
-      <div>
-        <div class="eyebrow">🚆 ระบบช่วยคำนวณเบื้องต้น</div>
-        <h1>คำนวณวันเริ่มจองตั๋ว<br>ได้รวดเร็วและแม่นยำขึ้น</h1>
-        <p>เลือกสายทาง ขบวนรถ และสถานีที่เดินทาง หรือกรอกระยะทางด้วยตนเอง ระบบจะคำนวณสัดส่วนการเดินทางและวันจองล่วงหน้าให้อัตโนมัติ</p>
+      <div class="hero-copy">
+        <div class="eyebrow">🚆 เครื่องมือช่วยงานสถานี</div>
+        <h1>คำนวณตั๋วรถไฟให้เร็วขึ้น<br>โดยไม่ทำให้หน้าจอซับซ้อน</h1>
+        <p>รวมเครื่องมือคำนวณวันเริ่มจองและตั๋วเดือนไว้ในหน้าเดียว พร้อมค้นหาสถานี ประวัติ รายการโปรด และผลลัพธ์ที่พร้อมคัดลอกหรือพิมพ์</p>
       </div>
-      <div class="hero-stats">
-        <div class="stat"><strong>90</strong><span>วัน เมื่อเดินทาง ≥ 60%</span></div>
-        <div class="stat"><strong>30</strong><span>วัน เมื่อเดินทาง ≥ 25%</span></div>
-        <div class="stat"><strong>1</strong><span>วัน เมื่อเดินทาง &lt; 25%</span></div>
+      <div class="version-badge">
+        <strong>Premium v1.0</strong>
+        <span>ปรับโครงสร้าง 27 สิงหาคม 2569</span>
       </div>
-    </div>
-    <div class="rule-panel">
-      <div class="rule"><div class="rule-icon r1">✅</div><div><h3>จองล่วงหน้า 90 วัน</h3><p>เมื่อระยะทางเดินทางจริงตั้งแต่ 60% ขึ้นไปของระยะทางขบวนรถ</p></div></div>
-      <div class="rule"><div class="rule-icon r2">📅</div><div><h3>จองล่วงหน้า 30 วัน</h3><p>เมื่อระยะทางเดินทางจริงตั้งแต่ 25% แต่ไม่ถึง 60% ของระยะทางขบวนรถ</p></div></div>
-      <div class="rule"><div class="rule-icon r3">🎫</div><div><h3>จองล่วงหน้า 1 วัน</h3><p>เมื่อระยะทางเดินทางจริงน้อยกว่า 25% ของระยะทางขบวนรถ</p></div></div>
     </div>
   </section>
 
-  <main class="layout">
-    <section class="panel">
-      <div class="panel-head">
-        <div><h2>กรอกข้อมูลการเดินทาง</h2><p>ระบบคำนวณให้อัตโนมัติเมื่อข้อมูลครบ</p></div>
-      </div>
-      <div class="panel-body grid">
-        <div>
-          <label for="travelDate">วันที่ต้องการเดินทาง</label>
-          <input id="travelDate" type="date" />
-          <div class="hint">ระบบจะนับย้อนหลังจากวันที่เดินทางตามจำนวนวันที่จองล่วงหน้า</div>
-        </div>
-
-        <div class="switch" role="tablist" aria-label="เลือกวิธีกรอกข้อมูล">
-          <button id="modeStation" class="active" type="button">เลือกจากสถานี</button>
-          <button id="modeManual" type="button">กรอกระยะทางเอง</button>
-        </div>
-
-        <div id="stationMode" class="subcard grid">
-          <div class="grid grid-2">
-            <div><label for="selectedLine">สายทาง</label><select id="selectedLine"><option value="">- เลือกสายทาง -</option></select></div>
-            <div><label for="selectedTrain">ขบวนรถ</label><select id="selectedTrain"><option value="">ไม่ระบุขบวน / เลือกเอง</option></select></div>
-          </div>
-
-          <div id="trainManualBox" class="grid grid-2">
-            <div><label for="trainOrigin">ต้นทางของขบวนรถ</label><select id="trainOrigin"><option value="">- เลือก -</option></select></div>
-            <div><label for="trainDest">ปลายทางของขบวนรถ</label><select id="trainDest"><option value="">- เลือก -</option></select></div>
-          </div>
-
-          <div class="divider"></div>
-          <div class="grid grid-2">
-            <div><label for="passOrigin">สถานีขึ้นของผู้โดยสาร</label><select id="passOrigin"><option value="">- เลือก -</option></select></div>
-            <div><label for="passDest">สถานีลงของผู้โดยสาร</label><select id="passDest"><option value="">- เลือก -</option></select></div>
-          </div>
-          <div id="distanceBox" class="distance-box hidden">
-            <div><span>ระยะทางขบวนรถ</span><strong id="showTotal">-</strong></div>
-            <div class="sep">|</div>
-            <div><span>ระยะทางเดินทางจริง</span><strong id="showPassenger">-</strong></div>
-          </div>
-        </div>
-
-        <div id="manualMode" class="subcard grid hidden">
-          <div class="grid grid-2">
-            <div><label for="totalDistance">ระยะทางวิ่งทั้งหมดของขบวนรถ (กม.)</label><input id="totalDistance" type="number" min="0" step="1" placeholder="เช่น 751" /></div>
-            <div><label for="passengerDistance">ระยะทางเดินทางจริงของผู้โดยสาร (กม.)</label><input id="passengerDistance" type="number" min="0" step="1" placeholder="เช่น 480" /></div>
-          </div>
-          <div class="hint">ใช้กรณีต้องการคำนวณเอง หรือกรณีสายทาง/สถานียังไม่มีในรายการ</div>
-        </div>
-      </div>
-    </section>
-
-    <aside class="panel result-shell">
-      <div class="panel-head">
-        <div><h2>ผลการคำนวณ</h2><p>แสดงวันเริ่มจองตั๋วและสัดส่วนการเดินทาง</p></div>
-      </div>
-      <div id="result" class="result-card">
-        <div class="empty"><div class="big">🧮</div><p>กรุณาระบุข้อมูลให้ครบถ้วน<br>เพื่อคำนวณวันจองให้อัตโนมัติ</p></div>
-      </div>
-    </aside>
-  </main>
-
-  <section class="notice">
-    <div class="notice-card">
-      <h2>ข้อมูลและระเบียบที่ควรทราบ</h2>
-      <ul>
-        <li>ตั๋วสำรองที่นั่งต้องระบุชื่อ-นามสกุล และเลขบัตรประชาชน หรือ Passport No. ให้ตรงกับผู้เดินทาง</li>
-        <li>รถธรรมดา รถชานเมือง และรถท้องถิ่นที่ไม่สำรองที่นั่ง โดยทั่วไปซื้อได้ในวันเดินทางก่อนรถออกไม่เกิน 2 ชั่วโมง</li>
-        <li>รถไฟสายตะวันออกในระบบนี้กำหนดให้ขบวน 997/998 เป็นขบวนที่จองล่วงหน้าได้ ส่วนขบวนธรรมดา/ชานเมืองให้ซื้อวันเดินทาง</li>
-        <li>โปรดตรวจสอบตั๋วทันทีเมื่อได้รับตั๋ว หากผิดพลาดควรแจ้งเจ้าหน้าที่ก่อนพ้นหน้าช่องจำหน่ายตั๋ว</li>
-      </ul>
-    </div>
-  </section>
-
-
+  <div class="trustbar">
+    <div class="trustbar-inner"><span>🛡️</span><div><b>เครื่องมือนี้ไม่ใช่ระบบจำหน่ายตั๋วอย่างเป็นทางการ</b> ผลลัพธ์ใช้ช่วยคำนวณเบื้องต้น โปรดตรวจสอบกับ D-Ticket เจ้าหน้าที่สถานี หรือสายด่วน 1690 ก่อนทำรายการทุกครั้ง</div></div>
   </div>
 
-  <div id="toolMonthly" class="tool-page">
-    <section class="monthly-hero">
-      <div class="monthly-card">
-        <div>
-          <div class="eyebrow">🎟️ เครื่องมือคำนวณตั๋วเดือน</div>
-          <h1>คำนวณราคาตั๋วเดือน<br>แบบเร็วและเข้าใจง่าย</h1>
-          <p>กรอกค่าโดยสารเต็มราคาแบบเที่ยวเดียว เลือกรูปแบบเดินทาง ประเภทผู้โดยสาร และระยะเวลาที่ต้องการ ระบบจะคำนวณราคาประมาณการให้ทันที</p>
-        </div>
-        <div class="hero-stats">
-          <div class="stat"><strong>6</strong><span>วัน สำหรับรายสัปดาห์</span></div>
-          <div class="stat"><strong>24</strong><span>วัน สำหรับ 1 เดือน</span></div>
-          <div class="stat"><strong>72</strong><span>วัน สำหรับ 3 เดือน</span></div>
-        </div>
-      </div>
-      <div class="quick-rules">
-        <div class="quick-rule"><h3>ประชาชนทั่วไป</h3><p>คิดจากค่าโดยสารเต็มราคา × จำนวนเที่ยว × จำนวนวัน แล้วหักส่วนลดตามแพ็กเกจที่เลือก</p></div>
-        <div class="quick-rule"><h3>ผู้มีสิทธิลดครึ่งราคา</h3><p>คิด 50% ของฐานค่าโดยสารตามจำนวนวันและจำนวนเที่ยว</p></div>
-        <div class="quick-rule"><h3>นักเรียน / นักศึกษาไป-กลับ</h3><p>ใช้จำนวนวันพิเศษ 5 / 20 / 40 / 60 วัน โดยรายสัปดาห์และ 1 เดือนคิด 50%, ราย 2 เดือนคิด 47%, ราย 3 เดือนคิด 45%</p></div>
-        <div class="quick-rule"><h3>ตรวจสอบก่อนออกตั๋ว</h3><p>บางเส้นทาง ประเภทขบวน หรือเงื่อนไขเฉพาะ อาจทำให้ราคาจริงต่างจากที่คำนวณได้</p></div>
-      </div>
-    </section>
+  <nav class="tabs" aria-label="เลือกเครื่องมือ">
+    <button class="tab active" id="bookingTab" type="button">📅 วันเริ่มจองตั๋ว</button>
+    <button class="tab" id="monthlyTab" type="button">🎟️ ราคาตั๋วเดือน</button>
+  </nav>
 
-    <main class="monthly-layout">
-      <section class="panel">
-        <div class="panel-head">
-          <div><h2>กรอกข้อมูลตั๋วเดือน</h2><p>ระบบคำนวณราคาประมาณการจากค่าโดยสารเต็มราคา</p></div>
-        </div>
-        <div class="panel-body grid">
-          <div class="grid grid-2">
-            <div>
-              <label for="monthlyFare">ค่าโดยสารเต็มราคา / เที่ยวเดียว (บาท)</label>
-              <input id="monthlyFare" type="number" min="0" step="1" placeholder="เช่น 10, 12, 24, 48" />
-              <div class="hint">ใส่ราคาตั๋วเต็มราคา 1 เที่ยว ก่อนหักส่วนลด</div>
-            </div>
-            <div>
-              <label for="monthlyTrips">รูปแบบการเดินทาง</label>
-              <select id="monthlyTrips">
-                <option value="1">เที่ยวเดียว วันละ 1 เที่ยว</option>
-                <option value="2">ไป-กลับ วันละ 2 เที่ยว</option>
-              </select>
+  <section id="bookingPage" class="page active">
+    <main class="workspace">
+      <section class="card">
+        <div class="card-head"><div><h2>ข้อมูลการเดินทาง</h2><p>กรอกตามขั้นตอน ระบบจะคำนวณให้อัตโนมัติ</p></div></div>
+        <div class="card-body">
+          <div class="step">
+            <div class="step-no">1</div>
+            <div class="step-content">
+              <h3>วันที่และรูปแบบการคำนวณ</h3>
+              <div class="grid grid-2">
+                <div class="field"><label for="travelDate">วันที่เดินทาง</label><input class="control" id="travelDate" type="date" /></div>
+                <div class="field"><label>วิธีกรอกข้อมูล</label><div class="mode-switch"><button class="active" id="stationModeBtn" type="button">เลือกสถานี</button><button id="manualModeBtn" type="button">กรอกระยะทาง</button></div></div>
+              </div>
             </div>
           </div>
 
-          <div class="grid grid-2">
-            <div>
-              <label for="monthlyPassenger">ประเภทผู้โดยสาร</label>
-              <select id="monthlyPassenger">
-                <option value="general">ประชาชนทั่วไป</option>
-                <option value="half">ผู้มีสิทธิลดครึ่งราคา</option>
-                <option value="student">นักเรียน / นักศึกษา</option>
-              </select>
-              <div class="hint">ผู้มีสิทธิลดครึ่งราคาคิด 50%; นักเรียน/นักศึกษาใช้สิทธิเฉพาะแบบไป-กลับ โดยรายสัปดาห์และ 1 เดือนคิด 50%, ราย 2 เดือนคิด 47%, ราย 3 เดือนคิด 45%</div>
-            </div>
-            <div>
-              <label for="monthlyPeriod">ระยะเวลาตั๋วเดือน</label>
-              <select id="monthlyPeriod">
-                <option value="week">รายสัปดาห์ คิด 6 วัน</option>
-                <option value="m1">ราย 1 เดือน คิด 24 วัน</option>
-                <option value="m2">ราย 2 เดือน คิด 48 วัน</option>
-                <option value="m3">ราย 3 เดือน คิด 72 วัน</option>
-              </select>
-            </div>
-          </div>
-          <div class="subcard grid">
-            <div>
-              <label>การยกเศษราคา</label>
-              <div class="hint">ระบบใช้เกณฑ์ใบแทรก 692: เศษต่ำกว่า 50 สตางค์ตัดทิ้ง / ตั้งแต่ 50 สตางค์ขึ้นไปยกเป็น 1 บาท และยกเศษเฉพาะขั้นสุดท้าย</div>
+          <div class="step" id="stationStep">
+            <div class="step-no">2</div>
+            <div class="step-content">
+              <h3>เลือกขบวนและเส้นทาง</h3>
+              <div class="grid grid-2">
+                <div class="field"><label for="selectedLine">สายทาง</label><select class="control" id="selectedLine"><option value="">- เลือกสายทาง -</option></select></div>
+                <div class="field"><label for="selectedTrain">ขบวนรถ</label><select class="control" id="selectedTrain"><option value="">ไม่ระบุขบวน / กำหนดเอง</option></select></div>
+              </div>
+
+              <div id="customTrainBox" class="advanced hidden">
+                <div class="advanced-title"><span>กำหนดช่วงวิ่งของขบวนเอง</span><span>ใช้เมื่อไม่ได้เลือกหมายเลขขบวน</span></div>
+                <div class="grid grid-3">
+                  <div class="field"><label for="reservationType">ประเภทการจำหน่าย</label><select class="control" id="reservationType"><option value="">- เลือกประเภท -</option><option value="reserved">สำรองที่นั่ง</option><option value="nonreserved">ไม่สำรองที่นั่ง</option></select></div>
+                  <div class="field"><label for="trainOrigin">ต้นทางขบวน</label><input class="control station-input" id="trainOrigin" list="stationList" autocomplete="off" placeholder="ค้นหาสถานี" /></div>
+                  <div class="field"><label for="trainDest">ปลายทางขบวน</label><input class="control station-input" id="trainDest" list="stationList" autocomplete="off" placeholder="ค้นหาสถานี" /></div>
+                </div>
+              </div>
+
+              <div class="swap-row" style="margin-top:12px">
+                <div class="field"><label for="passOrigin">สถานีขึ้น <span>พิมพ์เพื่อค้นหา</span></label><div class="control-wrap"><input class="control station-input" id="passOrigin" list="activeStationList" autocomplete="off" placeholder="เช่น กรุงเทพ (อภิวัฒน์)" /><button class="mini-btn" id="favOriginBtn" type="button" title="บันทึกสถานีโปรด">☆</button></div></div>
+                <button class="swap-btn" id="swapStationsBtn" type="button" title="สลับต้นทางและปลายทาง">⇄</button>
+                <div class="field"><label for="passDest">สถานีลง <span>พิมพ์เพื่อค้นหา</span></label><div class="control-wrap"><input class="control station-input" id="passDest" list="activeStationList" autocomplete="off" placeholder="เช่น เชียงใหม่" /><button class="mini-btn" id="favDestBtn" type="button" title="บันทึกสถานีโปรด">☆</button></div></div>
+              </div>
+              <datalist id="stationList"></datalist>
+              <datalist id="activeStationList"></datalist>
+
+              <div class="favorite-strip" id="favoriteStrip">
+                <div class="favorite-strip-head"><span>⭐ สถานีที่บันทึกไว้</span><button class="text-btn" id="clearFavoritesBtn" type="button">ล้างทั้งหมด</button></div>
+                <div class="chips" id="favoriteChips"><span class="chip">ยังไม่มีสถานีโปรด</span></div>
+              </div>
+
+              <div class="distance-summary hidden" id="distanceSummary">
+                <div class="metric"><span>ระยะขบวน</span><strong id="totalKmText">-</strong></div>
+                <div class="metric"><span>ระยะผู้โดยสาร</span><strong id="passengerKmText">-</strong></div>
+                <div class="metric"><span>สัดส่วน</span><strong id="percentageText">-</strong></div>
+              </div>
             </div>
           </div>
 
-          <div class="warning-note">หมายเหตุ: ราคาเป็นการคำนวณเบื้องต้นตามสูตรใบแทรก 692 โปรดตรวจสอบอีกครั้งกับระบบขายตั๋วและเจ้าหน้าที่ก่อนจำหน่ายตั๋วครับ</div>
+          <div class="step hidden" id="manualStep">
+            <div class="step-no">2</div>
+            <div class="step-content">
+              <h3>กรอกระยะทางด้วยตนเอง</h3>
+              <div class="grid grid-3">
+                <div class="field"><label for="manualReservationType">ประเภทการจำหน่าย</label><select class="control" id="manualReservationType"><option value="">- เลือกประเภท -</option><option value="reserved">สำรองที่นั่ง</option><option value="nonreserved">ไม่สำรองที่นั่ง</option></select></div>
+                <div class="field"><label for="totalDistance">ระยะวิ่งทั้งหมด (กม.)</label><input class="control" id="totalDistance" type="number" min="0" step="1" placeholder="เช่น 751" /></div>
+                <div class="field"><label for="passengerDistance">ระยะเดินทางจริง (กม.)</label><input class="control" id="passengerDistance" type="number" min="0" step="1" placeholder="เช่น 480" /></div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <aside class="panel result-shell">
-        <div class="panel-head">
-          <div><h2>ผลคำนวณราคาตั๋วเดือน</h2><p>ราคาโดยประมาณจากข้อมูลที่กรอก</p></div>
+      <aside class="card sticky">
+        <div class="card-head"><div><h2>ผลการคำนวณ</h2><p>พร้อมคัดลอก แชร์ หรือพิมพ์</p></div></div>
+        <div class="result-body" id="bookingResult">
+          <div class="empty"><div class="empty-icon">🧮</div><h3>พร้อมคำนวณ</h3><p>เลือกวันที่ สายทาง และสถานีให้ครบ<br>ผลลัพธ์จะแสดงอัตโนมัติ</p></div>
         </div>
-        <div id="monthlyResult" class="monthly-result">
-          <div class="empty"><div class="big">🎟️</div><p>กรุณากรอกค่าโดยสารเต็มราคา<br>เพื่อคำนวณตั๋วเดือน</p></div>
+        <div class="card-body" style="padding-top:0">
+          <div class="side-section">
+            <h3><span>🕘 ประวัติล่าสุด</span><button class="text-btn" id="clearBookingHistoryBtn" type="button">ล้าง</button></h3>
+            <div class="history-list" id="bookingHistory"></div>
+          </div>
         </div>
       </aside>
     </main>
+  </section>
 
-    <section class="notice">
-      <div class="notice-card">
-        <h2>เกณฑ์คำนวณที่ใช้ในระบบนี้</h2>
-        <ul>
-          <li>เที่ยวเดียว / ประชาชนทั่วไป / ผู้มีสิทธิลดครึ่งราคา: รายสัปดาห์ 6 วัน, ราย 1 เดือน 24 วัน, ราย 2 เดือน 48 วัน, ราย 3 เดือน 72 วัน</li>
-          <li>ประชาชนทั่วไป: รายสัปดาห์และ 1 เดือน คิด 75% ของฐานราคา, 2 เดือน คิด 72%, 3 เดือน คิด 70%</li>
-          <li>ผู้มีสิทธิลดครึ่งราคา: คิด 50% ของฐานราคา</li>
-          <li>นักเรียน / นักศึกษาแบบไป-กลับ: รายสัปดาห์ 5 วันและราย 1 เดือน 20 วันคิด 50%; ราย 2 เดือน 40 วันคิด 47%; ราย 3 เดือน 60 วันคิด 45%</li>
-          <li>นักเรียน / นักศึกษามีสิทธิเฉพาะบัตรไป-กลับเท่านั้น หากเลือกเที่ยวเดียว ระบบจะปรับกลับเป็นประชาชนทั่วไปอัตโนมัติ</li>
-          <li><strong>โปรดตรวจสอบราคาจริงกับเจ้าหน้าที่อีกครั้ง เพราะบางกรณีราคาอาจคลาดเคลื่อนได้</strong></li>
-        </ul>
-      </div>
-    </section>
-  </div>
+  <section id="monthlyPage" class="page">
+    <main class="workspace">
+      <section class="card">
+        <div class="card-head"><div><h2>คำนวณราคาตั๋วเดือน</h2><p>ใช้กฎกลางชุดเดียว ลดปัญหาสูตรซ้ำ</p></div></div>
+        <div class="card-body">
+          <div class="monthly-intro"><b>กรอกค่าโดยสารเต็มราคา 1 เที่ยว</b><span>จากนั้นเลือกรูปแบบเดินทาง ประเภทผู้โดยสาร และระยะเวลาที่ต้องการ</span></div>
+          <div class="grid grid-2">
+            <div class="field"><label for="monthlyFare">ค่าโดยสารเต็มราคา / เที่ยว (บาท)</label><input class="control" id="monthlyFare" type="number" min="0" step="0.01" placeholder="เช่น 10, 12, 24, 48" /></div>
+            <div class="field"><label for="monthlyTrips">รูปแบบการเดินทาง</label><select class="control" id="monthlyTrips"><option value="1">เที่ยวเดียว วันละ 1 เที่ยว</option><option value="2">ไป-กลับ วันละ 2 เที่ยว</option></select></div>
+            <div class="field"><label for="monthlyPassenger">ประเภทผู้โดยสาร</label><select class="control" id="monthlyPassenger"><option value="general">ประชาชนทั่วไป</option><option value="half">ผู้มีสิทธิลดครึ่งราคา</option><option value="student">นักเรียน / นักศึกษา</option></select><small>นักเรียน/นักศึกษาใช้สิทธิเฉพาะแบบไป-กลับ</small></div>
+            <div class="field"><label for="monthlyPeriod">ระยะเวลาตั๋วเดือน</label><select class="control" id="monthlyPeriod"><option value="week">รายสัปดาห์</option><option value="m1">ราย 1 เดือน</option><option value="m2">ราย 2 เดือน</option><option value="m3">ราย 3 เดือน</option></select></div>
+          </div>
+          <div class="note info" style="margin-top:14px">การยกเศษราคาปกติ: ต่ำกว่า 50 สตางค์ตัดทิ้ง / ตั้งแต่ 50 สตางค์ขึ้นไปยกเป็น 1 บาท โดยยกเศษเฉพาะขั้นสุดท้าย ส่วนราคานักเรียน 2 และ 5 บาทใช้ค่ากรณีพิเศษที่บันทึกไว้จากระบบขายจริง</div>
+        </div>
+      </section>
+
+      <aside class="card sticky">
+        <div class="card-head"><div><h2>ผลราคาตั๋วเดือน</h2><p>ราคาโดยประมาณจากข้อมูลที่กรอก</p></div></div>
+        <div class="result-body" id="monthlyResult">
+          <div class="empty"><div class="empty-icon">🎟️</div><h3>กรอกค่าโดยสาร</h3><p>ระบบจะแสดงราคา สูตร และค่าเฉลี่ยให้ทันที</p></div>
+        </div>
+        <div class="card-body" style="padding-top:0">
+          <div class="side-section">
+            <h3><span>🕘 ประวัติล่าสุด</span><button class="text-btn" id="clearMonthlyHistoryBtn" type="button">ล้าง</button></h3>
+            <div class="history-list" id="monthlyHistory"></div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </section>
 
   <footer class="footer">
     <strong>จัดทำโดย นายพชรวิชญ์ ตุ้มวิจิตร</strong><br>
-    นายสถานีคลองบางพระ | เครื่องมือนี้ใช้เพื่อช่วยคำนวณเบื้องต้น บางทีราคาอาจจะคลาดเคลื่อน โปรดตรวจสอบอีกครั้งกับเจ้าหน้าที่ก่อนออกตั๋ว
+    นายสถานีคลองบางพระ · SRT Ticket Tools Premium v1.0<br>
+    เครื่องมือนี้ใช้ช่วยคำนวณเบื้องต้น ไม่ใช่ระบบจำหน่ายตั๋วอย่างเป็นทางการ
   </footer>
-
-  <div id="toast" class="toast"></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
+'use strict';
+
+/* =========================================================
+   1) APP CONFIG + SINGLE SOURCE OF TRUTH
+   ========================================================= */
+const APP_CONFIG = Object.freeze({
+  version: 'Premium v1.0',
+  buildDate: '27 สิงหาคม 2569',
+  dticketUrl: 'https://dticket.railway.co.th/DTicketPublicWeb/home/Home',
+  hotline: '1690',
+  historyLimit: 8
+});
+
+const BOOKING_RULES = Object.freeze({
+  thresholds: [
+    { min: 60, days: 90 },
+    { min: 25, days: 30 },
+    { min: 0, days: 1 }
+  ],
+  standardOpenTime: '08:30',
+  nonReservedText: 'ซื้อในวันเดินทาง ก่อนขบวนรถออกไม่เกิน 2 ชั่วโมง',
+  special997998: {
+    ids: ['997/998'],
+    chachoengsaoKm: 61,
+    chonburiKm: 108,
+    terminalTimes: {
+      '997': { station: 'กรุงเทพ (หัวลำโพง)', time: '06:45' },
+      '998': { station: 'จุกเสม็ด', time: '15:30' }
+    }
+  }
+});
+
+const MONTHLY_RULES = Object.freeze({
+  week:{label:'รายสัปดาห์',normalDays:6,studentDays:5,generalRate:.75,halfRate:.50,studentRate:.50},
+  m1:{label:'ราย 1 เดือน',normalDays:24,studentDays:20,generalRate:.75,halfRate:.50,studentRate:.50},
+  m2:{label:'ราย 2 เดือน',normalDays:48,studentDays:40,generalRate:.72,halfRate:.50,studentRate:.47},
+  m3:{label:'ราย 3 เดือน',normalDays:72,studentDays:60,generalRate:.70,halfRate:.50,studentRate:.45}
+});
+
+const STUDENT_OVERRIDES = Object.freeze({
+  2:{week:10,m1:40,m2:76,m3:108},
+  5:{week:26,m1:100,m2:188,m3:270}
+});
+
+const PASSENGER_LABELS = Object.freeze({general:'ประชาชนทั่วไป',half:'ผู้มีสิทธิลดครึ่งราคา',student:'นักเรียน / นักศึกษา'});
+
+/* =========================================================
+   2) DATA LAYER
+   ========================================================= */
 const trainData = {
                 north: {
                     name: "สายเหนือ (กทม.-เชียงใหม่)",
@@ -588,422 +566,197 @@ const trainSchedules = {
                 ]
             };
 
-(function(){
-  const $ = (id) => document.getElementById(id);
-  const els = {
-    travelDate: $('travelDate'), modeStation: $('modeStation'), modeManual: $('modeManual'),
-    stationMode: $('stationMode'), manualMode: $('manualMode'), selectedLine: $('selectedLine'), selectedTrain: $('selectedTrain'),
-    trainManualBox: $('trainManualBox'), trainOrigin: $('trainOrigin'), trainDest: $('trainDest'), passOrigin: $('passOrigin'), passDest: $('passDest'),
-    totalDistance: $('totalDistance'), passengerDistance: $('passengerDistance'), distanceBox: $('distanceBox'), showTotal: $('showTotal'), showPassenger: $('showPassenger'), result: $('result'), toast: $('toast')
-  };
-  let inputMode = 'station';
+/* =========================================================
+   3) UTILITIES
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+const DAY_MS = 86400000;
+const STORAGE = {
+  get(key, fallback){try{const raw=localStorage.getItem(key);return raw===null?fallback:JSON.parse(raw)}catch{return fallback}},
+  set(key, value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}},
+  remove(key){try{localStorage.removeItem(key)}catch{}}
+};
+function localDateOnly(date=new Date()){return new Date(date.getFullYear(),date.getMonth(),date.getDate())}
+function toLocalISO(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`}
+function parseLocalDate(value){if(!/^\d{4}-\d{2}-\d{2}$/.test(value||''))return null;const [y,m,d]=value.split('-').map(Number);const date=new Date(y,m-1,d);return date.getFullYear()===y&&date.getMonth()===m-1&&date.getDate()===d?date:null}
+function formatDate(date){return date.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})}
+function money(value){const n=Number(value);return Number.isFinite(n)?n.toLocaleString('th-TH',{minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2}):'0'}
+function roundFinalBaht(value){return Math.floor(Number(value)+0.5+1e-9)}
+function esc(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]))}
+function showToast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),2200)}
+function copyText(text){if(navigator.clipboard?.writeText){return navigator.clipboard.writeText(text)}const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();return Promise.resolve()}
+function daysUntil(date){return Math.round((localDateOnly(date)-localDateOnly())/DAY_MS)}
+function exactStation(line, name){return Boolean((trainData[line]?.stations||[]).some(s=>s.name===name))}
+function getKm(line, stationName){const s=(trainData[line]?.stations||[]).find(item=>item.name===stationName);return s?Number(s.km):null}
+function getTrain(line, id){return (trainSchedules[line]||[]).find(t=>t.id===id)||null}
+function getReservationType(train){if(!train)return '';return /(ธรรมดา|ชานเมือง|ท้องถิ่น|ที่นั่งอิสระ|non[-\s]?reserved)/i.test(`${train.id||''} ${train.name||''}`)?'nonreserved':'reserved'}
+function stationNames(line){return (trainData[line]?.stations||[]).map(s=>s.name)}
+function activeStationNames(line, train){if(!line)return[];const all=stationNames(line);if(!train)return all;if(Array.isArray(train.stops)&&train.stops.length)return train.stops.filter(name=>all.includes(name));return all.filter(name=>{const km=getKm(line,name),a=getKm(line,train.origin),b=getKm(line,train.dest);return Number.isFinite(km)&&Number.isFinite(a)&&Number.isFinite(b)&&km>=Math.min(a,b)&&km<=Math.max(a,b)})}
+function bookingDaysFromPercentage(p){return p>=60?90:p>=25?30:1}
+function statusForOpenDate(openDate, openTime='08:30'){const now=new Date();const [h,m]=openTime.split(':').map(Number);const opensAt=new Date(openDate);opensAt.setHours(h,m,0,0);if(now>=opensAt)return{kind:'open',text:'เปิดจองแล้ว',detail:'สามารถตรวจสอบที่นั่งใน D-Ticket ได้'};const diff=daysUntil(openDate);if(diff===0)return{kind:'waiting',text:`เปิดวันนี้ ${openTime} น.`,detail:'ยังไม่ถึงเวลาเปิดจอง'};if(diff===1)return{kind:'waiting',text:`เปิดพรุ่งนี้ ${openTime} น.`,detail:'เตรียมทำรายการล่วงหน้าได้'};return{kind:'waiting',text:`อีกประมาณ ${Math.max(diff,0).toLocaleString('th-TH')} วัน`,detail:`เริ่มเปิด ${formatDate(openDate)} เวลา ${openTime} น.`}}
 
-  function option(value, text){ const o=document.createElement('option'); o.value=value; o.textContent=text; return o; }
-  function clearSelect(sel, placeholder){ sel.innerHTML=''; sel.appendChild(option('', placeholder)); }
-  function getLine(){ return els.selectedLine.value; }
-  function getTrain(){ const line=getLine(); const id=els.selectedTrain.value; return (trainSchedules[line]||[]).find(t=>t.id===id)||null; }
-  function getKm(stationName){ const line=getLine(); const st=(trainData[line]?.stations||[]).find(s=>s.name===stationName); return st ? Number(st.km) : null; }
-  function formatDate(date){ return date.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'}); }
-  function parseLocalDate(value){ const [y,m,d]=value.split('-').map(Number); return new Date(y, m-1, d); }
-  function showToast(msg){ els.toast.textContent=msg; els.toast.classList.add('show'); setTimeout(()=>els.toast.classList.remove('show'),1800); }
+/* =========================================================
+   4) STATE + DOM
+   ========================================================= */
+const state={
+  tool:'booking',bookingMode:'station',lastStationField:'passOrigin',lastBookingResult:null,lastMonthlyResult:null,
+  bookingHistory:STORAGE.get('srtPremiumBookingHistory',[]),monthlyHistory:STORAGE.get('srtPremiumMonthlyHistory',[]),
+  favorites:STORAGE.get('srtPremiumFavoriteStations',[]),deferredInstallPrompt:null
+};
+const el={
+  bookingTab:$('bookingTab'),monthlyTab:$('monthlyTab'),bookingPage:$('bookingPage'),monthlyPage:$('monthlyPage'),
+  travelDate:$('travelDate'),stationModeBtn:$('stationModeBtn'),manualModeBtn:$('manualModeBtn'),stationStep:$('stationStep'),manualStep:$('manualStep'),
+  selectedLine:$('selectedLine'),selectedTrain:$('selectedTrain'),customTrainBox:$('customTrainBox'),reservationType:$('reservationType'),trainOrigin:$('trainOrigin'),trainDest:$('trainDest'),passOrigin:$('passOrigin'),passDest:$('passDest'),
+  manualReservationType:$('manualReservationType'),totalDistance:$('totalDistance'),passengerDistance:$('passengerDistance'),stationList:$('stationList'),activeStationList:$('activeStationList'),
+  distanceSummary:$('distanceSummary'),totalKmText:$('totalKmText'),passengerKmText:$('passengerKmText'),percentageText:$('percentageText'),bookingResult:$('bookingResult'),bookingHistory:$('bookingHistory'),
+  monthlyFare:$('monthlyFare'),monthlyTrips:$('monthlyTrips'),monthlyPassenger:$('monthlyPassenger'),monthlyPeriod:$('monthlyPeriod'),monthlyResult:$('monthlyResult'),monthlyHistory:$('monthlyHistory')
+};
 
-  function initLines(){
-    Object.keys(trainData).forEach(key=> els.selectedLine.appendChild(option(key, trainData[key].name)));
-  }
+/* =========================================================
+   5) INITIALIZATION / NAVIGATION
+   ========================================================= */
+function initLines(){Object.entries(trainData).forEach(([key,data])=>{const o=document.createElement('option');o.value=key;o.textContent=data.name;el.selectedLine.appendChild(o)})}
+function fillTrainOptions(){const line=el.selectedLine.value;el.selectedTrain.innerHTML='<option value="">ไม่ระบุขบวน / กำหนดเอง</option>';(trainSchedules[line]||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.name;el.selectedTrain.appendChild(o)});fillStationData();updateCustomTrainVisibility()}
+function fillDatalist(target, names){target.innerHTML='';names.forEach(name=>{const o=document.createElement('option');o.value=name;target.appendChild(o)})}
+function fillStationData(){const line=el.selectedLine.value;const train=getTrain(line,el.selectedTrain.value);fillDatalist(el.stationList,stationNames(line));fillDatalist(el.activeStationList,activeStationNames(line,train));if(train){el.trainOrigin.value=train.origin||'';el.trainDest.value=train.dest||'';if(!activeStationNames(line,train).includes(el.passOrigin.value))el.passOrigin.value='';if(!activeStationNames(line,train).includes(el.passDest.value))el.passDest.value=''}renderFavoriteButtons()}
+function updateCustomTrainVisibility(){const line=el.selectedLine.value;const train=el.selectedTrain.value;el.customTrainBox.classList.toggle('hidden',!line||Boolean(train))}
+function setTool(tool){state.tool=tool;const isBooking=tool==='booking';el.bookingTab.classList.toggle('active',isBooking);el.monthlyTab.classList.toggle('active',!isBooking);el.bookingPage.classList.toggle('active',isBooking);el.monthlyPage.classList.toggle('active',!isBooking);syncUrl()}
+function setBookingMode(mode){state.bookingMode=mode;const station=mode==='station';el.stationModeBtn.classList.toggle('active',station);el.manualModeBtn.classList.toggle('active',!station);el.stationStep.classList.toggle('hidden',!station);el.manualStep.classList.toggle('hidden',station);calculateBooking();syncUrl()}
 
-  function activeStations(){
-    const line=getLine(); if(!line) return [];
-    const all=trainData[line].stations || [];
-    const train=getTrain();
-    if(train){
-      if(train.stops && train.stops.length){ return all.filter(s=>train.stops.includes(s.name)); }
-      const start=all.findIndex(s=>s.name===train.origin), end=all.findIndex(s=>s.name===train.dest);
-      if(start !== -1 && end !== -1){ return all.slice(Math.min(start,end), Math.max(start,end)+1); }
+/* =========================================================
+   6) FAVORITES
+   ========================================================= */
+function saveFavorites(){STORAGE.set('srtPremiumFavoriteStations',state.favorites);renderFavorites()}
+function toggleFavorite(station){if(!station)return showToast('กรุณาเลือกสถานีก่อน');const line=el.selectedLine.value;if(!line||!exactStation(line,station))return showToast('กรุณาเลือกสถานีจากรายการ');const i=state.favorites.indexOf(station);if(i>=0){state.favorites.splice(i,1);showToast('นำออกจากสถานีโปรดแล้ว')}else{state.favorites.unshift(station);state.favorites=[...new Set(state.favorites)].slice(0,12);showToast('บันทึกสถานีโปรดแล้ว')}saveFavorites();renderFavoriteButtons()}
+function renderFavorites(){const box=$('favoriteChips');if(!state.favorites.length){box.innerHTML='<span class="chip">ยังไม่มีสถานีโปรด</span>';return}box.innerHTML=state.favorites.map(name=>`<button class="chip" type="button" data-favorite="${esc(name)}">${esc(name)}</button>`).join('');box.querySelectorAll('[data-favorite]').forEach(btn=>btn.addEventListener('click',()=>{const target=$(state.lastStationField)||el.passOrigin;target.value=btn.dataset.favorite;target.dispatchEvent(new Event('input',{bubbles:true}));target.focus()}))}
+function renderFavoriteButtons(){const a=state.favorites.includes(el.passOrigin.value),b=state.favorites.includes(el.passDest.value);$('favOriginBtn').classList.toggle('active',a);$('favOriginBtn').textContent=a?'★':'☆';$('favDestBtn').classList.toggle('active',b);$('favDestBtn').textContent=b?'★':'☆'}
+
+/* =========================================================
+   7) BOOKING ENGINE
+   ========================================================= */
+function getBookingInputs(){
+  const travelDate=parseLocalDate(el.travelDate.value);
+  if(state.bookingMode==='manual')return{mode:'manual',travelDate,reservationType:el.manualReservationType.value,total:Number.parseFloat(el.totalDistance.value),passenger:Number.parseFloat(el.passengerDistance.value),origin:'กรอกระยะทางเอง',destination:'กรอกระยะทางเอง',line:'',train:null,routeValid:true};
+  const line=el.selectedLine.value,train=getTrain(line,el.selectedTrain.value);let total=NaN,passenger=NaN,routeValid=true;
+  const origin=el.passOrigin.value.trim(),destination=el.passDest.value.trim();
+  const trainOrigin=train?.origin||el.trainOrigin.value.trim(),trainDest=train?.dest||el.trainDest.value.trim();
+  const t1=getKm(line,trainOrigin),t2=getKm(line,trainDest),p1=getKm(line,origin),p2=getKm(line,destination);
+  if([t1,t2].every(Number.isFinite))total=Math.abs(t2-t1);if([p1,p2].every(Number.isFinite))passenger=Math.abs(p2-p1);
+  if([t1,t2,p1,p2].every(Number.isFinite)){const min=Math.min(t1,t2),max=Math.max(t1,t2);routeValid=p1>=min&&p1<=max&&p2>=min&&p2<=max}
+  return{mode:'station',travelDate,line,train,reservationType:train?getReservationType(train):el.reservationType.value,total,passenger,routeValid,origin,destination,trainOrigin,trainDest,p1,p2};
+}
+function classify997998(p1,p2){if(!Number.isFinite(p1)||!Number.isFinite(p2))return null;const min=Math.min(p1,p2),max=Math.max(p1,p2),b=BOOKING_RULES.special997998;if(max<=b.chachoengsaoKm)return'special-48h';if(min<b.chachoengsaoKm&&max>=b.chonburiKm)return'standard-distance';return'special-1day'}
+function bookingError(message){state.lastBookingResult=null;el.distanceSummary.classList.add('hidden');el.bookingResult.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><h3>ตรวจสอบข้อมูล</h3><p>${esc(message)}</p></div>`}
+function bookingEmpty(message='เลือกวันที่ สายทาง และสถานีให้ครบ'){state.lastBookingResult=null;el.distanceSummary.classList.add('hidden');el.bookingResult.innerHTML=`<div class="empty"><div class="empty-icon">🧮</div><h3>พร้อมคำนวณ</h3><p>${esc(message)}<br>ผลลัพธ์จะแสดงอัตโนมัติ</p></div>`}
+function updateDistanceSummary(total,passenger){const valid=Number.isFinite(total)&&Number.isFinite(passenger)&&total>0&&passenger>0;if(!valid||state.bookingMode!=='station'){el.distanceSummary.classList.add('hidden');return}const p=(passenger/total)*100;el.distanceSummary.classList.remove('hidden');el.totalKmText.textContent=`${money(total)} กม.`;el.passengerKmText.textContent=`${money(passenger)} กม.`;el.percentageText.textContent=`${p.toFixed(2)}%`}
+function calculateBooking(){
+  renderFavoriteButtons();const d=getBookingInputs();
+  if(!d.travelDate)return bookingEmpty();if(d.travelDate<localDateOnly())return bookingError('วันที่เดินทางผ่านไปแล้ว กรุณาเลือกวันนี้หรือวันในอนาคต');
+  if(d.mode==='station'&&!d.line)return bookingEmpty('กรุณาเลือกสายทาง');
+  if(d.mode==='station'){
+    if(!d.origin||!d.destination)return bookingEmpty('กรุณาเลือกสถานีขึ้นและสถานีลง');
+    if(!exactStation(d.line,d.origin)||!exactStation(d.line,d.destination))return bookingError('กรุณาเลือกสถานีขึ้นและสถานีลงจากรายการค้นหา');
+    if(d.train){
+      const stops=activeStationNames(d.line,d.train);
+      if(!stops.includes(d.origin)||!stops.includes(d.destination))return bookingError('สถานีที่เลือกไม่อยู่ในรายการจอดของขบวนรถนี้');
     }
-    return all;
   }
+  if(!d.reservationType)return bookingError('กรุณาเลือกประเภทการจำหน่ายของขบวนรถ');
+  if(d.reservationType==='nonreserved')return renderNonReservedResult(d);
+  if(d.mode==='station'&&!d.train&&(!d.trainOrigin||!d.trainDest))return bookingEmpty('กรุณาระบุต้นทางและปลายทางของขบวนรถ');
+  if(d.mode==='station'&&!d.train&&(!exactStation(d.line,d.trainOrigin)||!exactStation(d.line,d.trainDest)))return bookingError('ต้นทาง/ปลายทางของขบวนต้องเลือกจากรายการสถานี');
+  if(!Number.isFinite(d.total)||!Number.isFinite(d.passenger))return bookingEmpty('กรุณาระบุข้อมูลระยะทางให้ครบ');if(!d.routeValid)return bookingError('สถานีขึ้นและสถานีลงต้องอยู่ภายในช่วงต้นทาง–ปลายทางของขบวนรถ');if(d.total<=0||d.passenger<=0)return bookingError('ต้นทางและปลายทางต้องไม่เป็นสถานีเดียวกัน');if(d.passenger>d.total)return bookingError('ระยะทางผู้โดยสารต้องไม่เกินระยะทางวิ่งทั้งหมดของขบวน');
+  updateDistanceSummary(d.total,d.passenger);
+  if(d.mode==='station'&&d.train&&BOOKING_RULES.special997998.ids.includes(d.train.id)){
+    const rule=classify997998(d.p1,d.p2);if(rule==='special-48h')return renderSpecial48Result(d);if(rule==='special-1day')return renderSpecialOneDayResult(d);if(rule==='standard-distance')return renderStandardBooking(d,'ขบวน 997/998 ช่วงฝั่งกรุงเทพไปตั้งแต่ชลบุรีขึ้นไป ใช้เกณฑ์ระยะทาง 1 / 30 / 90 วัน');
+  }
+  return renderStandardBooking(d);
+}
+function makeBookingResultBase(d,type){return{type,createdAt:new Date().toISOString(),travelDate:toLocalISO(d.travelDate),origin:d.origin,destination:d.destination,line:d.line||'',trainId:d.train?.id||'',trainName:d.train?.name||'',total:d.total,passenger:d.passenger}}
+function renderNonReservedResult(d){
+  const result={...makeBookingResultBase(d,'nonreserved'),headline:'ซื้อในวันเดินทาง',summary:BOOKING_RULES.nonReservedText,copyText:`ขบวนไม่สำรองที่นั่ง\nเดินทางวันที่ ${formatDate(d.travelDate)}\n${BOOKING_RULES.nonReservedText}\nโปรดตรวจสอบกับสถานีหรือ 1690`};state.lastBookingResult=result;
+  el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">ขบวนไม่สำรองที่นั่ง</div><h3>ซื้อในวันเดินทาง</h3></div><span class="status info">🎫 วันเดินทาง</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>แนวทางจำหน่าย</span><strong style="font-size:30px">วันเดินทาง</strong><small>ก่อนรถออกไม่เกิน 2 ชั่วโมง</small></div><div class="date-panel"><div class="label">วันที่เดินทาง</div><div class="date">${formatDate(d.travelDate)}</div></div><div class="note warning">บางสถานีหรือป้ายหยุดรถอาจมีวิธีจำหน่ายเฉพาะ โปรดตรวจสอบกับสถานีหรือสายด่วน 1690</div>${bookingActions()}</div></div>`;afterBookingRender(result)
+}
+function renderStandardBooking(d,routeNote=''){
+  const percentage=(d.passenger/d.total)*100,days=bookingDaysFromPercentage(percentage),bookingDate=new Date(d.travelDate);bookingDate.setDate(bookingDate.getDate()-days);const status=statusForOpenDate(bookingDate,BOOKING_RULES.standardOpenTime);
+  const result={...makeBookingResultBase(d,'standard'),percentage,days,bookingDate:toLocalISO(bookingDate),openTime:BOOKING_RULES.standardOpenTime,headline:`จองล่วงหน้า ${days} วัน`,summary:`เริ่มจอง ${formatDate(bookingDate)} เวลา ${BOOKING_RULES.standardOpenTime} น.`,copyText:`${d.train?.name||'ขบวนสำรองที่นั่ง'}\n${d.origin} → ${d.destination}\nเดินทางวันที่ ${formatDate(d.travelDate)}\nเดินทาง ${percentage.toFixed(2)}% ของระยะขบวน\nจองล่วงหน้า ${days} วัน\nเริ่มจอง ${formatDate(bookingDate)} เวลา ${BOOKING_RULES.standardOpenTime} น.\nโปรดตรวจสอบกับ D-Ticket ก่อนทำรายการ`};state.lastBookingResult=result;
+  el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">${esc(d.train?.name||'ขบวนสำรองที่นั่ง')}</div><h3>${esc(d.origin)} → ${esc(d.destination)}</h3></div><span class="status ${status.kind}">${status.kind==='open'?'✓':'⏳'} ${esc(status.text)}</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>เปิดจองล่วงหน้า</span><strong>${days} วัน</strong><small>เดินทาง ${percentage.toFixed(2)}% ของระยะทางขบวนรถ</small></div><div class="date-panel"><div class="label">วันที่เริ่มจองได้เร็วที่สุด</div><div class="date">${formatDate(bookingDate)}</div><div class="time">เวลา ${BOOKING_RULES.standardOpenTime} น. เป็นต้นไป</div></div><div class="result-grid"><div class="result-mini"><span>ระยะขบวน</span><strong>${money(d.total)} กม.</strong></div><div class="result-mini"><span>ระยะผู้โดยสาร</span><strong>${money(d.passenger)} กม.</strong></div></div>${routeNote?`<div class="note info">${esc(routeNote)}</div>`:''}<div class="note warning">${esc(status.detail)} · ทั้งนี้ขึ้นอยู่กับที่นั่งว่างและเงื่อนไขของขบวนรถ</div>${bookingActions()}</div></div>`;afterBookingRender(result)
+}
+function renderSpecialOneDayResult(d){
+  const bookingDate=new Date(d.travelDate);bookingDate.setDate(bookingDate.getDate()-1);const status=statusForOpenDate(bookingDate,'08:30');const result={...makeBookingResultBase(d,'special-1day'),days:1,bookingDate:toLocalISO(bookingDate),openTime:'08:30',headline:'ขบวน 997/998 • ล่วงหน้า 1 วัน',summary:`เริ่มทำรายการ ${formatDate(bookingDate)} เวลา 08:30 น.`,copyText:`ขบวน 997/998\n${d.origin} → ${d.destination}\nเดินทางวันที่ ${formatDate(d.travelDate)}\nช่วงนี้เปิดขายล่วงหน้า 1 วันตามผลทดสอบ D-Ticket\nเริ่ม ${formatDate(bookingDate)} เวลา 08:30 น.\nโปรดตรวจสอบ D-Ticket อีกครั้ง`};state.lastBookingResult=result;
+  el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">ขบวน 997/998 • เงื่อนไขพิเศษ</div><h3>${esc(d.origin)} → ${esc(d.destination)}</h3></div><span class="status ${status.kind}">${status.kind==='open'?'✓':'⏳'} ${esc(status.text)}</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>เปิดขายล่วงหน้า</span><strong>1 วัน</strong><small>ช่วงฉะเชิงเทราไปทางชลบุรี/พัทยา/สัตหีบ และภายในฝั่งดังกล่าว</small></div><div class="date-panel"><div class="label">วันที่เริ่มทำรายการ</div><div class="date">${formatDate(bookingDate)}</div><div class="time">ระบบคำนวณที่เวลา 08:30 น. โปรดตรวจ D-Ticket อีกครั้ง</div></div><div class="note warning">เงื่อนไขนี้อ้างอิงผลทดสอบ D-Ticket ที่ผู้จัดทำบันทึกไว้ ไม่ใช่การยืนยันที่นั่งหรือการเปิดขายแบบเรียลไทม์</div>${bookingActions()}</div></div>`;afterBookingRender(result)
+}
+function renderSpecial48Result(d){
+  const b=BOOKING_RULES.special997998,trainNo=d.p2>d.p1?'997':'998',terminal=b.terminalTimes[trainNo],saleDate=new Date(d.travelDate);saleDate.setDate(saleDate.getDate()-2);const known=Boolean(terminal&&d.origin===terminal.station);let status={kind:'info',text:'ตรวจเวลาเปิดขาย'};if(known)status=statusForOpenDate(saleDate,terminal.time);const weekend=[0,6].includes(d.travelDate.getDay());
+  const opening=known?`${formatDate(saleDate)} เวลา ${terminal.time} น.`:`${formatDate(saleDate)} ณ เวลาเดียวกับเวลาขบวนออกจากสถานี ${d.origin}`;const result={...makeBookingResultBase(d,'special-48h'),trainNo,saleDate:toLocalISO(saleDate),openTime:known?terminal.time:null,headline:`ขบวน ${trainNo} • ภายใน 48 ชั่วโมง`,summary:opening,copyText:`ขบวน ${trainNo} เงื่อนไข 48 ชั่วโมง\n${d.origin} → ${d.destination}\nเดินทางวันที่ ${formatDate(d.travelDate)}\nเริ่มทำรายการได้เร็วที่สุด: ${opening}\nโปรดตรวจเวลาขบวนออกจากสถานีขึ้นและ D-Ticket อีกครั้ง`};state.lastBookingResult=result;
+  el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">ขบวน ${trainNo} • ช่วงอัตราพิเศษ</div><h3>${esc(d.origin)} → ${esc(d.destination)}</h3></div><span class="status ${status.kind}">${known?(status.kind==='open'?'✓':'⏳'):'ℹ️'} ${esc(status.text)}</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>เปิดขายภายใน</span><strong>48 ชม.</strong><small>ก่อนรถออกจากสถานีขึ้น</small></div><div class="date-panel"><div class="label">เริ่มทำรายการได้เร็วที่สุด</div><div class="date">${esc(opening)}</div>${known?`<div class="time">อ้างอิงเวลาต้นทางขบวน ${terminal.time} น.</div>`:'<div class="time">ต้องตรวจเวลาขบวนออกจากสถานีขึ้นเพื่อระบุเวลาให้ตรง 48 ชั่วโมง</div>'}</div>${weekend?'':'<div class="note warning">วันเดินทางที่เลือกไม่ใช่วันเสาร์–อาทิตย์ ตามข้อมูลตารางที่ผู้จัดทำใช้อ้างอิง โปรดตรวจสอบตารางเดินรถอีกครั้ง</div>'}<div class="note info">เงื่อนไขนี้ใช้กับช่วงกรุงเทพ–ชุมทางฉะเชิงเทรา และควรตรวจสอบข้อความใน D-Ticket ก่อนออกตั๋วทุกครั้ง</div>${bookingActions()}</div></div>`;afterBookingRender(result)
+}
+function routeMarkup(d){if(d.mode!=='station')return'';return`<div class="route-line"><div class="station">${esc(d.origin)}</div><div class="arrow">→</div><div class="station">${esc(d.destination)}</div></div>`}
+function bookingActions(){return`<div class="result-actions"><button class="action-btn primary" type="button" data-action="dticket">D-Ticket</button><button class="action-btn" type="button" data-action="copy-booking">คัดลอก</button><button class="action-btn" type="button" data-action="share-booking">แชร์</button><button class="action-btn" type="button" data-action="print-booking">พิมพ์</button></div>`}
+function afterBookingRender(result){bindBookingActions();saveBookingHistory(result);syncUrl()}
+function bindBookingActions(){el.bookingResult.querySelector('[data-action="dticket"]')?.addEventListener('click',()=>window.open(APP_CONFIG.dticketUrl,'_blank','noopener,noreferrer'));el.bookingResult.querySelector('[data-action="copy-booking"]')?.addEventListener('click',()=>copyText(state.lastBookingResult?.copyText||'').then(()=>showToast('คัดลอกผลการคำนวณแล้ว')));el.bookingResult.querySelector('[data-action="share-booking"]')?.addEventListener('click',shareBooking);el.bookingResult.querySelector('[data-action="print-booking"]')?.addEventListener('click',()=>printResult('booking'))}
+function shareBooking(){const r=state.lastBookingResult;if(!r)return;syncUrl();const data={title:'SRT Ticket Tools',text:r.copyText,url:location.href};if(navigator.share)navigator.share(data).catch(()=>{});else copyText(location.href).then(()=>showToast('คัดลอกลิงก์ผลการคำนวณแล้ว'))}
 
-  function fillSelects(){
-    const line=getLine();
-    clearSelect(els.selectedTrain, 'ไม่ระบุขบวน / เลือกเอง');
-    if(line){ (trainSchedules[line]||[]).forEach(t=> els.selectedTrain.appendChild(option(t.id, t.name))); }
-    fillStationSelects();
-  }
+/* =========================================================
+   8) MONTHLY ENGINE
+   ========================================================= */
+function updateMonthlyOptions(){const trips=Number(el.monthlyTrips.value),studentOpt=el.monthlyPassenger.querySelector('option[value="student"]');studentOpt.disabled=trips!==2;studentOpt.textContent=trips===2?'นักเรียน / นักศึกษา':'นักเรียน / นักศึกษา (เฉพาะไป-กลับ)';if(trips!==2&&el.monthlyPassenger.value==='student')el.monthlyPassenger.value='general';const student=trips===2&&el.monthlyPassenger.value==='student';Object.entries(MONTHLY_RULES).forEach(([key,r])=>{const opt=el.monthlyPeriod.querySelector(`option[value="${key}"]`);if(opt)opt.textContent=`${r.label} · คิด ${student?r.studentDays:r.normalDays} วัน`})}
+function monthlyEmpty(){state.lastMonthlyResult=null;el.monthlyResult.innerHTML='<div class="empty"><div class="empty-icon">🎟️</div><h3>กรอกค่าโดยสาร</h3><p>ระบบจะแสดงราคา สูตร และค่าเฉลี่ยให้ทันที</p></div>'}
+function calculateMonthly(){updateMonthlyOptions();const fare=Number.parseFloat(el.monthlyFare.value),trips=Number(el.monthlyTrips.value),passenger=el.monthlyPassenger.value,key=el.monthlyPeriod.value,rule=MONTHLY_RULES[key];if(!Number.isFinite(fare)||fare<=0)return monthlyEmpty();const student=passenger==='student'&&trips===2,days=student?rule.studentDays:rule.normalDays,rate=passenger==='general'?rule.generalRate:passenger==='half'?rule.halfRate:rule.studentRate,base=fare*trips*days,raw=base*rate,override=student&&STUDENT_OVERRIDES[fare]?.[key],usesOverride=Number.isFinite(override),finalPrice=usesOverride?override:roundFinalBaht(raw),saving=Math.max(0,base-finalPrice),avgDay=finalPrice/days,avgTrip=finalPrice/(days*trips),ruleText=usesOverride?`ใช้ราคากรณีพิเศษที่บันทึกไว้สำหรับค่าโดยสาร ${money(fare)} บาท`:'ยกเศษเฉพาะราคาขั้นสุดท้ายตามเกณฑ์ 50 สตางค์';
+  const copy=`ตั๋วเดือน ${rule.label}\n${PASSENGER_LABELS[passenger]} • ${trips===2?'ไป-กลับ':'เที่ยวเดียว'}\nค่าโดยสารเต็มราคา ${money(fare)} บาท/เที่ยว\nราคาโดยประมาณ ${money(finalPrice)} บาท\nฐานราคา ${money(base)} บาท • ${days} วัน • คิด ${(rate*100).toFixed(0)}%\n${ruleText}\nโปรดตรวจสอบกับระบบขายตั๋วก่อนจำหน่าย`;
+  const result={type:'monthly',createdAt:new Date().toISOString(),fare,trips,passenger,period:key,days,rate,base,raw,finalPrice,saving,copyText:copy,headline:`${money(finalPrice)} บาท`,summary:`${rule.label} • ${PASSENGER_LABELS[passenger]}`};state.lastMonthlyResult=result;
+  el.monthlyResult.innerHTML=`<div class="result-card" id="monthlyResultCard"><div class="result-top"><div><div class="kicker">${esc(rule.label)} • ${esc(PASSENGER_LABELS[passenger])}</div><h3>${trips===2?'ไป-กลับ วันละ 2 เที่ยว':'เที่ยวเดียว วันละ 1 เที่ยว'}</h3></div><span class="status info">ประมาณการ</span></div><div class="result-main"><div class="price-main"><span>ราคาประมาณการ</span><strong>${money(finalPrice)}</strong><small>บาท</small></div><div class="summary-table"><div class="summary-row"><span>ฐานราคาก่อนคิดอัตรา</span><strong>${money(base)} บาท</strong></div><div class="summary-row"><span>เกณฑ์ที่ใช้</span><strong>${days} วัน / ${(rate*100).toFixed(0)}%</strong></div><div class="summary-row"><span>ราคาตามสูตรก่อนยกเศษ</span><strong>${money(raw)} บาท</strong></div><div class="summary-row"><span>ราคาขั้นสุดท้าย</span><strong>${money(finalPrice)} บาท</strong></div><div class="summary-row"><span>ประหยัดโดยประมาณ</span><strong>${money(saving)} บาท</strong></div><div class="summary-row"><span>เฉลี่ยต่อวัน / ต่อเที่ยว</span><strong>${money(avgDay)} / ${money(avgTrip)} บาท</strong></div></div><div class="note info">${esc(ruleText)}</div><div class="note warning">ราคาเป็นการคำนวณเบื้องต้น โปรดตรวจสอบกับระบบขายตั๋วหรือเจ้าหน้าที่ก่อนจำหน่ายทุกครั้ง</div><div class="result-actions"><button class="action-btn primary" type="button" data-action="copy-monthly">คัดลอก</button><button class="action-btn" type="button" data-action="share-monthly">แชร์</button><button class="action-btn" type="button" data-action="print-monthly">พิมพ์</button><button class="action-btn" type="button" data-action="reset-monthly">ล้างค่า</button></div></div></div>`;
+  el.monthlyResult.querySelector('[data-action="copy-monthly"]')?.addEventListener('click',()=>copyText(copy).then(()=>showToast('คัดลอกผลตั๋วเดือนแล้ว')));el.monthlyResult.querySelector('[data-action="share-monthly"]')?.addEventListener('click',shareMonthly);el.monthlyResult.querySelector('[data-action="print-monthly"]')?.addEventListener('click',()=>printResult('monthly'));el.monthlyResult.querySelector('[data-action="reset-monthly"]')?.addEventListener('click',()=>{el.monthlyFare.value='';monthlyEmpty();syncUrl()});saveMonthlyHistory(result);syncUrl()
+}
+function shareMonthly(){const r=state.lastMonthlyResult;if(!r)return;syncUrl();const data={title:'SRT Ticket Tools - ตั๋วเดือน',text:r.copyText,url:location.href};if(navigator.share)navigator.share(data).catch(()=>{});else copyText(location.href).then(()=>showToast('คัดลอกลิงก์แล้ว'))}
 
-  function fillStationSelects(){
-    const stations=activeStations();
-    const saved={to:els.trainOrigin.value, td:els.trainDest.value, po:els.passOrigin.value, pd:els.passDest.value};
-    [els.trainOrigin, els.trainDest, els.passOrigin, els.passDest].forEach((sel)=> clearSelect(sel, '- เลือก -'));
-    stations.forEach(s=>{
-      els.trainOrigin.appendChild(option(s.name, s.name));
-      els.trainDest.appendChild(option(s.name, s.name));
-      els.passOrigin.appendChild(option(s.name, s.name));
-      els.passDest.appendChild(option(s.name, s.name));
-    });
-    els.trainOrigin.value=saved.to; els.trainDest.value=saved.td; els.passOrigin.value=saved.po; els.passDest.value=saved.pd;
-    const train=getTrain();
-    if(train){
-      els.trainManualBox.classList.add('hidden');
-      els.trainOrigin.value=train.origin || '';
-      els.trainDest.value=train.dest || '';
-    }else{
-      els.trainManualBox.classList.remove('hidden');
-    }
-  }
+/* =========================================================
+   9) HISTORY
+   ========================================================= */
+function saveBookingHistory(r){if(!r)return;const key=[r.type,r.travelDate,r.origin,r.destination,r.trainId,r.days,r.saleDate].join('|');state.bookingHistory=state.bookingHistory.filter(x=>x.key!==key);state.bookingHistory.unshift({key,createdAt:r.createdAt,title:r.headline,subtitle:`${r.origin} → ${r.destination} • ${r.summary}`,restore:getBookingSnapshot()});state.bookingHistory=state.bookingHistory.slice(0,APP_CONFIG.historyLimit);STORAGE.set('srtPremiumBookingHistory',state.bookingHistory);renderHistories()}
+function saveMonthlyHistory(r){if(!r)return;const key=[r.fare,r.trips,r.passenger,r.period,r.finalPrice].join('|');state.monthlyHistory=state.monthlyHistory.filter(x=>x.key!==key);state.monthlyHistory.unshift({key,createdAt:r.createdAt,title:`${money(r.finalPrice)} บาท`,subtitle:`${r.summary} • ค่าโดยสาร ${money(r.fare)} บาท`,restore:getMonthlySnapshot()});state.monthlyHistory=state.monthlyHistory.slice(0,APP_CONFIG.historyLimit);STORAGE.set('srtPremiumMonthlyHistory',state.monthlyHistory);renderHistories()}
+function renderHistories(){el.bookingHistory.innerHTML=state.bookingHistory.length?state.bookingHistory.map((x,i)=>`<button type="button" class="history-item" data-booking-history="${i}"><b>${esc(x.title)}</b><span>${esc(x.subtitle)}</span></button>`).join(''):'<div class="note info">ยังไม่มีประวัติการคำนวณ</div>';el.monthlyHistory.innerHTML=state.monthlyHistory.length?state.monthlyHistory.map((x,i)=>`<button type="button" class="history-item" data-monthly-history="${i}"><b>${esc(x.title)}</b><span>${esc(x.subtitle)}</span></button>`).join(''):'<div class="note info">ยังไม่มีประวัติการคำนวณ</div>';el.bookingHistory.querySelectorAll('[data-booking-history]').forEach(b=>b.addEventListener('click',()=>restoreBooking(state.bookingHistory[Number(b.dataset.bookingHistory)].restore)));el.monthlyHistory.querySelectorAll('[data-monthly-history]').forEach(b=>b.addEventListener('click',()=>restoreMonthly(state.monthlyHistory[Number(b.dataset.monthlyHistory)].restore)))}
+function getBookingSnapshot(){return{mode:state.bookingMode,date:el.travelDate.value,line:el.selectedLine.value,train:el.selectedTrain.value,reservation:el.reservationType.value,trainOrigin:el.trainOrigin.value,trainDest:el.trainDest.value,origin:el.passOrigin.value,dest:el.passDest.value,manualReservation:el.manualReservationType.value,total:el.totalDistance.value,passenger:el.passengerDistance.value}}
+function restoreBooking(s){if(!s)return;setTool('booking');setBookingMode(s.mode||'station');el.travelDate.value=s.date||'';el.selectedLine.value=s.line||'';fillTrainOptions();el.selectedTrain.value=s.train||'';fillStationData();updateCustomTrainVisibility();el.reservationType.value=s.reservation||'';el.trainOrigin.value=s.trainOrigin||'';el.trainDest.value=s.trainDest||'';el.passOrigin.value=s.origin||'';el.passDest.value=s.dest||'';el.manualReservationType.value=s.manualReservation||'';el.totalDistance.value=s.total||'';el.passengerDistance.value=s.passenger||'';calculateBooking();showToast('เรียกคืนรายการแล้ว')}
+function getMonthlySnapshot(){return{fare:el.monthlyFare.value,trips:el.monthlyTrips.value,passenger:el.monthlyPassenger.value,period:el.monthlyPeriod.value}}
+function restoreMonthly(s){if(!s)return;setTool('monthly');el.monthlyFare.value=s.fare||'';el.monthlyTrips.value=s.trips||'1';el.monthlyPassenger.value=s.passenger||'general';el.monthlyPeriod.value=s.period||'week';calculateMonthly();showToast('เรียกคืนรายการแล้ว')}
 
-  function setMode(mode){
-    inputMode=mode;
-    els.modeStation.classList.toggle('active', mode==='station');
-    els.modeManual.classList.toggle('active', mode==='manual');
-    els.stationMode.classList.toggle('hidden', mode!=='station');
-    els.manualMode.classList.toggle('hidden', mode!=='manual');
-    calculate();
-  }
+/* =========================================================
+   10) URL SHARE STATE
+   ========================================================= */
+function syncUrl(){const p=new URLSearchParams();p.set('tool',state.tool);if(state.tool==='booking'){const s=getBookingSnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}else{const s=getMonthlySnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}try{history.replaceState(null,'',`${location.pathname}${p.toString()?`?${p}`:''}${location.hash}`)}catch{}}
+function restoreFromUrl(){const p=new URLSearchParams(location.search),tool=p.get('tool');if(tool==='monthly'){setTool('monthly');el.monthlyFare.value=p.get('fare')||'';el.monthlyTrips.value=p.get('trips')||'1';el.monthlyPassenger.value=p.get('passenger')||'general';el.monthlyPeriod.value=p.get('period')||'week';calculateMonthly();return}if(tool==='booking'||p.size){setTool('booking');setBookingMode(p.get('mode')||'station');el.travelDate.value=p.get('date')||'';el.selectedLine.value=p.get('line')||'';fillTrainOptions();el.selectedTrain.value=p.get('train')||'';fillStationData();updateCustomTrainVisibility();el.reservationType.value=p.get('reservation')||'';el.trainOrigin.value=p.get('trainOrigin')||'';el.trainDest.value=p.get('trainDest')||'';el.passOrigin.value=p.get('origin')||'';el.passDest.value=p.get('dest')||'';el.manualReservationType.value=p.get('manualReservation')||'';el.totalDistance.value=p.get('total')||'';el.passengerDistance.value=p.get('passenger')||'';calculateBooking()}}
 
-  function distances(){
-    if(inputMode==='manual'){
-      return {total:parseFloat(els.totalDistance.value), passenger:parseFloat(els.passengerDistance.value)};
-    }
-    const t1=getKm(els.trainOrigin.value), t2=getKm(els.trainDest.value), p1=getKm(els.passOrigin.value), p2=getKm(els.passDest.value);
-    const total=(t1!==null && t2!==null) ? Math.abs(t2-t1) : NaN;
-    const passenger=(p1!==null && p2!==null) ? Math.abs(p2-p1) : NaN;
-    return {total, passenger};
-  }
+/* =========================================================
+   11) THEME / PRINT / INSTALL
+   ========================================================= */
+function applyTheme(theme){document.documentElement.dataset.theme=theme;STORAGE.set('srtPremiumTheme',theme);$('themeIcon').textContent=theme==='dark'?'☀':'☾';document.querySelector('meta[name="theme-color"]').setAttribute('content',theme==='dark'?'#08121f':'#082a4c')}
+function printResult(target){document.body.dataset.printTarget=target;window.print();setTimeout(()=>delete document.body.dataset.printTarget,500)}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.deferredInstallPrompt=e;$('installBtn').classList.remove('hidden')});
+window.addEventListener('appinstalled',()=>{state.deferredInstallPrompt=null;showToast('ติดตั้งแอปสำเร็จ')});
+async function installApp(){if(state.deferredInstallPrompt){state.deferredInstallPrompt.prompt();await state.deferredInstallPrompt.userChoice;state.deferredInstallPrompt=null;return}showToast('หากเบราว์เซอร์รองรับ ให้ใช้เมนู “ติดตั้งแอป / Add to Home Screen” เมื่อเปิดผ่าน HTTPS')}
 
-  function renderEmpty(){
-    els.result.innerHTML='<div class="empty"><div class="big">🧮</div><p>กรุณาระบุข้อมูลให้ครบถ้วน<br>เพื่อคำนวณวันจองให้อัตโนมัติ</p></div>';
-  }
-  function renderError(msg){ els.result.innerHTML='<div class="error">⚠️ '+msg+'</div>'; }
-  function renderEast(){
-    els.result.innerHTML = '<div class="east"><div class="icon">🚆</div><h3>รถไฟสายตะวันออก</h3><p><b>ขบวนรถธรรมดา / ชานเมือง</b></p><div class="main">ซื้อได้ในวันเดินทาง</div><p style="font-weight:800;margin:12px 0 0;color:#9a3412">ก่อนรถออกไม่เกิน 2 ชั่วโมง</p></div>';
-  }
-  function renderBooking({percentage, days, bookingDate, travelDate}){
-    const color=days===90?'green':days===30?'blue':'gray';
-    els.result.innerHTML = `
-      <div class="booking ${color}"><div class="booking-inner">
-        <div class="pill">เดินทาง ${percentage}% ของระยะทางขบวนรถ</div>
-        <div class="days ${color}">จองล่วงหน้า ${days} วัน</div>
-        <div class="datebox">
-          <div class="label">วันที่เริ่มจองตั๋วได้คือ</div>
-          <div class="date">${formatDate(bookingDate)}</div>
-          <div style="font-size:12px;color:#64748b;font-weight:800">สำหรับการเดินทางวันที่ ${formatDate(travelDate)}</div>
-          <div class="time">⏰ เริ่มจองได้ตั้งแต่เวลา 08.30 น. เป็นต้นไป</div>
-        </div>
-      </div></div>`;
-  }
+/* =========================================================
+   12) EVENTS
+   ========================================================= */
+el.bookingTab.addEventListener('click',()=>setTool('booking'));el.monthlyTab.addEventListener('click',()=>setTool('monthly'));el.stationModeBtn.addEventListener('click',()=>setBookingMode('station'));el.manualModeBtn.addEventListener('click',()=>setBookingMode('manual'));
+el.selectedLine.addEventListener('change',()=>{fillTrainOptions();el.passOrigin.value='';el.passDest.value='';calculateBooking();syncUrl()});el.selectedTrain.addEventListener('change',()=>{fillStationData();updateCustomTrainVisibility();calculateBooking();syncUrl()});
+[el.travelDate,el.reservationType,el.trainOrigin,el.trainDest,el.passOrigin,el.passDest,el.manualReservationType,el.totalDistance,el.passengerDistance].forEach(node=>{node.addEventListener('input',calculateBooking);node.addEventListener('change',calculateBooking)});
+[el.trainOrigin,el.trainDest,el.passOrigin,el.passDest].forEach(node=>node.addEventListener('focus',()=>{state.lastStationField=node.id}));
+$('swapStationsBtn').addEventListener('click',()=>{const a=el.passOrigin.value;el.passOrigin.value=el.passDest.value;el.passDest.value=a;calculateBooking();showToast('สลับสถานีแล้ว')});$('favOriginBtn').addEventListener('click',()=>toggleFavorite(el.passOrigin.value));$('favDestBtn').addEventListener('click',()=>toggleFavorite(el.passDest.value));$('clearFavoritesBtn').addEventListener('click',()=>{state.favorites=[];saveFavorites();renderFavoriteButtons();showToast('ล้างสถานีโปรดแล้ว')});
+[el.monthlyFare,el.monthlyTrips,el.monthlyPassenger,el.monthlyPeriod].forEach(node=>{node.addEventListener('input',calculateMonthly);node.addEventListener('change',calculateMonthly)});
+$('clearBookingHistoryBtn').addEventListener('click',()=>{state.bookingHistory=[];STORAGE.set('srtPremiumBookingHistory',[]);renderHistories();showToast('ล้างประวัติแล้ว')});$('clearMonthlyHistoryBtn').addEventListener('click',()=>{state.monthlyHistory=[];STORAGE.set('srtPremiumMonthlyHistory',[]);renderHistories();showToast('ล้างประวัติแล้ว')});
+$('themeBtn').addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));$('installBtn').addEventListener('click',installApp);
+window.addEventListener('error',e=>{console.error(e.error||e.message);showToast('พบข้อผิดพลาด โปรดเปิด Console เพื่อตรวจสอบ')});
 
-  function updateDistanceBox(total, passenger){
-    const ok=Number.isFinite(total) && Number.isFinite(passenger) && total>0 && passenger>0;
-    els.distanceBox.classList.toggle('hidden', !ok || inputMode!=='station');
-    if(ok){ els.showTotal.textContent=total+' กม.'; els.showPassenger.textContent=passenger+' กม.'; }
-  }
-
-  function calculate(){
-    const {total, passenger}=distances();
-    updateDistanceBox(total, passenger);
-    if(!els.travelDate.value || !Number.isFinite(total) || !Number.isFinite(passenger)){ renderEmpty(); return; }
-    if(total<=0 || passenger<=0 || passenger>total){ renderError('กรุณาระบุระยะทางให้ถูกต้อง ระยะทางที่เดินทางต้องไม่เกินระยะทางขบวนรถ'); return; }
-    const line=getLine(); const trainId=els.selectedTrain.value;
-    if(inputMode==='station' && line==='east' && trainId !== '997/998'){ renderEast(); return; }
-    const percentage=(passenger/total)*100;
-    const days=percentage>=60 ? 90 : (percentage>=25 ? 30 : 1);
-    const travelDate=parseLocalDate(els.travelDate.value);
-    const bookingDate=new Date(travelDate);
-    bookingDate.setDate(bookingDate.getDate()-days);
-    renderBooking({percentage:percentage.toFixed(2), days, bookingDate, travelDate});
-  }
-
-  els.modeStation.addEventListener('click',()=>setMode('station'));
-  els.modeManual.addEventListener('click',()=>setMode('manual'));
-  els.selectedLine.addEventListener('change',()=>{ fillSelects(); calculate(); });
-  els.selectedTrain.addEventListener('change',()=>{ fillStationSelects(); calculate(); });
-  [els.travelDate, els.trainOrigin, els.trainDest, els.passOrigin, els.passDest, els.totalDistance, els.passengerDistance].forEach(el=> el.addEventListener('input', calculate));
-  [els.trainOrigin, els.trainDest, els.passOrigin, els.passDest].forEach(el=> el.addEventListener('change', calculate));
-  initLines(); renderEmpty();
-  window.addEventListener('error', (e)=>{ console.error(e.error||e.message); showToast('พบข้อผิดพลาดในหน้าเว็บ โปรดตรวจสอบ Console'); });
+/* =========================================================
+   13) BOOT
+   ========================================================= */
+(function boot(){
+  initLines();el.travelDate.min=toLocalISO();fillTrainOptions();renderFavorites();renderHistories();applyTheme(STORAGE.get('srtPremiumTheme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));updateMonthlyOptions();restoreFromUrl();if(!location.search){bookingEmpty();monthlyEmpty()}
+  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
+  console.info(`SRT Ticket Tools ${APP_CONFIG.version} loaded`)
 })();
-
-(function(){
-  const $ = (id) => document.getElementById(id);
-
-  const pages = { booking: $('toolBooking'), monthly: $('toolMonthly') };
-  const tabs = { booking: $('tabBooking'), monthly: $('tabMonthly') };
-
-  function showTool(name){
-    Object.keys(pages).forEach(key => {
-      if(pages[key]) pages[key].classList.toggle('active', key === name);
-      if(tabs[key]) tabs[key].classList.toggle('active', key === name);
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  if(tabs.booking) tabs.booking.addEventListener('click', () => showTool('booking'));
-  if(tabs.monthly) tabs.monthly.addEventListener('click', () => showTool('monthly'));
-
-  const els = {
-    fare: $('monthlyFare'),
-    trips: $('monthlyTrips'),
-    passenger: $('monthlyPassenger'),
-    period: $('monthlyPeriod'),
-    result: $('monthlyResult')
-  };
-
-  const periods = {
-    week: {
-      label:'รายสัปดาห์',
-      normalDays:6,
-      studentDays:5,
-      generalRate:.75,
-      halfRate:.50,
-      studentRate:.51,
-      generalText:'คิด 75% (ลด 25%)',
-      halfText:'คิด 50%',
-      studentText:'คิด 51% และปัดเศษขึ้น'
-    },
-    m1: {
-      label:'ราย 1 เดือน',
-      normalDays:24,
-      studentDays:20,
-      generalRate:.75,
-      halfRate:.50,
-      studentRate:.50,
-      generalText:'คิด 75% (ลด 25%)',
-      halfText:'คิด 50%',
-      studentText:'คิด 50% และปัดเศษขึ้น'
-    },
-    m2: {
-      label:'ราย 2 เดือน',
-      normalDays:48,
-      studentDays:40,
-      generalRate:.72,
-      halfRate:.50,
-      studentRate:.47,
-      generalText:'คิด 72% (ลด 28%)',
-      halfText:'คิด 50%',
-      studentText:'คิด 47% และปัดเศษขึ้น'
-    },
-    m3: {
-      label:'ราย 3 เดือน',
-      normalDays:72,
-      studentDays:60,
-      generalRate:.70,
-      halfRate:.50,
-      studentRate:.45,
-      generalText:'คิด 70% (ลด 30%)',
-      halfText:'คิด 50%',
-      studentText:'คิด 45% และปัดเศษขึ้น'
-    }
-  };
-
-  const passengerLabels = {
-    general:'ประชาชนทั่วไป',
-    half:'ผู้มีสิทธิลดครึ่งราคา',
-    student:'นักเรียน / นักศึกษา'
-  };
-
-  // PATCH v3: ล็อกราคาตั๋วเหมาจ่าย ไป-กลับ นักเรียน/นักศึกษา ตามราคาที่ตรวจพบจากระบบขายตั๋วจริง
-  // สำคัญ: periodKey ในหน้าเว็บนี้ใช้ week / m1 / m2 / m3
-  const STUDENT_ROUND_TRIP_MONTHLY_OVERRIDES = {
-    2:  { week: 10, m1: 40,  m2: 76,  m3: 108 },
-    5:  { week: 26, m1: 100, m2: 188, m3: 270 }
-  };
-
-  // สูตรสำรองสำหรับค่าโดยสารอื่นที่ไม่ได้ล็อกราคาไว้
-  // รายสัปดาห์ใช้ 51% เพื่อให้ค่าโดยสาร 5 บาท ได้ 26 บาท
-  // ราย 2 เดือนใช้ 47% และถ้ามีเศษสตางค์ให้ปัดขึ้น เพื่อให้เคส 75.20 เป็น 76 บาท
-  const STUDENT_ROUND_TRIP_MONTHLY_RULES = {
-    week: { label:'รายสัปดาห์', days:5,  rate:.51, text:'คิด 51% และปัดเศษขึ้น' },
-    m1:   { label:'ราย 1 เดือน', days:20, rate:.50, text:'คิด 50% และปัดเศษขึ้น' },
-    m2:   { label:'ราย 2 เดือน', days:40, rate:.47, text:'คิด 47% และปัดเศษขึ้น' },
-    m3:   { label:'ราย 3 เดือน', days:60, rate:.45, text:'คิด 45% และปัดเศษขึ้น' }
-  };
-
-  function ceilBahtForMonthlyTicket(value){
-    const n = Number(value) || 0;
-    return Math.ceil(n - 0.000000001);
-  }
-
-  function getStudentRoundTripMonthlyDetail(oneWayFare, periodKey){
-    const fare = Number(oneWayFare);
-    const key = String(periodKey || '').trim();
-    const rule = STUDENT_ROUND_TRIP_MONTHLY_RULES[key];
-    if(!rule) return null;
-
-    const overrideTable = STUDENT_ROUND_TRIP_MONTHLY_OVERRIDES[fare];
-    const rawByRule = fare * 2 * rule.days * rule.rate;
-
-    if(overrideTable && overrideTable[key] !== undefined){
-      return {
-        finalPrice: overrideTable[key],
-        rawPrice: rawByRule,
-        base: fare * 2 * rule.days,
-        calcDays: rule.days,
-        rate: rule.rate,
-        rateText: rule.text,
-        isOverride: true,
-        overrideText: 'ล็อกราคาตามระบบขายตั๋วจริงสำหรับค่าโดยสาร ' + money(fare) + ' บาท'
-      };
-    }
-
-    return {
-      finalPrice: ceilBahtForMonthlyTicket(rawByRule),
-      rawPrice: rawByRule,
-      base: fare * 2 * rule.days,
-      calcDays: rule.days,
-      rate: rule.rate,
-      rateText: rule.text,
-      isOverride: false,
-      overrideText: 'ใช้สูตรสำรองสำหรับค่าโดยสารที่ไม่ได้ล็อกราคาไว้'
-    };
-  }
-
-  function money(v){
-    const value = Number(v);
-    if(!Number.isFinite(value)) return '0';
-    return value.toLocaleString('th-TH', {
-      minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
-      maximumFractionDigits: 2
-    });
-  }
-
-  function roundFinalBaht(v){
-    // ใบแทรก 692: เศษต่ำกว่า 50 สตางค์ตัดทิ้ง / ตั้งแต่ 50 สตางค์ขึ้นไปยกเป็น 1 บาท
-    // ทำเฉพาะขั้นสุดท้ายของราคา
-    return Math.floor(Number(v) + 0.5 + 0.000000001);
-  }
-
-  function empty(){
-    if(els.result){
-      els.result.innerHTML = '<div class="empty"><div class="big">🎟️</div><p>กรุณากรอกค่าโดยสารเต็มราคา<br>เพื่อคำนวณตั๋วเดือน</p></div>';
-    }
-  }
-
-  function updatePassengerOptions(){
-    if(!els.trips || !els.passenger) return;
-    const trips = parseInt(els.trips.value || '1', 10);
-    const studentOption = els.passenger.querySelector('option[value="student"]');
-
-    if(studentOption){
-      studentOption.disabled = trips !== 2;
-      studentOption.textContent = trips === 2
-        ? 'นักเรียน / นักศึกษา'
-        : 'นักเรียน / นักศึกษา (ใช้ได้เฉพาะไป-กลับ)';
-    }
-
-    if(trips !== 2 && els.passenger.value === 'student'){
-      els.passenger.value = 'general';
-    }
-  }
-
-  function updatePeriodLabels(){
-    if(!els.period) return;
-    updatePassengerOptions();
-
-    const trips = parseInt(els.trips?.value || '1', 10);
-    const passenger = els.passenger?.value || 'general';
-    const useStudentDays = trips === 2 && passenger === 'student';
-
-    Object.entries(periods).forEach(([key, info]) => {
-      const opt = els.period.querySelector(`option[value="${key}"]`);
-      if(opt){
-        const days = useStudentDays ? info.studentDays : info.normalDays;
-        opt.textContent = `${info.label} คิด ${days} วัน`;
-      }
-    });
-  }
-
-  function getRateAndText(passenger, period){
-    if(passenger === 'general'){
-      return { rate: period.generalRate, text: period.generalText };
-    }
-    if(passenger === 'half'){
-      return { rate: period.halfRate, text: period.halfText };
-    }
-    return { rate: period.studentRate, text: period.studentText };
-  }
-
-  function calcMonthly(){
-    updatePeriodLabels();
-    if(!els.result) return;
-
-    const fare = parseFloat(els.fare?.value || '');
-    const trips = parseInt(els.trips?.value || '1', 10);
-    let passenger = els.passenger?.value || 'general';
-    const period = periods[els.period?.value || 'week'];
-
-    if(!Number.isFinite(fare) || fare <= 0){
-      empty();
-      return;
-    }
-
-    // นักเรียน/นักศึกษามีสิทธิ์เฉพาะบัตรไป-กลับตามใบแทรก
-    if(passenger === 'student' && trips !== 2){
-      passenger = 'general';
-      if(els.passenger) els.passenger.value = 'general';
-    }
-
-    const isStudentRoundTrip = passenger === 'student' && trips === 2;
-    const periodKey = els.period?.value || 'week';
-    let calcDays, rateInfo, base, rawPrice, finalPrice, specialStudentDetail = null;
-
-    if(isStudentRoundTrip){
-      specialStudentDetail = getStudentRoundTripMonthlyDetail(fare, periodKey);
-      calcDays = specialStudentDetail.calcDays;
-      rateInfo = { rate: specialStudentDetail.rate, text: specialStudentDetail.rateText };
-      base = specialStudentDetail.base;
-      rawPrice = specialStudentDetail.rawPrice;
-      finalPrice = specialStudentDetail.finalPrice;
-    } else {
-      calcDays = period.normalDays;
-      rateInfo = getRateAndText(passenger, period);
-      base = fare * trips * calcDays;
-      rawPrice = base * rateInfo.rate;
-      finalPrice = roundFinalBaht(rawPrice);
-    }
-
-    const saving = Math.max(0, base - finalPrice);
-    const avgPerDay = finalPrice / calcDays;
-    const avgPerTrip = finalPrice / (calcDays * trips);
-
-    const tripText = trips === 2 ? 'ไป-กลับ วันละ 2 เที่ยว' : 'เที่ยวเดียว วันละ 1 เที่ยว';
-    const dayNote = isStudentRoundTrip ? ' วัน (เกณฑ์นักเรียน/นักศึกษาไป-กลับ)' : ' วัน';
-    const ruleNote = isStudentRoundTrip
-      ? (specialStudentDetail?.overrideText || 'นักเรียน/นักศึกษาใช้สิทธิเฉพาะบัตรไป-กลับ')
-      : 'ใช้จำนวนวันปกติ 6 / 24 / 48 / 72 วัน';
-
-    els.result.innerHTML = `
-      <div class="price-card"><div class="price-inner">
-        <div class="price-kicker">${period.label} • ${passengerLabels[passenger]} • ${tripText}</div>
-        <div class="price-main">${money(finalPrice)} <small>บาท</small></div>
-        <div class="summary-row"><span>ฐานราคาก่อนคิดอัตรา</span><strong>${money(base)} บาท</strong></div>
-        <div class="summary-row"><span>เกณฑ์ที่ใช้</span><strong>${calcDays}${dayNote} / ${rateInfo.text}</strong></div>
-        <div class="summary-row"><span>ราคาก่อนยกเศษ</span><strong>${money(rawPrice)} บาท</strong></div>
-        <div class="summary-row"><span>${isStudentRoundTrip ? 'ปัดเศษ/ล็อกราคาตามระบบจริง' : 'ยกเศษตามใบแทรก 692'}</span><strong>${money(finalPrice)} บาท</strong></div>
-        <div class="summary-row"><span>หมายเหตุสูตร</span><strong>${ruleNote}</strong></div>
-        <div class="summary-row"><span>ประหยัดโดยประมาณ</span><strong>${money(saving)} บาท</strong></div>
-        <div class="price-grid">
-          <div class="price-mini"><span>เฉลี่ยต่อวัน</span><strong>${money(avgPerDay)} บาท</strong></div>
-          <div class="price-mini"><span>เฉลี่ยต่อเที่ยว</span><strong>${money(avgPerTrip)} บาท</strong></div>
-        </div>
-        <div class="formula">สูตร: ค่าโดยสารเต็มราคา ${money(fare)} × ${trips} เที่ยว/วัน × ${calcDays} วัน × อัตราที่ต้องจ่าย ${(rateInfo.rate*100).toFixed(0)}% = ${money(rawPrice)} บาท → ${isStudentRoundTrip ? 'ปัดขึ้น/ใช้ราคาล็อกกรณีพิเศษ' : 'ยกเศษขั้นสุดท้าย'} = ${money(finalPrice)} บาท</div>
-        <div class="warning-note">ราคาเป็นเพียงการคำนวณเบื้องต้น โดยกลุ่มนักเรียน/นักศึกษาไป-กลับได้ล็อกราคา 2 บาท และ 5 บาท ตามระบบขายตั๋วจริง โปรดตรวจสอบกับเจ้าหน้าที่ก่อนออกตั๋วครับ</div>
-      </div></div>`;
-  }
-
-  ['fare','trips','passenger','period'].forEach(key => {
-    if(els[key]){
-      els[key].addEventListener('input', calcMonthly);
-      els[key].addEventListener('change', calcMonthly);
-    }
-  });
-
-  updatePeriodLabels();
-  empty();
-})();
-
 </script>
-  
-<script src="./booking-fix-v6.js?v=6"></script>
-  
 </body>
 </html>

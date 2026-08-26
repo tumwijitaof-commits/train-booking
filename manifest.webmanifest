@@ -1,0 +1,14 @@
+{
+  "name": "SRT Ticket Tools Premium",
+  "short_name": "SRT Tools",
+  "description": "เครื่องมือช่วยคำนวณวันเริ่มจองตั๋วรถไฟและราคาตั๋วเดือน",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#082a4c",
+  "lang": "th",
+  "icons": [
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
