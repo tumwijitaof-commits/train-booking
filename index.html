@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#082a4c" />
+  <meta name="theme-color" content="#891c3c" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23891c3c'/%3E%3Ctext x='32' y='39' font-family='sans-serif' font-size='22' font-weight='bold' text-anchor='middle' fill='white'%3ESRT%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="เช็กวันเริ่มซื้อตั๋วรถไฟและคำนวณราคาตั๋วเดือนแบบเข้าใจง่าย ใช้เพื่อการคำนวณเบื้องต้น" />
-  <title>เช็กวันซื้อตั๋วรถไฟและราคาตั๋วเดือน | SRT Ticket Tools</title>
+  <title>ตั๋วเดือนและการจองล่วงหน้า | SRT Ticket Tools</title>
   <style>
     :root{
       --navy:#082a4c;--navy-2:#0b3768;--blue:#1557a6;--blue-2:#2563eb;--gold:#c89a32;
@@ -87,49 +87,98 @@
       .result-actions{display:none!important}
     }
   </style>
+<style>
+/* Refreshed visual system: Prompt, burgundy, clear service entrances. */
+:root{--navy:#891c3c;--navy-2:#67152e;--blue:#891c3c;--blue-2:#a72b50;--gold:#ac6512;--ink:#27222b;--muted:#706674;--muted-2:#928996;--bg:#f7f7fa;--surface:#fff;--surface-2:#faf9fc;--surface-3:#f4eaf0;--line:#e8e3e9;--line-strong:#d5ccd8;--radius:20px;--radius-sm:12px;--shadow-sm:0 3px 12px rgba(42,23,35,.025);--shadow:0 16px 50px rgba(52,24,40,.06);--focus:0 0 0 4px #891c3c18;--topbar:88px}
+html[data-theme="dark"]{--ink:#f5f0f6;--muted:#bcb0c0;--muted-2:#9a8ba0;--bg:#17151b;--surface:#211d26;--surface-2:#29232e;--surface-3:#382631;--line:#3e3343;--line-strong:#65526a;--navy:#ab365b;--navy-2:#782340;--blue:#ef9ab4;--gold:#edba6e;--focus:0 0 0 4px #ef9ab424;--success:#83d9ae;--warning:#edc074;--danger:#ffb5ac;--shadow-sm:none}
+body{font-family:"Prompt","Leelawadee UI",Tahoma,sans-serif;font-size:16px;line-height:1.7}
+button,input,select{font-family:inherit}button{touch-action:manipulation}button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:4px}
+h1,h2,h3{letter-spacing:0!important;font-weight:600!important;line-height:1.4!important}
+.skip-link{position:fixed;top:-100px;left:12px;padding:10px 18px;background:var(--surface);z-index:1000}.skip-link:focus{top:12px}
+.topbar{background:var(--surface);backdrop-filter:none;height:auto;min-height:var(--topbar);box-shadow:none}
+.topbar-inner{max-width:1160px;padding:18px 28px;gap:28px;flex-wrap:wrap}
+.brand{border:0;background:none;text-align:left;padding:0;color:var(--ink);gap:12px}
+.brand-mark{width:46px;height:46px;border-radius:12px;background:var(--navy);font-size:15px;font-weight:700;box-shadow:none}
+.brand-title,.brand-sub{display:block}.brand-title{font-size:17px;font-weight:600}.brand-sub{font-size:10px;letter-spacing:1.7px;font-weight:500;margin-top:0}
+.tabs{max-width:none;margin:0;padding:0;display:flex;gap:6px;margin-left:auto}
+.tab{box-shadow:none;border:0;border-radius:10px;background:transparent;font-size:15px;font-weight:500;padding:11px 16px;color:var(--muted)}
+.tab:hover{background:var(--surface-3);color:var(--ink);transform:none}.tab.active{background:var(--surface-3);color:var(--blue);box-shadow:inset 0 -2px 0 var(--navy)}
+.top-actions{gap:6px}.icon-btn{box-shadow:none;border:0;border-radius:10px;background:var(--surface-2);height:42px;min-width:42px;font-weight:400;font-size:14px}.icon-btn:hover{transform:none;background:var(--surface-3)}
+#installBtn:not(.hidden){display:inline-flex}.top-actions .label{display:none}
+.home-page{max-width:1064px;margin:auto;padding:54px 28px 28px;outline:none}
+.home-eyebrow{color:var(--blue);font-size:14px;font-weight:500;display:block;letter-spacing:0}
+.home-heading{margin-bottom:30px}.home-heading h1{font-size:clamp(32px,4.6vw,48px);margin:14px 0 16px;font-weight:600;line-height:1.45!important}.home-heading h1 span{color:var(--muted);font-weight:400}.home-heading p{font-size:16px;color:var(--muted);margin:0;line-height:1.9}.mobile-break{display:none}
+.service-menu{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.service-card{display:flex;flex-direction:column;text-align:left;border:1px solid var(--line);border-radius:24px;padding:28px;color:var(--ink);background:var(--surface);box-shadow:var(--shadow);transition:transform .18s,border-color .18s;min-width:0;position:relative;overflow:hidden}
+.service-card:hover{transform:translateY(-4px);border-color:var(--navy)}.service-card:active{transform:translateY(-1px)}
+.monthly-service{background:var(--navy);color:white;border-color:var(--navy)}
+.menu-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px}.menu-icon{width:56px;height:56px;display:grid;place-items:center;background:var(--surface-3);color:var(--navy);border-radius:16px}.menu-icon svg{width:32px;height:32px}.monthly-service .menu-icon{background:#ffffff1c;color:white}.menu-number{font-size:12px;color:var(--muted);font-weight:400}.monthly-service .menu-number{color:#ffdae5}
+.menu-title{font-size:29px;line-height:1.6;font-weight:600;display:block;margin-bottom:8px}.menu-description{font-size:15px;color:var(--muted);line-height:1.9;font-weight:400}.monthly-service .menu-description{color:#fce6ed}.menu-tags{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 26px}.menu-tags span{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:3px 9px;color:var(--muted);font-weight:400}.monthly-service .menu-tags span{color:#ffdae5;border-color:#ffffff3d}
+.menu-cta{padding:13px 16px;text-align:center;background:var(--surface-3);color:var(--navy);border-radius:11px;font-size:15px;font-weight:500;display:block;margin-top:auto}.monthly-service .menu-cta{background:white;color:#891c3c}
+.home-caption{font-size:13px;color:var(--muted);margin:24px 0 0;text-align:center}
+.tool-heading{max-width:1160px;margin:0 auto;padding:26px 28px 8px}.back-home{border:0;padding:0;background:none;color:var(--muted);text-decoration:underline;text-underline-offset:4px;font-size:14px;margin-bottom:20px;min-height:30px}.back-home:hover{color:var(--blue)}.tool-title-row{display:flex;align-items:center;justify-content:space-between;gap:16px}.tool-title-row h1{font-size:32px;margin:5px 0 8px;outline:none}.tool-title-row p{margin:0;color:var(--muted);font-size:15px}.auto-badge{background:var(--surface-3);color:var(--blue);font-size:12px;border-radius:8px;padding:7px 12px;white-space:nowrap}
+.workspace{max-width:1160px;padding:24px 28px 42px;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:22px}
+.card{box-shadow:var(--shadow-sm);border-radius:20px}.card-head{padding:22px 24px;background:var(--surface);gap:12px}.card-head h2{font-size:21px;font-weight:600}.card-head p{font-size:14px;font-weight:400;line-height:1.8}.card-body{padding:24px}
+.step{grid-template-columns:30px minmax(0,1fr);gap:12px;padding:2px 0 28px}.step:not(:last-child):before{left:14px;top:34px}.step-no{width:30px;height:30px;border-radius:50%;font-size:14px;font-weight:500;background:var(--surface-3);color:var(--blue)}.step-content h3{margin:1px 0 16px;font-size:17px}
+.field label{font-size:14px;font-weight:500;color:var(--ink);line-height:1.7;flex-wrap:wrap;gap:2px}.field label span{font-size:12px;font-weight:400;color:var(--muted)}.field small{font-size:12px;font-weight:400;line-height:1.8}.control{min-height:52px;border-width:1px;border-radius:10px;font-weight:400;font-size:16px;line-height:1.65;padding:11px 12px}.control::placeholder{font-weight:400;font-size:14px}.grid{gap:16px}
+.grid-3{grid-template-columns:1fr}.mode-switch,.monthly-mode{padding:4px;border-radius:12px;background:var(--surface-2)}.mode-switch button,.monthly-mode button{font-size:14px;line-height:1.7;font-weight:500;border-radius:8px;padding:10px 7px;white-space:normal}.mode-switch button.active,.monthly-mode button.active{color:var(--blue);box-shadow:0 2px 6px #271e3010}.swap-row{gap:8px;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr)}.swap-btn{height:52px;font-size:20px;border-radius:10px}.swap-btn:hover{transform:none;background:var(--surface-3)}.mini-btn{min-width:32px;width:32px;border-radius:10px;font-size:19px;background:transparent}
+.advanced{padding:16px;border-radius:12px}.advanced-title{font-size:13px;font-weight:400;flex-wrap:wrap}.favorite-strip-head{font-size:12px;font-weight:400}.chip{font-size:12px;font-weight:400;line-height:1.7}.text-btn{font-size:12px;font-weight:400;min-height:32px}.metric{border-radius:10px}.metric span{font-size:12px;font-weight:400}.metric strong{font-size:16px;font-weight:500}
+.result-body{padding:20px;min-height:350px}.empty{padding:24px 8px}.empty-icon{background:var(--surface-2);border-radius:50%;font-size:25px;width:66px;height:66px;margin-bottom:18px}.empty h3{font-size:18px;font-weight:500}.empty p{font-size:14px;font-weight:400;line-height:1.9;margin-top:8px}
+.result-card{box-shadow:none;border:1px solid var(--line);border-radius:16px}.result-top{background:var(--navy);padding:20px}.result-top .kicker{font-weight:400;color:#fce6ed;font-size:13px}.result-top h3{font-size:21px;font-weight:500}.status{font-weight:500;font-size:12px;white-space:normal;text-align:center}.result-main{padding:18px}.route-line{padding:12px;border-radius:10px}.route-line .station{font-size:14px;font-weight:500}.big-result{background:var(--surface-3);border:1px solid var(--line);border-radius:14px}.big-result span{font-size:14px;font-weight:400}.big-result strong{font-size:64px;letter-spacing:0;font-weight:600}.big-result small{font-size:13px;font-weight:400}
+.price-main{background:var(--surface-3);border:0;border-radius:14px}.price-main span{font-weight:400;font-size:14px}.price-main strong{color:var(--blue);font-size:clamp(46px,6vw,72px);font-weight:600;letter-spacing:0;overflow-wrap:anywhere}.price-main small{font-size:16px;font-weight:400}.date-panel{border:1px solid var(--line);border-radius:12px}.date-panel .label{font-size:14px;font-weight:400}.date-panel .date{font-size:26px;font-weight:600}.date-panel .time{font-size:15px;font-weight:500}.result-mini span{font-size:12px;font-weight:400}.result-mini strong{font-size:15px;font-weight:500}
+.note{font-size:13px;font-weight:400;line-height:1.85;border-radius:10px}.result-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.action-btn{font-size:14px;font-weight:500;min-height:44px;border-radius:10px}.action-btn:hover{transform:none;background:var(--surface-3)}.action-btn.primary:hover{background:var(--navy-2)}
+.side-section{margin-top:8px}.side-section h3{font-size:14px;font-weight:500}.history-item{border-radius:10px;padding:12px}.history-item b{font-size:14px;font-weight:500}.history-item span{font-size:12px;font-weight:400;line-height:1.8}.history-list{max-height:320px;overflow:auto}
+.monthly-intro{background:var(--surface-2);border-radius:12px;padding:16px}.monthly-intro b{font-size:15px;font-weight:500}.monthly-intro span{font-size:13px;font-weight:400;line-height:1.8}.fare-route-box{border-radius:12px;background:var(--surface);padding:16px}.fare-route-title{flex-wrap:wrap;gap:4px}.fare-route-title b{font-size:15px;font-weight:500}.fare-route-title span{font-size:12px;font-weight:400}.fare-preview,.trip-lock-preview{border-width:1px;border-radius:12px}.fare-preview-main span{font-size:13px;font-weight:400}.fare-preview-main strong{font-weight:600}.fare-preview-main small{font-size:13px;font-weight:400}.fare-preview-meta>div{font-size:13px}.fare-preview-meta span{font-weight:400}.fare-preview-meta strong{font-size:14px;font-weight:500}.fare-source-badge{font-size:12px;font-weight:400;white-space:normal;max-width:100%;width:auto!important}.monthly-helper{font-size:12px;font-weight:400;line-height:1.85}.monthly-auto-error{font-size:14px;font-weight:400}.trip-lock-head{flex-wrap:wrap}.trip-lock-head b{font-size:14px;font-weight:500}.trip-lock-head span{font-size:12px;font-weight:400}.trip-leg .tag{font-size:12px;font-weight:400}.trip-leg strong{font-size:14px;font-weight:500}.round-fare-highlight span,.round-fare-highlight small{font-size:13px;font-weight:400}.round-fare-highlight strong{font-weight:600;color:var(--blue)}.fare-preview-note{font-size:12px;font-weight:400}.route-error-title{font-size:15px;font-weight:500}.route-error-detail{font-size:13px;font-weight:400}.summary-row{font-size:13px;line-height:1.85;gap:12px}.summary-row span{font-weight:400}.summary-row strong{font-weight:500;font-size:14px;text-align:right}.summary-table{border-radius:10px}
+.footer{border-top:1px solid var(--line);max-width:1104px;margin:8px auto 0;padding:24px 28px;font-size:12px;color:var(--muted);line-height:1.95;font-weight:400}.footer strong{font-weight:500;color:var(--ink)}.toast{font-size:14px;font-weight:400}.sticky{top:calc(var(--topbar) + 18px)}
+html[data-theme="dark"] .big-result,html[data-theme="dark"] .price-main{background:var(--surface-3);border-color:var(--line)}html[data-theme="dark"] .menu-icon{color:var(--blue)}html[data-theme="dark"] .monthly-service .menu-icon{color:white}html[data-theme="dark"] .menu-cta{color:var(--ink)}html[data-theme="dark"] .monthly-service .menu-cta{color:#891c3c}
+@media(min-width:900px){.home-page{min-height:calc(100vh - 210px)}}
+@media(max-width:1000px){.topbar-inner{gap:12px}.workspace{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.card-head,.card-body{padding:20px}.grid-2{grid-template-columns:1fr}.monthly-mode{grid-template-columns:1fr}.tool-title-row p{max-width:560px}}
+@media(max-width:780px){:root{--topbar:130px}.topbar-inner{padding:14px 20px;gap:12px}.top-actions{margin-left:auto}.tabs{order:3;width:100%;margin-left:0;display:grid;grid-template-columns:1fr 1fr}.tab{padding:9px 8px;font-size:14px}.home-page{padding:32px 20px 24px}.home-heading h1{font-size:34px}.home-heading{margin-bottom:24px}.service-menu{gap:16px}.service-card{padding:22px}.menu-title{font-size:24px}.menu-description{font-size:14px}.menu-top{margin-bottom:20px;flex-wrap:wrap}.menu-number{font-size:12px}.menu-tags{margin:18px 0}.menu-cta{font-size:14px;padding:12px 8px}.workspace{grid-template-columns:1fr;padding:20px;gap:20px}.sticky{position:static}.tool-heading{padding:24px 20px 0}.tool-title-row h1{font-size:28px}.tool-title-row p{font-size:14px}.tool-title-row{align-items:flex-start}.auto-badge{display:none}.grid-2{grid-template-columns:1fr 1fr}.monthly-mode{grid-template-columns:1fr 1fr}.result-body{min-height:240px}.result-main{padding:18px}.footer{margin:0 20px;padding:20px 0}.result-actions{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:540px){.service-menu{grid-template-columns:1fr}.service-card{padding:24px;border-radius:20px}.home-heading h1{font-size:32px}.mobile-break{display:block}.menu-top{margin-bottom:12px;flex-wrap:nowrap}.menu-title{font-size:27px}.menu-description{font-size:15px}.menu-tags{margin:16px 0 20px}.menu-cta{font-size:15px}.home-caption{font-size:12px;line-height:1.8}.tool-heading{padding-top:20px}.back-home{margin-bottom:12px}.card-head h2{font-size:20px}.grid-2{grid-template-columns:1fr}.monthly-mode{grid-template-columns:1fr}.swap-row{grid-template-columns:1fr 36px;align-items:center}.swap-row>.field:first-child{grid-column:1;grid-row:1}.swap-row>.swap-btn{grid-column:2;grid-row:1 / 3}.swap-row>.field:last-child{grid-column:1;grid-row:2}.swap-btn{height:48px}.control-wrap{gap:6px}.result-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.trip-legs{grid-template-columns:1fr}.summary-row{align-items:flex-start;flex-wrap:wrap}.summary-row strong{margin-left:auto}.step{grid-template-columns:26px minmax(0,1fr);gap:10px}.step-no{width:26px;height:26px}.step:not(:last-child):before{left:12px}.card-body,.card-head{padding:18px}.result-top{flex-wrap:wrap}.fare-route-box{padding:14px}.tool-title-row h1{font-size:27px}.home-heading p{font-size:15px}.brand-title{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+@media print{.topbar,.home-page,.tool-heading,.footer,.skip-link{display:none!important}.page.active,.workspace,aside.card{display:block!important}.result-body{min-height:0!important}}
+
+</style>
 </head>
-<body>
+<body data-tool="home">
+<a class="skip-link" href="#homePage">ข้ามไปยังเนื้อหา</a>
 <div class="app-shell">
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">SRT</div>
-        <div class="brand-text">
-          <div class="brand-title">SRT Ticket Tools</div>
-          <div class="brand-sub">PREMIUM CALCULATOR</div>
-        </div>
-      </div>
+      <button class="brand" id="brandHomeBtn" type="button" aria-label="SRT Ticket Tools กลับหน้าหลัก">
+        <span class="brand-mark" aria-hidden="true">SRT</span>
+        <span class="brand-text"><span class="brand-title">เรื่องตั๋วรถไฟ</span><span class="brand-sub">SRT TICKET TOOLS</span></span>
+      </button>
+      <nav class="tabs" aria-label="เครื่องมือตั๋วรถไฟ">
+        <button class="tab" id="monthlyTab" type="button" aria-controls="monthlyPage">ตั๋วเดือน</button>
+        <button class="tab" id="bookingTab" type="button" aria-controls="bookingPage">การจองล่วงหน้า</button>
+      </nav>
       <div class="top-actions">
-        <button class="icon-btn" id="installBtn" type="button" title="ติดตั้งเป็นแอป"><span>＋</span><span class="label">ติดตั้ง</span></button>
+        <button class="icon-btn hidden" id="installBtn" type="button" title="ติดตั้งเป็นแอป"><span>＋</span><span class="label">ติดตั้ง</span></button>
         <button class="icon-btn" id="themeBtn" type="button" title="สลับโหมดสี"><span id="themeIcon">☾</span><span class="label">โหมดสี</span></button>
       </div>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="hero-card">
-      <div class="hero-copy">
-        <div class="eyebrow">🚆 เครื่องมือช่วยตรวจสอบตั๋วรถไฟ</div>
-        <h1>เช็กวันซื้อตั๋วรถไฟ<br>และคำนวณราคาตั๋วเดือนได้ในหน้าเดียว</h1>
-        <p>เลือกเส้นทางและวันที่เดินทาง ระบบจะช่วยบอกวันเริ่มซื้อตั๋วให้อัตโนมัติ พร้อมคำนวณราคาตั๋วเดือนแบบอ่านง่าย ชัดเจน และใช้งานสะดวก</p>
-      </div>
-      <div class="version-badge">
-        <strong>ตั๋วเดือนไป–กลับชัดเจนขึ้น</strong>
-        <span>สายตะวันออก • Premium v1.3</span>
-      </div>
+  <main id="homePage" class="home-page" tabindex="-1">
+    <div class="home-heading"><span class="home-eyebrow">วางแผนเดินทางได้ง่ายขึ้น</span><h1>เรื่องตั๋วรถไฟ<br><span>เลือกเช็กได้ในที่เดียว</span></h1><p>เดินทางประจำ หรือเตรียมเดินทางครั้งหน้า<br class="mobile-break"> เลือกเครื่องมือที่ต้องการได้เลย</p></div>
+    <div class="service-menu">
+      <button class="service-card monthly-service" id="openMonthlyBtn" type="button" aria-controls="monthlyPage">
+        <span class="menu-top"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 7h22v7a3 3 0 0 0 0 6v5H5v-5a3 3 0 0 0 0-6V7Z"/><path d="M20 8v3m0 3v4m0 3v3M9 12h7m-7 5h5"/></svg></span><span class="menu-number">01 / เดินทางประจำ</span></span>
+        <span class="menu-title">ตั๋วเดือน</span><span class="menu-description">คำนวณราคาตั๋วรายสัปดาห์และรายเดือน<br>เลือกเที่ยวเดียวหรือไป–กลับได้</span><span class="menu-tags"><span>เลือกสถานี</span><span>ดูราคาโดยประมาณ</span></span><span class="menu-cta">คำนวณราคาตั๋วเดือน</span>
+      </button>
+      <button class="service-card booking-service" id="openBookingBtn" type="button" aria-controls="bookingPage">
+        <span class="menu-top"><span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="5" y="7" width="22" height="21" rx="3"/><path d="M10 4v7m12-7v7M5 14h22m-17 5h4m4 0h4m-12 5h4"/></svg></span><span class="menu-number">02 / เตรียมเดินทาง</span></span>
+        <span class="menu-title">การจองล่วงหน้า</span><span class="menu-description">เช็กวันแรกที่สามารถซื้อตั๋วได้<br>จากวันที่เดินทางและเส้นทางของคุณ</span><span class="menu-tags"><span>เลือกวันเดินทาง</span><span>เช็กวันเปิดจอง</span></span><span class="menu-cta">เช็กวันจองล่วงหน้า</span>
+      </button>
     </div>
-  </section>
-
-  <div class="trustbar">
-    <div class="trustbar-inner"><span>🛡️</span><div><b>เครื่องมือนี้ไม่ใช่ระบบจำหน่ายตั๋วอย่างเป็นทางการ</b> ผลลัพธ์ใช้ช่วยคำนวณเบื้องต้น โปรดตรวจสอบกับ D-Ticket เจ้าหน้าที่สถานี หรือสายด่วน 1690 ก่อนทำรายการทุกครั้ง</div></div>
+    <div class="home-caption">คำนวณเบื้องต้น · ซื้อตั๋วผ่าน D-Ticket หรือเจ้าหน้าที่สถานี</div>
+  </main>
+  <div class="tool-heading hidden" id="toolHeading">
+    <button class="back-home" id="backHomeBtn" type="button">กลับหน้าหลัก</button>
+    <div class="tool-title-row"><div><span class="home-eyebrow" id="toolEyebrow">เตรียมเดินทาง</span><h1 id="toolTitle" tabindex="-1">การจองล่วงหน้า</h1><p id="toolDescription">เลือกวันเดินทางและเส้นทาง เพื่อเช็กวันเริ่มซื้อตั๋ว</p></div><span class="auto-badge">คำนวณอัตโนมัติ</span></div>
   </div>
-
-  <nav class="tabs" aria-label="เลือกเครื่องมือ">
-    <button class="tab active" id="bookingTab" type="button">📅 เช็กวันซื้อตั๋ว</button>
-    <button class="tab" id="monthlyTab" type="button">🎟️ ราคาตั๋วเดือน</button>
-  </nav>
-
-  <section id="bookingPage" class="page active">
+  <section id="bookingPage" class="page" aria-labelledby="toolTitle">
     <main class="workspace">
       <section class="card">
         <div class="card-head"><div><h2>ข้อมูลการเดินทาง</h2><p>กรอกตามขั้นตอน ระบบจะคำนวณให้อัตโนมัติ</p></div></div>
@@ -200,7 +249,7 @@
 
       <aside class="card sticky">
         <div class="card-head"><div><h2>วันเริ่มซื้อตั๋ว</h2><p>ดูวันแรกที่สามารถซื้อตั๋วได้อย่างชัดเจน</p></div></div>
-        <div class="result-body" id="bookingResult">
+        <div class="result-body" id="bookingResult" role="status" aria-live="polite" aria-atomic="true">
           <div class="empty"><div class="empty-icon">🧮</div><h3>พร้อมคำนวณ</h3><p>เลือกวันที่ สายทาง และสถานีให้ครบ<br>ผลลัพธ์จะแสดงอัตโนมัติ</p></div>
         </div>
         <div class="card-body" style="padding-top:0">
@@ -213,12 +262,12 @@
     </main>
   </section>
 
-  <section id="monthlyPage" class="page">
+  <section id="monthlyPage" class="page" aria-labelledby="toolTitle">
     <main class="workspace">
       <section class="card">
-        <div class="card-head"><div><h2>คำนวณราคาตั๋วเดือน</h2><p>เลือกต้นทาง–ปลายทาง ระบบจะเช็กเส้นทางและแสดงค่าโดยสารเที่ยวเดียวหรือไป-กลับให้รู้ก่อนคำนวณตั๋วเดือน</p></div></div>
+        <div class="card-head"><div><h2>คำนวณราคาตั๋วเดือน</h2><p>เลือกเส้นทาง แล้วดูราคาตามรูปแบบการเดินทางของคุณ</p></div></div>
         <div class="card-body">
-          <div class="monthly-intro"><b>เลือกสถานีแล้วรู้ราคาได้เลย</b><span>ระบบอัตโนมัติรองรับสายตะวันออกก่อน และจะตรวจสอบสายทางก่อนคำนวณ หากเส้นทางไม่รองรับ ระบบจะให้เลือกใหม่โดยไม่แสดงราคาที่อาจคลาดเคลื่อน</span></div>
+          <div class="monthly-intro"><b>เลือกสถานีแล้วรู้ราคาได้เลย</b><span>เลือกสถานีสำหรับสายตะวันออก หรือกรอกค่าโดยสารเองสำหรับสายอื่น</span></div>
 
           <div class="monthly-mode" aria-label="วิธีระบุค่าโดยสาร">
             <button class="active" id="monthlyAutoBtn" type="button">🚆 เลือกสถานีสายตะวันออก</button>
@@ -266,8 +315,8 @@
       </section>
 
       <aside class="card sticky">
-        <div class="card-head"><div><h2>ราคาตั๋วเดือนโดยประมาณ</h2><p>แสดงเส้นทาง ค่าโดยสารต่อเที่ยว สูตร และราคาตั๋วเดือนอย่างชัดเจน</p></div></div>
-        <div class="result-body" id="monthlyResult">
+        <div class="card-head"><div><h2>ราคาตั๋วเดือนโดยประมาณ</h2><p>ราคาและรายละเอียดจะแสดงเมื่อกรอกข้อมูลครบ</p></div></div>
+        <div class="result-body" id="monthlyResult" role="status" aria-live="polite" aria-atomic="true">
           <div class="empty"><div class="empty-icon">🎟️</div><h3>เลือกต้นทางและปลายทาง</h3><p>ระบบจะหาค่าโดยสารต่อเที่ยวให้ก่อน<br>แล้วคำนวณราคาตั๋วเดือนต่อทันที</p></div>
         </div>
         <div class="card-body" style="padding-top:0">
@@ -290,6 +339,8 @@
 
 <script>
 'use strict';
+let routeBooting=true;
+const initialSearch=location.search;
 
 /* =========================================================
    1) APP CONFIG + SINGLE SOURCE OF TRUTH
@@ -686,7 +737,26 @@ function fillTrainOptions(){const line=el.selectedLine.value;el.selectedTrain.in
 function fillDatalist(target, names){target.innerHTML='';names.forEach(name=>{const o=document.createElement('option');o.value=name;target.appendChild(o)})}
 function fillStationData(){const line=el.selectedLine.value;const train=getTrain(line,el.selectedTrain.value);fillDatalist(el.stationList,stationNames(line));fillDatalist(el.activeStationList,activeStationNames(line,train));if(train){el.trainOrigin.value=train.origin||'';el.trainDest.value=train.dest||'';if(!activeStationNames(line,train).includes(el.passOrigin.value))el.passOrigin.value='';if(!activeStationNames(line,train).includes(el.passDest.value))el.passDest.value=''}renderFavoriteButtons()}
 function updateCustomTrainVisibility(){const line=el.selectedLine.value;const train=el.selectedTrain.value;el.customTrainBox.classList.toggle('hidden',!line||Boolean(train))}
-function setTool(tool){state.tool=tool;const isBooking=tool==='booking';el.bookingTab.classList.toggle('active',isBooking);el.monthlyTab.classList.toggle('active',!isBooking);el.bookingPage.classList.toggle('active',isBooking);el.monthlyPage.classList.toggle('active',!isBooking);syncUrl()}
+function setTool(tool){
+  state.tool=['home','booking','monthly'].includes(tool)?tool:'home';
+  const booking=state.tool==='booking',monthly=state.tool==='monthly',home=state.tool==='home';
+  el.bookingTab.classList.toggle('active',booking);el.monthlyTab.classList.toggle('active',monthly);
+  el.bookingTab.setAttribute('aria-current',booking?'page':'false');el.monthlyTab.setAttribute('aria-current',monthly?'page':'false');
+  el.bookingPage.classList.toggle('active',booking);el.monthlyPage.classList.toggle('active',monthly);
+  $('homePage').classList.toggle('hidden',!home);$('toolHeading').classList.toggle('hidden',home);
+  document.body.dataset.tool=state.tool;
+  $('toolTitle').textContent=monthly?'ตั๋วเดือน':'การจองล่วงหน้า';
+  $('toolEyebrow').textContent=monthly?'เดินทางประจำ':'เตรียมเดินทาง';
+  $('toolDescription').textContent=monthly?'เลือกเส้นทางและรูปแบบการเดินทาง เพื่อคำนวณราคาตั๋วเดือน':'เลือกวันเดินทางและเส้นทาง เพื่อเช็กวันเริ่มซื้อตั๋ว';
+  document.querySelector('.skip-link').href=home?'#homePage':'#toolTitle';
+  document.title=(home?'ตั๋วเดือนและการจองล่วงหน้า':monthly?'คำนวณราคาตั๋วเดือน':'เช็กวันจองล่วงหน้า')+' | SRT Ticket Tools';
+  syncUrl();
+}
+function navigateTool(tool){
+  if(state.tool!==tool){try{history.pushState(null,'',location.pathname+(tool==='home'?'':'?tool='+tool))}catch{}}
+  setTool(tool);window.scrollTo({top:0,behavior:'instant'});(tool==='home'?$('homePage'):$('toolTitle')).focus({preventScroll:true});
+}
+
 function setBookingMode(mode){state.bookingMode=mode;const station=mode==='station';el.stationModeBtn.classList.toggle('active',station);el.manualModeBtn.classList.toggle('active',!station);el.stationStep.classList.toggle('hidden',!station);el.manualStep.classList.toggle('hidden',station);calculateBooking();syncUrl()}
 
 /* =========================================================
@@ -890,13 +960,13 @@ function restoreMonthly(s){if(!s)return;setTool('monthly');setMonthlyFareMode(s.
 /* =========================================================
    10) URL SHARE STATE
    ========================================================= */
-function syncUrl(){const p=new URLSearchParams();p.set('tool',state.tool);if(state.tool==='booking'){const s=getBookingSnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}else{const s=getMonthlySnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}try{history.replaceState(null,'',`${location.pathname}${p.toString()?`?${p}`:''}${location.hash}`)}catch{}}
-function restoreFromUrl(){const p=new URLSearchParams(location.search),tool=p.get('tool');if(tool==='monthly'){setTool('monthly');setMonthlyFareMode(p.get('fareMode')||'auto',false);el.monthlyOrigin.value=p.get('origin')||'คลองบางพระ';el.monthlyDest.value=p.get('dest')||'';el.monthlyFare.value=p.get('fare')||'';el.monthlyTrips.value=p.get('trips')||'1';el.monthlyPassenger.value=p.get('passenger')||'general';el.monthlyPeriod.value=p.get('period')||'week';calculateMonthly();return}if(tool==='booking'||p.size){setTool('booking');setBookingMode(p.get('mode')||'station');el.travelDate.value=p.get('date')||'';el.selectedLine.value=p.get('line')||'';fillTrainOptions();el.selectedTrain.value=p.get('train')||'';fillStationData();updateCustomTrainVisibility();el.reservationType.value=p.get('reservation')||'';el.trainOrigin.value=p.get('trainOrigin')||'';el.trainDest.value=p.get('trainDest')||'';el.passOrigin.value=p.get('origin')||'';el.passDest.value=p.get('dest')||'';el.manualReservationType.value=p.get('manualReservation')||'';el.totalDistance.value=p.get('total')||'';el.passengerDistance.value=p.get('passenger')||'';calculateBooking()}}
+function syncUrl(){if(routeBooting)return;if(state.tool==='home'){try{history.replaceState(null,'',location.pathname)}catch{}return}const p=new URLSearchParams();p.set('tool',state.tool);if(state.tool==='booking'){const s=getBookingSnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}else{const s=getMonthlySnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}try{history.replaceState(null,'',`${location.pathname}${p.toString()?`?${p}`:''}${location.hash}`)}catch{}}
+function restoreFromUrl(search=location.search){const p=new URLSearchParams(search),tool=p.get('tool');if(tool==='home'||!p.size){setTool('home');return;}if(tool==='monthly'){setTool('monthly');setMonthlyFareMode(p.get('fareMode')||'auto',false);el.monthlyOrigin.value=p.get('origin')||'คลองบางพระ';el.monthlyDest.value=p.get('dest')||'';el.monthlyFare.value=p.get('fare')||'';el.monthlyTrips.value=p.get('trips')||'1';el.monthlyPassenger.value=p.get('passenger')||'general';el.monthlyPeriod.value=p.get('period')||'week';calculateMonthly();return}if(tool==='booking'||p.size){setTool('booking');setBookingMode(p.get('mode')||'station');el.travelDate.value=p.get('date')||'';el.selectedLine.value=p.get('line')||'';fillTrainOptions();el.selectedTrain.value=p.get('train')||'';fillStationData();updateCustomTrainVisibility();el.reservationType.value=p.get('reservation')||'';el.trainOrigin.value=p.get('trainOrigin')||'';el.trainDest.value=p.get('trainDest')||'';el.passOrigin.value=p.get('origin')||'';el.passDest.value=p.get('dest')||'';el.manualReservationType.value=p.get('manualReservation')||'';el.totalDistance.value=p.get('total')||'';el.passengerDistance.value=p.get('passenger')||'';calculateBooking()}}
 
 /* =========================================================
    11) THEME / PRINT / INSTALL
    ========================================================= */
-function applyTheme(theme){document.documentElement.dataset.theme=theme;STORAGE.set('srtPremiumTheme',theme);$('themeIcon').textContent=theme==='dark'?'☀':'☾';document.querySelector('meta[name="theme-color"]').setAttribute('content',theme==='dark'?'#08121f':'#082a4c')}
+function applyTheme(theme){document.documentElement.dataset.theme=theme;STORAGE.set('srtPremiumTheme',theme);$('themeIcon').textContent=theme==='dark'?'☀':'☾';document.querySelector('meta[name="theme-color"]').setAttribute('content',theme==='dark'?'#17151b':'#891c3c')}
 function printResult(target){document.body.dataset.printTarget=target;window.print();setTimeout(()=>delete document.body.dataset.printTarget,500)}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.deferredInstallPrompt=e;$('installBtn').classList.remove('hidden')});
 window.addEventListener('appinstalled',()=>{state.deferredInstallPrompt=null;showToast('ติดตั้งแอปสำเร็จ')});
@@ -905,13 +975,18 @@ async function installApp(){if(state.deferredInstallPrompt){state.deferredInstal
 /* =========================================================
    12) EVENTS
    ========================================================= */
-el.bookingTab.addEventListener('click',()=>setTool('booking'));el.monthlyTab.addEventListener('click',()=>setTool('monthly'));el.stationModeBtn.addEventListener('click',()=>setBookingMode('station'));el.manualModeBtn.addEventListener('click',()=>setBookingMode('manual'));
+el.bookingTab.addEventListener('click',()=>navigateTool('booking'));el.monthlyTab.addEventListener('click',()=>navigateTool('monthly'));el.stationModeBtn.addEventListener('click',()=>setBookingMode('station'));el.manualModeBtn.addEventListener('click',()=>setBookingMode('manual'));
 el.selectedLine.addEventListener('change',()=>{fillTrainOptions();el.passOrigin.value='';el.passDest.value='';calculateBooking();syncUrl()});el.selectedTrain.addEventListener('change',()=>{fillStationData();updateCustomTrainVisibility();calculateBooking();syncUrl()});
 [el.travelDate,el.reservationType,el.trainOrigin,el.trainDest,el.passOrigin,el.passDest,el.manualReservationType,el.totalDistance,el.passengerDistance].forEach(node=>{node.addEventListener('input',calculateBooking);node.addEventListener('change',calculateBooking)});
 [el.trainOrigin,el.trainDest,el.passOrigin,el.passDest].forEach(node=>node.addEventListener('focus',()=>{state.lastStationField=node.id}));
 $('swapStationsBtn').addEventListener('click',()=>{const a=el.passOrigin.value;el.passOrigin.value=el.passDest.value;el.passDest.value=a;calculateBooking();showToast('สลับสถานีแล้ว')});$('favOriginBtn').addEventListener('click',()=>toggleFavorite(el.passOrigin.value));$('favDestBtn').addEventListener('click',()=>toggleFavorite(el.passDest.value));$('clearFavoritesBtn').addEventListener('click',()=>{state.favorites=[];saveFavorites();renderFavoriteButtons();showToast('ล้างสถานีโปรดแล้ว')});
 el.monthlyAutoBtn.addEventListener('click',()=>setMonthlyFareMode('auto'));el.monthlyManualBtn.addEventListener('click',()=>setMonthlyFareMode('manual'));el.monthlySwapBtn.addEventListener('click',()=>{const a=el.monthlyOrigin.value;el.monthlyOrigin.value=el.monthlyDest.value;el.monthlyDest.value=a;calculateMonthly();showToast('สลับสถานีแล้ว')});[el.monthlyOrigin,el.monthlyDest,el.monthlyFare,el.monthlyTrips,el.monthlyPassenger,el.monthlyPeriod].forEach(node=>{node.addEventListener('input',calculateMonthly);node.addEventListener('change',calculateMonthly)});
 $('clearBookingHistoryBtn').addEventListener('click',()=>{state.bookingHistory=[];STORAGE.set('srtPremiumBookingHistory',[]);renderHistories();showToast('ล้างประวัติแล้ว')});$('clearMonthlyHistoryBtn').addEventListener('click',()=>{state.monthlyHistory=[];STORAGE.set('srtPremiumMonthlyHistory',[]);renderHistories();showToast('ล้างประวัติแล้ว')});
+$('openMonthlyBtn').addEventListener('click',()=>navigateTool('monthly'));
+$('openBookingBtn').addEventListener('click',()=>navigateTool('booking'));
+$('brandHomeBtn').addEventListener('click',()=>navigateTool('home'));
+$('backHomeBtn').addEventListener('click',()=>navigateTool('home'));
+window.addEventListener('popstate',()=>{routeBooting=true;restoreFromUrl();routeBooting=false;syncUrl();window.scrollTo(0,0)});
 $('themeBtn').addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));$('installBtn').addEventListener('click',installApp);
 window.addEventListener('error',e=>{console.error(e.error||e.message);showToast('พบข้อผิดพลาด โปรดเปิด Console เพื่อตรวจสอบ')});
 
@@ -919,7 +994,7 @@ window.addEventListener('error',e=>{console.error(e.error||e.message);showToast(
    13) BOOT
    ========================================================= */
 (function boot(){
-  initLines();populateMonthlyStations();setMonthlyFareMode('auto',false);el.travelDate.min=toLocalISO();fillTrainOptions();renderFavorites();renderHistories();applyTheme(STORAGE.get('srtPremiumTheme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));updateMonthlyOptions();restoreFromUrl();if(!location.search){bookingEmpty();calculateMonthly()}
+  initLines();populateMonthlyStations();setMonthlyFareMode('auto',false);el.travelDate.min=toLocalISO();fillTrainOptions();renderFavorites();renderHistories();applyTheme(STORAGE.get('srtPremiumTheme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));updateMonthlyOptions();restoreFromUrl(initialSearch);if(!initialSearch){bookingEmpty();calculateMonthly()}routeBooting=false;syncUrl();
   if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
   console.info(`SRT Ticket Tools ${APP_CONFIG.version} loaded`)
 })();
