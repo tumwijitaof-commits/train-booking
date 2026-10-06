@@ -31,6 +31,18 @@ h1,h2,h3{font-weight:600}.home-heading h1{font-weight:700}.menu-title{font-weigh
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
 @media print{*{box-shadow:none!important}body{background:#fff;color:#111;font-size:12px}.topbar,.tool-heading,.home-page,.footer,.toast,.reminder-entry,.reminder-dialog,.result-actions,.side-section,.workspace>section.card{display:none!important}.page{display:none!important}body[data-print-target="booking"] #bookingPage,body[data-print-target="monthly"] #monthlyPage{display:block!important}.workspace{display:block;max-width:100%;padding:0}.sticky{position:static}.card{border:0}.card-head{padding:0 0 12px}.result-body{padding:0}.result-top,.price-main,.date-panel{background:#f3f3f3}.result-card{border:1px solid #ccc}.note,.summary-row,.result-top{break-inside:avoid}.result-main{padding:16px}.big-result strong,.price-main strong{color:#841b3a}.result-body .result-card{print-color-adjust:exact}}
 
+/* Mobile station selection, Thai calendar and community feedback. */
+.station-input[readonly]{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23727a89' stroke-width='2'%3E%3Cpath d='m4 6 5 5 5-5'/%3E%3C/svg%3E");background-position:right 10px center;background-repeat:no-repeat;padding-right:34px;text-overflow:ellipsis}
+.control-wrap .station-input[readonly]{background-position:right 38px center;padding-right:63px}
+.date-control{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left}.date-control span{overflow-wrap:anywhere}.date-control svg{width:21px;height:21px;flex-shrink:0;color:var(--brand)}.date-control.is-empty span{color:var(--muted-2)}
+.picker-dialog{width:calc(100% - 32px);max-width:510px;margin:auto;padding:0;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);box-shadow:0 25px 70px #0004;max-height:calc(100dvh - 32px);overflow:hidden}.picker-dialog::backdrop{background:#12121e88;backdrop-filter:blur(3px)}.picker-dialog .dialog-head{padding:19px 20px 16px}.picker-dialog .dialog-head h2{font-size:21px}.station-picker-body{padding:16px 20px 20px;display:flex;flex-direction:column;min-height:0}.station-search{position:relative}.station-search .control{padding-right:44px}.search-clear{position:absolute;right:4px;top:4px;width:38px;height:39px;border:0;border-radius:8px;background:none;color:var(--muted);font-size:23px}.station-count{font-size:12px;color:var(--muted);margin:11px 0 8px}.station-options{overflow-y:auto;overscroll-behavior:contain;max-height:min(430px,49dvh);display:grid;gap:7px;padding:1px 4px 4px 1px;scrollbar-width:thin}.station-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;padding:10px 13px;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;text-align:left;font-size:16px}.station-option[aria-pressed="true"]{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}.station-option:hover{border-color:var(--brand)}.station-option small{color:var(--muted);font-size:12px;white-space:nowrap}.station-group{font-size:12px;color:var(--muted);padding:7px 3px 0}.station-no-results{padding:20px 10px;text-align:center;color:var(--muted);font-size:14px}
+.date-picker-body{padding:17px 20px 20px}.calendar-nav{display:flex;align-items:center;gap:9px;margin-bottom:14px}.calendar-nav .icon-btn{min-width:42px;min-height:44px;font-size:22px}.calendar-selects{display:grid;grid-template-columns:1.3fr 1fr;gap:7px;flex:1;min-width:0}.calendar-selects .control{min-height:44px;padding:8px;font-size:15px}.calendar-weekdays,.calendar-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.calendar-weekdays{color:var(--muted);text-align:center;font-size:12px;margin-bottom:8px}.calendar-days{min-height:248px;align-content:start}.calendar-day{display:grid;place-items:center;border:1px solid transparent;background:none;color:var(--ink);border-radius:10px;min-height:40px;font-size:16px;padding:5px}.calendar-day:hover:not(:disabled){background:var(--brand-soft);border-color:var(--line)}.calendar-day.is-today{border-color:var(--brand)}.calendar-day[aria-pressed="true"]{background:#841b3a;color:#fff;border-color:#841b3a}.calendar-day:disabled{opacity:.25}.calendar-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;border-top:1px solid var(--line);padding-top:13px}.calendar-footer span{font-size:12px;color:var(--muted)}.calendar-footer .action-btn{min-width:90px}.calendar-key{margin-top:11px;font-size:12px;color:var(--muted)}
+.community{max-width:1180px;margin:0 auto;padding:8px 30px 18px}.community-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}.community-head h2{font-size:19px}.community-head span{color:var(--muted);font-size:12px}.visitor-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:10px}.visitor-stat{padding:15px 12px;background:var(--surface);border:1px solid var(--line);border-radius:13px;text-align:center}.visitor-stat strong{display:block;color:var(--brand);font-size:25px;line-height:1.45;font-weight:600}.visitor-stat span{display:block;font-size:12px;color:var(--muted);margin-top:4px}.community-status{font-size:12px;color:var(--muted);margin:5px 0 20px;min-height:20px}.community-status button{border:0;background:none;color:var(--brand);font-size:12px;padding:4px 8px}.feedback-card{border:1px solid var(--line);border-radius:17px;background:var(--surface);padding:23px 25px}.feedback-card h2{font-size:20px}.feedback-card>p{color:var(--muted);font-size:14px;margin:5px 0 18px}.feedback-fields{padding:0;margin:0;border:0;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:18px 24px}.feedback-fields legend{font-size:15px;font-weight:500;margin-bottom:10px}.feedback-group{margin:0;padding:0;border:0;min-width:0}.rating-options{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.feedback-choice{position:relative;min-width:0}.feedback-choice input{position:absolute;width:1px;height:1px;opacity:0}.feedback-choice label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:70px;border:1px solid var(--line);background:var(--surface-2);border-radius:11px;padding:8px 4px;cursor:pointer;font-size:11px;text-align:center;line-height:1.4}.feedback-choice .emoji{font-size:23px;line-height:1.4}.feedback-choice input:checked+label{border-color:var(--brand);background:var(--brand-soft);color:var(--brand);box-shadow:0 0 0 1px var(--brand)}.feedback-choice input:focus-visible+label{outline:3px solid var(--brand);outline-offset:3px}.accuracy-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.accuracy-options .feedback-choice label{font-size:13px;min-height:70px;padding:8px}.feedback-comment{grid-column:1/-1}.feedback-comment label{display:block;font-size:14px;margin-bottom:7px}.feedback-comment textarea{resize:vertical;min-height:88px}.feedback-comment small{display:block;color:var(--muted);font-size:11px;margin-top:5px}.feedback-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:17px}.feedback-bottom p{font-size:12px;color:var(--muted);max-width:650px}.feedback-bottom .action-btn{min-width:130px;min-height:46px;font-size:15px}.feedback-result{font-size:14px;color:var(--brand);margin-top:13px}.feedback-result.error{color:var(--danger)}.feedback-honeypot{display:none}.iphone-guide{border:1px solid var(--line);border-radius:10px;margin-top:14px;padding:11px 13px;color:var(--muted);font-size:13px}.iphone-guide summary{cursor:pointer;color:var(--ink)}.iphone-guide ol{margin:10px 0 4px;padding-left:20px}.iphone-guide a{color:var(--brand)}
+@media(max-width:820px){.community{padding:8px 22px 18px}.feedback-fields{grid-template-columns:1fr}.feedback-card{padding:21px}.community-head span{max-width:180px;text-align:right}}
+@media(max-width:560px){.community{padding:5px 16px 16px}.visitor-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.visitor-stat{padding:13px 10px}.visitor-stat strong{font-size:25px}.community-head{align-items:flex-start}.community-head h2{font-size:17px}.community-head span{font-size:11px;max-width:130px}.feedback-card{padding:18px 16px}.feedback-card h2{font-size:18px}.feedback-card>p{font-size:13px}.feedback-fields{gap:20px}.rating-options{gap:5px}.feedback-choice label{font-size:10px;min-height:74px}.feedback-bottom{align-items:stretch;flex-direction:column;gap:12px}.feedback-bottom .action-btn{width:100%}.feedback-bottom p{font-size:11px}.picker-dialog{width:calc(100% - 16px);max-height:calc(100dvh - 16px);border-radius:17px}.station-picker-body,.date-picker-body{padding:15px 16px 18px}.station-options{max-height:49dvh}.calendar-weekdays,.calendar-days{gap:4px}.calendar-day{min-height:39px}.calendar-days{min-height:250px}.calendar-nav{gap:6px}.calendar-selects{grid-template-columns:1.3fr 1fr;gap:5px}.calendar-nav .icon-btn{min-width:36px}.calendar-selects .control{font-size:14px}}
+@media print{.community,.picker-dialog{display:none!important}}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 
 
@@ -89,7 +101,7 @@ h1,h2,h3{font-weight:600}.home-heading h1{font-weight:700}.menu-title{font-weigh
             <div class="step-content">
               <h3>วันที่และรูปแบบการคำนวณ</h3>
               <div class="grid grid-2">
-                <div class="field"><label for="travelDate">วันที่เดินทาง</label><input class="control" id="travelDate" type="date" /></div>
+                <div class="field"><label for="travelDatePickerBtn">วันที่เดินทาง <span>ปฏิทินภาษาไทย</span></label><input id="travelDate" type="hidden" /><button class="control date-control is-empty" id="travelDatePickerBtn" type="button" aria-haspopup="dialog" aria-controls="thaiDateDialog"><span id="travelDateLabel">กดเลือกวันที่</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-11 4h3"/></svg></button></div>
                 <div class="field"><label>วิธีกรอกข้อมูล</label><div class="mode-switch"><button class="active" id="stationModeBtn" type="button">เลือกสถานี</button><button id="manualModeBtn" type="button">กรอกระยะทาง</button></div></div>
               </div>
             </div>
@@ -108,15 +120,15 @@ h1,h2,h3{font-weight:600}.home-heading h1{font-weight:700}.menu-title{font-weigh
                 <div class="advanced-title"><span>กำหนดช่วงวิ่งของขบวนเอง</span><span>ใช้เมื่อไม่ได้เลือกหมายเลขขบวน</span></div>
                 <div class="grid grid-3">
                   <div class="field"><label for="reservationType">ประเภทการจำหน่าย</label><select class="control" id="reservationType"><option value="">- เลือกประเภท -</option><option value="reserved">สำรองที่นั่ง</option><option value="nonreserved">ไม่สำรองที่นั่ง</option></select></div>
-                  <div class="field"><label for="trainOrigin">ต้นทางขบวน</label><input class="control station-input" id="trainOrigin" list="stationList" autocomplete="off" placeholder="ค้นหาสถานี" /></div>
-                  <div class="field"><label for="trainDest">ปลายทางขบวน</label><input class="control station-input" id="trainDest" list="stationList" autocomplete="off" placeholder="ค้นหาสถานี" /></div>
+                  <div class="field"><label for="trainOrigin">ต้นทางขบวน</label><input class="control station-input" id="trainOrigin" readonly role="button" aria-haspopup="dialog" aria-controls="stationPickerDialog" autocomplete="off" placeholder="กดเลือกสถานี" /></div>
+                  <div class="field"><label for="trainDest">ปลายทางขบวน</label><input class="control station-input" id="trainDest" readonly role="button" aria-haspopup="dialog" aria-controls="stationPickerDialog" autocomplete="off" placeholder="กดเลือกสถานี" /></div>
                 </div>
               </div>
 
               <div class="swap-row" style="margin-top:12px">
-                <div class="field"><label for="passOrigin">สถานีขึ้น <span>พิมพ์เพื่อค้นหา</span></label><div class="control-wrap"><input class="control station-input" id="passOrigin" list="activeStationList" autocomplete="off" placeholder="เช่น กรุงเทพ (อภิวัฒน์)" /><button class="mini-btn" id="favOriginBtn" type="button" title="บันทึกสถานีโปรด">☆</button></div></div>
+                <div class="field"><label for="passOrigin">สถานีขึ้น <span>กดเลือกจากรายการ</span></label><div class="control-wrap"><input class="control station-input" id="passOrigin" readonly role="button" aria-haspopup="dialog" aria-controls="stationPickerDialog" autocomplete="off" placeholder="กดเลือกสถานี" /><button class="mini-btn" id="favOriginBtn" type="button" title="บันทึกสถานีโปรด">☆</button></div></div>
                 <button class="swap-btn" id="swapStationsBtn" type="button" title="สลับต้นทางและปลายทาง">⇄</button>
-                <div class="field"><label for="passDest">สถานีลง <span>พิมพ์เพื่อค้นหา</span></label><div class="control-wrap"><input class="control station-input" id="passDest" list="activeStationList" autocomplete="off" placeholder="เช่น เชียงใหม่" /><button class="mini-btn" id="favDestBtn" type="button" title="บันทึกสถานีโปรด">☆</button></div></div>
+                <div class="field"><label for="passDest">สถานีลง <span>กดเลือกจากรายการ</span></label><div class="control-wrap"><input class="control station-input" id="passDest" readonly role="button" aria-haspopup="dialog" aria-controls="stationPickerDialog" autocomplete="off" placeholder="กดเลือกสถานี" /><button class="mini-btn" id="favDestBtn" type="button" title="บันทึกสถานีโปรด">☆</button></div></div>
               </div>
               <datalist id="stationList"></datalist>
               <datalist id="activeStationList"></datalist>
@@ -230,6 +242,40 @@ h1,h2,h3{font-weight:600}.home-heading h1{font-weight:700}.menu-title{font-weigh
     </main>
   </section>
 
+  <section class="community" aria-labelledby="communityTitle">
+    <div class="community-head"><h2 id="communityTitle">ขอบคุณที่แวะมาใช้งานครับ</h2><span>ทุกความคิดเห็นช่วยให้เว็บดีขึ้น</span></div>
+    <div class="visitor-stats" aria-label="สถิติการใช้งาน" aria-live="polite">
+      <div class="visitor-stat"><strong id="totalVisits">—</strong><span>เข้าชมทั้งหมด</span></div>
+      <div class="visitor-stat"><strong id="todayVisits">—</strong><span>เข้าชมวันนี้</span></div>
+      <div class="visitor-stat"><strong id="totalReviews">—</strong><span>รีวิวจากผู้ใช้</span></div>
+      <div class="visitor-stat"><strong id="averageRating">—</strong><span>ความพอใจเฉลี่ย</span></div>
+    </div>
+    <p class="community-status"><span id="statsStatusText">กำลังตรวจสอบสถิติ…</span><button id="refreshStatsBtn" class="hidden" type="button">ลองโหลดใหม่</button></p>
+    <div class="feedback-card">
+      <h2>ใช้งานแล้วเป็นอย่างไรบ้างครับ?</h2><p>รีวิวสั้น ๆ ให้ผมหน่อย หากมีข้อมูลผิด แจ้งได้เลย พร้อมปรับครับ</p>
+      <form id="feedbackForm" novalidate>
+        <fieldset class="feedback-fields" id="feedbackFields">
+          <fieldset class="feedback-group"><legend>พอใจกับการใช้งานแค่ไหน?</legend><div class="rating-options">
+            <div class="feedback-choice"><input type="radio" id="rating1" name="feedbackRating" value="1" required><label for="rating1"><span class="emoji" aria-hidden="true">😞</span><span>1 · ไม่พอใจ</span></label></div>
+            <div class="feedback-choice"><input type="radio" id="rating2" name="feedbackRating" value="2"><label for="rating2"><span class="emoji" aria-hidden="true">🙁</span><span>2 · ควรปรับ</span></label></div>
+            <div class="feedback-choice"><input type="radio" id="rating3" name="feedbackRating" value="3"><label for="rating3"><span class="emoji" aria-hidden="true">😐</span><span>3 · พอใช้</span></label></div>
+            <div class="feedback-choice"><input type="radio" id="rating4" name="feedbackRating" value="4"><label for="rating4"><span class="emoji" aria-hidden="true">🙂</span><span>4 · พอใจ</span></label></div>
+            <div class="feedback-choice"><input type="radio" id="rating5" name="feedbackRating" value="5"><label for="rating5"><span class="emoji" aria-hidden="true">😊</span><span>5 · ดีมาก</span></label></div>
+          </div></fieldset>
+          <fieldset class="feedback-group"><legend>ข้อมูลที่ดูถูกต้องไหม?</legend><div class="accuracy-options">
+            <div class="feedback-choice"><input type="radio" id="accuracyYes" name="feedbackAccuracy" value="correct" required><label for="accuracyYes">✓ ถูกต้อง</label></div>
+            <div class="feedback-choice"><input type="radio" id="accuracyNo" name="feedbackAccuracy" value="issue"><label for="accuracyNo">พบข้อมูลผิด</label></div>
+            <div class="feedback-choice"><input type="radio" id="accuracyUnsure" name="feedbackAccuracy" value="unsure"><label for="accuracyUnsure">ยังไม่แน่ใจ</label></div>
+          </div></fieldset>
+          <div class="feedback-comment"><label for="feedbackComment">มีอะไรอยากให้ปรับไหม? <span>(ไม่บังคับ)</span></label><textarea class="control" id="feedbackComment" maxlength="500" rows="3" placeholder="เช่น สถานีไหน หรือข้อมูลส่วนไหนที่ควรแก้"></textarea><small>ไม่เกิน 500 ตัวอักษร · ไม่ต้องใส่ชื่อ เบอร์โทร หรือข้อมูลส่วนตัวครับ</small></div>
+          <div class="feedback-honeypot" aria-hidden="true"><label for="feedbackWebsite">Website</label><input id="feedbackWebsite" type="text" tabindex="-1" autocomplete="off"></div>
+        </fieldset>
+        <div class="feedback-bottom"><p>รีวิวจะส่งให้ผู้จัดทำเพื่อปรับปรุงเว็บ แสดงบนหน้าเว็บเฉพาะยอดรวมและคะแนนเฉลี่ย</p><button class="action-btn primary" id="feedbackSubmitBtn" type="submit" disabled>ส่งรีวิว</button></div>
+        <p class="feedback-result" id="feedbackResult" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
   <footer class="footer">
     <strong>จัดทำโดย นายพชรวิชญ์ ตุ้มวิจิตร</strong><br>
     นายสถานีคลองบางพระ · SRT Ticket Tools<br>
@@ -245,13 +291,28 @@ h1,h2,h3{font-weight:600}.home-heading h1{font-weight:700}.menu-title{font-weigh
       <div class="field"><label for="reminderLead">เตือนเมื่อไหร่</label><select class="control" id="reminderLead"><option value="0">วันเปิดจอง</option><option value="1">ก่อนเปิดจอง 1 วัน</option><option value="2">ก่อนเปิดจอง 2 วัน</option><option value="custom">เลือกวันเอง</option></select></div>
       <div class="field"><label for="reminderTime">เวลาที่ต้องการเตือน</label><input class="control" id="reminderTime" type="time" required value="08:30" /></div>
     </div>
-    <div class="field hidden" id="reminderCustomBox" style="margin-top:15px"><label for="reminderDate">วันที่ต้องการเตือน</label><input class="control" id="reminderDate" type="date" /></div>
+    <div class="field hidden" id="reminderCustomBox" style="margin-top:15px"><label for="reminderDatePickerBtn">วันที่ต้องการเตือน</label><input id="reminderDate" type="hidden" /><button class="control date-control is-empty" id="reminderDatePickerBtn" type="button" aria-haspopup="dialog" aria-controls="thaiDateDialog"><span id="reminderDateLabel">กดเลือกวันที่</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-11 4h3"/></svg></button></div>
     <div class="reminder-preview" id="reminderPreview" aria-live="polite"></div>
     <div class="reminder-error hidden" id="reminderError" role="alert"></div>
-    <div class="reminder-buttons"><button class="action-btn primary" type="button" id="googleCalendarBtn">เพิ่มใน Google Calendar</button><button class="action-btn" type="button" id="downloadCalendarBtn">ดาวน์โหลดไฟล์ปฏิทิน (.ics)</button></div>
-    <ol class="reminder-instructions"><li>เลือกวันเวลา แล้วเปิด Google Calendar หรือไฟล์ปฏิทิน</li><li>กดบันทึก ตรวจว่ามีการเตือน “เมื่อถึงเวลาเริ่ม” และอนุญาตการแจ้งเตือนของแอปปฏิทิน</li><li>ปฏิทินจะเป็นผู้แจ้งเตือนตามการตั้งค่าของมือถือ แม้ปิดหน้าเว็บแล้ว</li></ol>
-    <p class="note info">Google Calendar เหมาะกับ Android และผู้ใช้บัญชี Google ส่วน iPhone ใช้ไฟล์ .ics กับแอปปฏิทินที่รองรับได้ ทั้งสองวิธีต้องตรวจการตั้งเตือนหลังบันทึก เว็บไม่สามารถยืนยันว่าบันทึกสำเร็จแล้วได้</p>
+    <div class="reminder-buttons"><button class="action-btn primary" type="button" id="iphoneCalendarBtn">เพิ่มลงปฏิทิน iPhone</button><button class="action-btn" type="button" id="googleCalendarBtn">เพิ่มใน Google Calendar</button><button class="action-btn" type="button" id="downloadCalendarBtn">ดาวน์โหลดไฟล์ปฏิทิน (.ics)</button></div>
+    <ol class="reminder-instructions"><li>เลือกวันเวลา แล้วเลือกปฏิทินที่ใช้บนมือถือ</li><li>กดบันทึก ตรวจว่ามีการเตือน “เมื่อถึงเวลาเริ่ม” และอนุญาตการแจ้งเตือนของแอปปฏิทิน</li><li>ปฏิทินจะเป็นผู้แจ้งเตือนตามการตั้งค่าของมือถือ แม้ปิดหน้าเว็บแล้ว</li></ol>
+    <details class="iphone-guide"><summary>วิธีเพิ่มในปฏิทิน iPhone</summary><ol><li>กด “เพิ่มลงปฏิทิน iPhone” แล้วเลือก Mail เพื่อส่งไฟล์ .ics ให้ตัวเอง หากแชร์ไม่ได้ ให้ใช้ไฟล์ที่ดาวน์โหลดแทน</li><li>เปิดอีเมลในแอป Mail บน iPhone แล้วแตะไฟล์แนบ .ics เพื่อเพิ่มรายการลงปฏิทิน</li><li>ตรวจวันที่ เวลา และตั้งการเตือน “เมื่อถึงเวลาเริ่ม” ก่อนบันทึก พร้อมเปิดการแจ้งเตือนของปฏิทิน</li></ol><p>ถ้าเปิดจาก Facebook หรือ LINE ให้เปิดเว็บใน Safari ก่อนแชร์ไฟล์ · <a href="https://support.apple.com/guide/iphone/ipha0d932e96/ios" target="_blank" rel="noopener noreferrer">วิธีนำเข้าไฟล์จาก Apple</a></p></details><p class="note info">ต้องบันทึกรายการและตรวจการเตือนในแอปปฏิทินด้วยตัวเอง เว็บยังยืนยันการบันทึกในมือถือไม่ได้</p>
     <div class="reminder-handoff hidden" id="reminderHandoff" role="status" aria-live="polite"></div>
+  </div>
+</dialog>
+
+<dialog class="picker-dialog" id="stationPickerDialog" aria-labelledby="stationPickerTitle" aria-describedby="stationPickerContext">
+  <div class="dialog-head"><div><h2 id="stationPickerTitle">เลือกสถานี</h2><p id="stationPickerContext"></p></div><button class="dialog-close" id="closeStationPickerBtn" type="button" aria-label="ปิดรายการสถานี" autofocus>×</button></div>
+  <div class="station-picker-body"><div class="station-search"><label class="sr-only" for="stationSearch">ค้นหาชื่อสถานี (ไม่บังคับ)</label><input class="control" id="stationSearch" type="search" placeholder="ค้นหาชื่อสถานี (ไม่บังคับ)" autocomplete="off" inputmode="search"><button class="search-clear hidden" id="clearStationSearchBtn" type="button" aria-label="ล้างคำค้นหา">×</button></div><p class="station-count" id="stationCount" aria-live="polite"></p><div class="station-options" id="stationOptions" role="group" aria-label="รายการสถานี"></div></div>
+</dialog>
+<dialog class="picker-dialog" id="thaiDateDialog" aria-labelledby="thaiDateTitle">
+  <div class="dialog-head"><div><h2 id="thaiDateTitle">เลือกวันที่เดินทาง</h2><p>เดือนภาษาไทย · ปี พ.ศ.</p></div><button class="dialog-close" id="closeThaiDateBtn" type="button" aria-label="ปิดปฏิทิน" autofocus>×</button></div>
+  <div class="date-picker-body">
+    <div class="calendar-nav"><button class="icon-btn" id="thaiCalendarPrev" type="button" aria-label="เดือนก่อนหน้า">‹</button><div class="calendar-selects"><select class="control" id="thaiCalendarMonth" aria-label="เดือน"></select><select class="control" id="thaiCalendarYear" aria-label="ปี พ.ศ."></select></div><button class="icon-btn" id="thaiCalendarNext" type="button" aria-label="เดือนถัดไป">›</button></div>
+    <div class="calendar-weekdays" aria-hidden="true"><span>อา.</span><span>จ.</span><span>อ.</span><span>พ.</span><span>พฤ.</span><span>ศ.</span><span>ส.</span></div>
+    <div class="calendar-days" id="thaiCalendarDays" role="group" aria-label="เลือกวัน"></div>
+    <p class="calendar-key">กรอบสีคือวันนี้ · วันที่จางเลือกไม่ได้</p>
+    <div class="calendar-footer"><span id="thaiCalendarSelection" aria-live="polite"></span><button class="action-btn" id="thaiCalendarToday" type="button">เลือกวันนี้</button></div>
   </div>
 </dialog>
 
@@ -266,11 +327,14 @@ const initialSearch=location.search;
    1) APP CONFIG + SINGLE SOURCE OF TRUTH
    ========================================================= */
 const APP_CONFIG = Object.freeze({
-  version: 'K2D Calendar v3.1',
+  version: 'K2D Mobile Thai Calendar v4.0',
   buildDate: '6 ตุลาคม 2569',
   dticketUrl: 'https://dticket.railway.co.th/DTicketPublicWeb/home/Home',
   hotline: '1690',
-  historyLimit: 8
+  historyLimit: 8,
+  // วาง URL /exec จาก Apps Script เพื่อเปิดสถิติรวมและรับรีวิว
+  serviceUrl: '',
+  siteKey: 'srt-ticket-tools'
 });
 
 const BOOKING_RULES = Object.freeze({
@@ -706,7 +770,7 @@ function bookingError(message){state.lastBookingResult=null;el.distanceSummary.c
 function bookingEmpty(message='เลือกวันที่ สายทาง และสถานีให้ครบ'){state.lastBookingResult=null;el.distanceSummary.classList.add('hidden');el.bookingResult.innerHTML=`<div class="empty"><div class="empty-icon">🧮</div><h3>พร้อมคำนวณ</h3><p>${esc(message)}<br>ผลลัพธ์จะแสดงอัตโนมัติ</p></div>`}
 function updateDistanceSummary(total,passenger){const valid=Number.isFinite(total)&&Number.isFinite(passenger)&&total>0&&passenger>0;if(!valid||state.bookingMode!=='station'){el.distanceSummary.classList.add('hidden');return}const p=(passenger/total)*100;el.distanceSummary.classList.remove('hidden');el.totalKmText.textContent=`${money(total)} กม.`;el.passengerKmText.textContent=`${money(passenger)} กม.`;el.percentageText.textContent=`${p.toFixed(2)}%`}
 function calculateBooking(){
-  renderFavoriteButtons();const d=getBookingInputs();
+  syncDateControls();renderFavoriteButtons();const d=getBookingInputs();
   if(!d.travelDate)return bookingEmpty();if(d.travelDate<localDateOnly())return bookingError('วันที่เดินทางผ่านไปแล้ว กรุณาเลือกวันนี้หรือวันในอนาคต');
   if(d.mode==='station'&&!d.line)return bookingEmpty('กรุณาเลือกสายทาง');
   if(d.mode==='station'){
@@ -896,7 +960,7 @@ async function installApp(){if(state.deferredInstallPrompt){state.deferredInstal
    12) EVENTS
    ========================================================= */
 el.bookingTab.addEventListener('click',()=>navigateTool('booking'));el.monthlyTab.addEventListener('click',()=>navigateTool('monthly'));el.stationModeBtn.addEventListener('click',()=>setBookingMode('station'));el.manualModeBtn.addEventListener('click',()=>setBookingMode('manual'));
-el.selectedLine.addEventListener('change',()=>{fillTrainOptions();el.passOrigin.value='';el.passDest.value='';calculateBooking();syncUrl()});el.selectedTrain.addEventListener('change',()=>{fillStationData();updateCustomTrainVisibility();calculateBooking();syncUrl()});
+el.selectedLine.addEventListener('change',()=>{el.trainOrigin.value='';el.trainDest.value='';fillTrainOptions();el.passOrigin.value='';el.passDest.value='';calculateBooking();syncUrl()});el.selectedTrain.addEventListener('change',()=>{fillStationData();updateCustomTrainVisibility();calculateBooking();syncUrl()});
 [el.travelDate,el.reservationType,el.trainOrigin,el.trainDest,el.passOrigin,el.passDest,el.manualReservationType,el.totalDistance,el.passengerDistance].forEach(node=>{node.addEventListener('input',calculateBooking);node.addEventListener('change',calculateBooking)});
 [el.trainOrigin,el.trainDest,el.passOrigin,el.passDest].forEach(node=>node.addEventListener('focus',()=>{state.lastStationField=node.id}));
 $('swapStationsBtn').addEventListener('click',()=>{const a=el.passOrigin.value;el.passOrigin.value=el.passDest.value;el.passDest.value=a;calculateBooking();showToast('สลับสถานีแล้ว')});$('favOriginBtn').addEventListener('click',()=>toggleFavorite(el.passOrigin.value));$('favDestBtn').addEventListener('click',()=>toggleFavorite(el.passDest.value));$('clearFavoritesBtn').addEventListener('click',()=>{state.favorites=[];saveFavorites();renderFavoriteButtons();showToast('ล้างสถานีโปรดแล้ว')});
@@ -943,14 +1007,14 @@ function reminderValidation(p) {
   return '';
 }
 function updateReminderPreview() {
-  if(!reminderResult)return;$('reminderCustomBox').classList.toggle('hidden',$('reminderLead').value!=='custom');
+  syncDateControls();if(!reminderResult)return;$('reminderCustomBox').classList.toggle('hidden',$('reminderLead').value!=='custom');
   const p=reminderInputs(),error=reminderValidation(p);const info=[];
   if(reminderResult.type==='nonreserved')info.push('เวลานี้เป็นเวลาเตือนเตรียมตัว โปรดตรวจเวลารถออกจากสถานีขึ้นก่อนซื้อตั๋ว');
   else if(!reminderResult.openTime)info.push('ยังไม่ทราบเวลาเปิดขายที่แน่นอน เวลาที่เลือกเป็นเวลาเตือนส่วนตัว');
   else if(bangkokInstant(bookingReminderDate(reminderResult),reminderResult.openTime)<=new Date())info.push('ตามผลคำนวณเปิดจองแล้ว เลือกเวลาส่วนตัวเพื่อเตือนให้เข้าซื้อตั๋ว');
   else info.push('เวลาที่เลือกเป็นเวลาเตือนส่วนตัว ตรวจเวลาเปิดขายจากผลคำนวณอีกครั้ง');
   $('reminderPreview').innerHTML=`<span>รายการเตือนที่จะเพิ่มลงปฏิทิน</span><strong>${p.at?`${bangkokDateLabel(p.date)} · ${esc(p.time)} น.`:'กรุณาระบุวันและเวลา'}</strong><small>เวลาประเทศไทย (UTC+7)</small><small>${esc(info.join(' '))}</small>`;
-  $('reminderError').textContent=error;$('reminderError').classList.toggle('hidden',!error);$('googleCalendarBtn').disabled=!!error;$('downloadCalendarBtn').disabled=!!error;$('reminderHandoff').classList.add('hidden');
+  $('reminderError').textContent=error;$('reminderError').classList.toggle('hidden',!error);$('googleCalendarBtn').disabled=!!error;$('downloadCalendarBtn').disabled=!!error;$('iphoneCalendarBtn').disabled=!!error;$('reminderHandoff').classList.add('hidden');
 }
 function reminderCalendarEvent() {
   if(!reminderResult)return null;const p=reminderInputs(),error=reminderValidation(p);if(error){updateReminderPreview();return null;}
@@ -975,7 +1039,7 @@ function foldICalLine(line) {
 }
 function calendarUID(e) { const key=[e.result.type,e.result.travelDate,e.result.origin,e.result.destination,e.result.trainId,e.date,e.time].join('|');let hash=2166136261;for(const ch of key){hash^=ch.codePointAt(0);hash=Math.imul(hash,16777619);}return `rail-${(hash>>>0).toString(16)}-${calendarStamp(e.start)}@srt-ticket-tools`; }
 function buildCalendarICS(e) {
-  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//SRT Ticket Tools//Ticket reminder//TH','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:${calendarUID(e)}`,`DTSTAMP:${calendarStamp(new Date())}`,`DTSTART:${calendarStamp(e.start)}`,`DTEND:${calendarStamp(e.end)}`,`SUMMARY:${escapeICal(e.title)}`,`DESCRIPTION:${escapeICal(e.details)}`,`LOCATION:${escapeICal(e.location)}`,'STATUS:CONFIRMED','TRANSP:TRANSPARENT','BEGIN:VALARM','ACTION:DISPLAY','TRIGGER:PT0M',`DESCRIPTION:${escapeICal(e.title)}`,'END:VALARM','END:VEVENT','END:VCALENDAR'];
+  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//SRT Ticket Tools//Ticket reminder//TH','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-TIMEZONE:Asia/Bangkok','BEGIN:VEVENT',`UID:${calendarUID(e)}`,`DTSTAMP:${calendarStamp(new Date())}`,`DTSTART:${calendarStamp(e.start)}`,`DTEND:${calendarStamp(e.end)}`,`SUMMARY:${escapeICal(e.title)}`,`DESCRIPTION:${escapeICal(e.details)}`,`LOCATION:${escapeICal(e.location)}`,'STATUS:CONFIRMED','TRANSP:TRANSPARENT','BEGIN:VALARM','ACTION:DISPLAY','TRIGGER:PT0M',`DESCRIPTION:${escapeICal(e.title)}`,'END:VALARM','END:VEVENT','END:VCALENDAR'];
   return lines.map(foldICalLine).join('\r\n')+'\r\n';
 }
 function downloadCalendar() {
@@ -987,11 +1051,208 @@ $('reminderDialog').addEventListener('click',e=>{if(e.target!==$('reminderDialog
 ['reminderLead','reminderDate','reminderTime'].forEach(id=>{const n=$(id);n.addEventListener('input',updateReminderPreview);n.addEventListener('change',updateReminderPreview);});
 $('googleCalendarBtn').addEventListener('click',openGoogleCalendar);$('downloadCalendarBtn').addEventListener('click',downloadCalendar);
 
+/* Station picker: show the list first; typing is optional. */
+let stationPickerField = null;
+const STATION_FIELD_LABELS = {trainOrigin:'ต้นทางขบวน',trainDest:'ปลายทางขบวน',passOrigin:'สถานีขึ้น',passDest:'สถานีลง'};
+function pickerStationNames(field) {
+  const line=el.selectedLine.value,train=getTrain(line,el.selectedTrain.value);
+  let names=field==='trainOrigin'||field==='trainDest'?stationNames(line):activeStationNames(line,train);
+  if(!train&&(field==='passOrigin'||field==='passDest')){
+    const a=getKm(line,el.trainOrigin.value),b=getKm(line,el.trainDest.value);
+    if(Number.isFinite(a)&&Number.isFinite(b))names=names.filter(n=>{const km=getKm(line,n);return km>=Math.min(a,b)&&km<=Math.max(a,b);});
+  }
+  return names;
+}
+function openStationPicker(field) {
+  if(!STATION_FIELD_LABELS[field])return;
+  if(!el.selectedLine.value){showToast('เลือกสายทางก่อน แล้วกดเลือกสถานีได้เลย');el.selectedLine.focus();return;}
+  stationPickerField=field;state.lastStationField=field;
+  $('stationPickerTitle').textContent='เลือก'+STATION_FIELD_LABELS[field];
+  const train=getTrain(el.selectedLine.value,el.selectedTrain.value);
+  $('stationPickerContext').textContent=train?train.name:trainData[el.selectedLine.value].name;
+  $('stationSearch').value='';renderStationPicker();$('stationPickerDialog').showModal();
+  const selected=$('stationOptions').querySelector('[aria-pressed="true"]');
+  if(selected?.scrollIntoView)selected.scrollIntoView({block:'nearest'});
+}
+function renderStationPicker() {
+  if(!stationPickerField)return;
+  const all=pickerStationNames(stationPickerField),query=$('stationSearch').value.trim().toLocaleLowerCase('th-TH');
+  const names=all.filter(n=>n.toLocaleLowerCase('th-TH').includes(query));
+  const favorites=names.filter(n=>state.favorites.includes(n)),remaining=names.filter(n=>!favorites.includes(n));
+  const selected=$(stationPickerField).value;
+  function option(n){return '<button type="button" class="station-option" data-station="'+esc(n)+'" aria-pressed="'+(n===selected)+'"><span>'+esc(n)+'</span><small>'+(n===selected?'✓ เลือกอยู่':money(getKm(el.selectedLine.value,n))+' กม.')+'</small></button>';}
+  $('stationOptions').innerHTML=names.length?(favorites.length?'<div class="station-group">สถานีที่บันทึกไว้</div>'+favorites.map(option).join('')+'<div class="station-group">สถานีในเส้นทาง</div>':'')+remaining.map(option).join(''):'<div class="station-no-results">'+(all.length?'ไม่พบสถานี ลองค้นหาด้วยชื่อสั้น ๆ':'ยังไม่มีรายชื่อสถานีสำหรับเส้นทางนี้')+'</div>';
+  $('stationCount').textContent=query?'พบ '+names.length+' จาก '+all.length+' สถานี':all.length+' สถานี · เลื่อนแล้วกดเลือกได้เลย';
+  $('clearStationSearchBtn').classList.toggle('hidden',!query);
+}
+function choosePickerStation(name) {
+  if(!stationPickerField||!pickerStationNames(stationPickerField).includes(name))return;
+  const field=$(stationPickerField);field.value=name;
+  $('stationPickerDialog').close();field.dispatchEvent(new Event('input',{bubbles:true}));field.focus();
+}
+Object.keys(STATION_FIELD_LABELS).forEach(id=>{
+  $(id).addEventListener('click',()=>openStationPicker(id));
+  $(id).addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openStationPicker(id);}});
+});
+$('stationSearch').addEventListener('input',renderStationPicker);
+$('clearStationSearchBtn').addEventListener('click',()=>{$('stationSearch').value='';renderStationPicker();$('stationSearch').focus();});
+$('stationOptions').addEventListener('click',e=>{const button=e.target.closest('button[data-station]');if(button)choosePickerStation(button.dataset.station);});
+$('closeStationPickerBtn').addEventListener('click',()=>$('stationPickerDialog').close());
+
+/* All calendar labels are authored in Thai; year choices use the Buddhist era. */
+const THAI_MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const thaiPicker={field:null,year:0,month:0};
+function thaiDateText(iso){const d=parseLocalDate(iso);return d?d.getDate()+' '+THAI_MONTHS[d.getMonth()]+' '+(d.getFullYear()+543):'';}
+function syncDateControls(){
+  ['travelDate','reminderDate'].forEach(id=>{
+    const text=thaiDateText($(id).value),button=$(id+'PickerBtn');
+    $(id+'Label').textContent=text||'กดเลือกวันที่';button.classList.toggle('is-empty',!text);
+    button.setAttribute('aria-label',(id==='travelDate'?'วันที่เดินทาง: ':'วันที่ต้องการเตือน: ')+(text||'ยังไม่ได้เลือก'));
+  });
+}
+function pickerDateBounds(){const f=$(thaiPicker.field);return {min:f.min||bangkokToday(),max:f.max||''};}
+function pickerDateAllowed(iso){const b=pickerDateBounds();return !!parseLocalDate(iso)&&iso>=b.min&&(!b.max||iso<=b.max);}
+function openThaiDatePicker(field){
+  if(!['travelDate','reminderDate'].includes(field))return;
+  thaiPicker.field=field;const f=$(field),min=f.min||bangkokToday(),max=f.max||'';
+  let iso=parseLocalDate(f.value)?f.value:bangkokToday();if(iso<min)iso=min;if(max&&iso>max)iso=max;
+  const d=parseLocalDate(iso);thaiPicker.year=d.getFullYear();thaiPicker.month=d.getMonth();
+  $('thaiDateTitle').textContent=field==='travelDate'?'เลือกวันที่เดินทาง':'เลือกวันที่ต้องการเตือน';
+  renderThaiCalendar();$('thaiDateDialog').showModal();
+}
+function calendarMonthISO(year,month){return year+'-'+String(month+1).padStart(2,'0')+'-01';}
+function calendarMonthAllowed(year,month){const b=pickerDateBounds(),first=calendarMonthISO(year,month),last=year+'-'+String(month+1).padStart(2,'0')+'-'+new Date(year,month+1,0).getDate();return last>=b.min&&(!b.max||first<=b.max);}
+function renderThaiCalendar(){
+  if(!thaiPicker.field)return;
+  const y=thaiPicker.year,m=thaiPicker.month,b=pickerDateBounds(),selected=$(thaiPicker.field).value,today=bangkokToday();
+  $('thaiCalendarMonth').innerHTML=THAI_MONTHS.map((n,i)=>'<option value="'+i+'"'+(calendarMonthAllowed(y,i)?'':' disabled')+'>'+n+'</option>').join('');$('thaiCalendarMonth').value=String(m);
+  const minYear=Number(b.min.slice(0,4)),maxYear=b.max?Number(b.max.slice(0,4)):Math.max(minYear+10,y);
+  let years='';for(let year=minYear;year<=maxYear;year++)years+='<option value="'+year+'">พ.ศ. '+(year+543)+'</option>';
+  $('thaiCalendarYear').innerHTML=years;$('thaiCalendarYear').value=String(y);
+  const first=new Date(y,m,1).getDay(),count=new Date(y,m+1,0).getDate();let markup='';
+  for(let i=0;i<first;i++)markup+='<span aria-hidden="true"></span>';
+  for(let day=1;day<=count;day++){
+    const iso=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0'),isToday=iso===today;
+    markup+='<button type="button" class="calendar-day'+(isToday?' is-today':'')+'" data-date="'+iso+'" aria-label="'+thaiDateText(iso)+'" aria-pressed="'+(iso===selected)+'"'+(isToday?' aria-current="date"':'')+(pickerDateAllowed(iso)?'':' disabled')+'>'+day+'</button>';
+  }
+  $('thaiCalendarDays').innerHTML=markup;
+  const prev=new Date(y,m-1,1),next=new Date(y,m+1,1);
+  $('thaiCalendarPrev').disabled=!calendarMonthAllowed(prev.getFullYear(),prev.getMonth());$('thaiCalendarNext').disabled=!calendarMonthAllowed(next.getFullYear(),next.getMonth());
+  $('thaiCalendarToday').disabled=!pickerDateAllowed(today);
+  $('thaiCalendarSelection').textContent=thaiDateText(selected)?'เลือกอยู่: '+thaiDateText(selected):'กดวันที่เพื่อเลือก';
+}
+function moveThaiCalendar(delta){const d=new Date(thaiPicker.year,thaiPicker.month+delta,1);if(!calendarMonthAllowed(d.getFullYear(),d.getMonth()))return;thaiPicker.year=d.getFullYear();thaiPicker.month=d.getMonth();renderThaiCalendar();}
+function chooseThaiDate(iso){
+  if(!thaiPicker.field||!pickerDateAllowed(iso))return;
+  const field=$(thaiPicker.field);field.value=iso;syncDateControls();$('thaiDateDialog').close();field.dispatchEvent(new Event('input',{bubbles:true}));
+}
+$('travelDatePickerBtn').addEventListener('click',()=>openThaiDatePicker('travelDate'));
+$('reminderDatePickerBtn').addEventListener('click',()=>openThaiDatePicker('reminderDate'));
+$('closeThaiDateBtn').addEventListener('click',()=>$('thaiDateDialog').close());
+$('thaiCalendarPrev').addEventListener('click',()=>moveThaiCalendar(-1));$('thaiCalendarNext').addEventListener('click',()=>moveThaiCalendar(1));
+$('thaiCalendarMonth').addEventListener('change',()=>{const m=Number($('thaiCalendarMonth').value);if(calendarMonthAllowed(thaiPicker.year,m)){thaiPicker.month=m;renderThaiCalendar();}});
+$('thaiCalendarYear').addEventListener('change',()=>{thaiPicker.year=Number($('thaiCalendarYear').value);if(!calendarMonthAllowed(thaiPicker.year,thaiPicker.month)){const months=THAI_MONTHS.map((_,i)=>i).filter(i=>calendarMonthAllowed(thaiPicker.year,i));thaiPicker.month=months[0];}renderThaiCalendar();});
+$('thaiCalendarDays').addEventListener('click',e=>{const button=e.target.closest('button[data-date]');if(button&&!button.disabled)chooseThaiDate(button.dataset.date);});
+$('thaiCalendarToday').addEventListener('click',()=>chooseThaiDate(bangkokToday()));
+['stationPickerDialog','thaiDateDialog'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target!==$(id))return;const b=e.target.getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom)e.target.close();}));
+
+/* iPhone supports importing .ics from Mail. Web Share passes the file, not a link. */
+async function addIPhoneCalendar(){
+  const e=reminderCalendarEvent();if(!e)return;
+  const file=typeof File==='function'?new File([buildCalendarICS(e)],'train-reminder-'+e.date+'.ics',{type:'text/calendar'}):null;
+  if(file&&navigator.share&&navigator.canShare?.({files:[file]})){
+    try{
+      await navigator.share({files:[file],title:e.title,text:'เปิดไฟล์แนบ .ics จาก Mail เพื่อเพิ่มลงปฏิทิน iPhone'});
+      showReminderHandoff('ส่งไฟล์ไปยังแอปที่เลือกแล้ว หากใช้ iPhone ให้เปิดไฟล์แนบใน Mail แล้วเพิ่มลงปฏิทิน ตรวจวันเวลาและการเตือนก่อนบันทึก');
+    }catch(error){if(error.name!=='AbortError'){downloadCalendar();showReminderHandoff('แชร์ไฟล์ไม่ได้ จึงดาวน์โหลดไฟล์ .ics ให้แทน ส่งไฟล์นี้ให้ตัวเองทางอีเมล แล้วเปิดไฟล์แนบใน Mail บน iPhone เพื่อเพิ่มลงปฏิทิน');}}
+  }else{
+    downloadCalendar();showReminderHandoff('ดาวน์โหลดไฟล์ .ics แล้ว บน iPhone ให้ส่งไฟล์นี้ให้ตัวเองทางอีเมล เปิดไฟล์แนบใน Mail แล้วเพิ่มรายการลงปฏิทิน ตรวจการเตือน “เมื่อถึงเวลาเริ่ม” ก่อนบันทึก');
+  }
+}
+$('iphoneCalendarBtn').addEventListener('click',addIPhoneCalendar);
+
+/* Shared counts and reviews. No local counter is shown as a public total.
+   Reads use JSONP for Apps Script redirects; writes are POST. A read-after-write
+   receipt must confirm the random ID before the UI reports that a review was saved. */
+const communityState={busy:false,sequence:0,visit:null};
+function communityEndpoint(){try{const u=new URL(APP_CONFIG.serviceUrl);return u.protocol==='https:'&&u.hostname==='script.google.com'&&/^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(u.pathname)?u.toString():null;}catch{return null;}}
+function randomServiceId(){if(globalThis.crypto?.randomUUID)return globalThis.crypto.randomUUID();return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)+'-'+Math.random().toString(36).slice(2);}
+function communityVisit(){
+  if(communityState.visit)return communityState.visit;
+  let v=STORAGE.get('srtCommunityVisit',null);
+  if(!v||typeof v.id!=='string'||v.expires<=Date.now()){v={id:randomServiceId(),expires:Date.now()+30*60000,counted:false};STORAGE.set('srtCommunityVisit',v);}
+  return communityState.visit=v;
+}
+function serviceRead(params={}){
+  const endpoint=communityEndpoint();if(!endpoint)return Promise.reject(new Error('not_configured'));
+  return new Promise((resolve,reject)=>{
+    const name='srtPublic_'+Date.now()+'_'+(++communityState.sequence),script=document.createElement('script'),url=new URL(endpoint);let timer;
+    function cleanup(){clearTimeout(timer);script.remove();delete window[name];}
+    window[name]=data=>{cleanup();if(data?.ok)resolve(data);else reject(new Error(data?.error||'service_error'));};
+    Object.entries({...params,callback:name,_:Date.now()}).forEach(([key,value])=>url.searchParams.set(key,String(value)));
+    script.src=url.toString();script.referrerPolicy='no-referrer';script.onerror=()=>{cleanup();reject(new Error('network_error'));};
+    timer=setTimeout(()=>{cleanup();reject(new Error('timeout'));},12000);document.head.appendChild(script);
+  });
+}
+function applyCommunityStats(data){
+  const s=data?.stats;if(!s)return;
+  const values=[s.total,s.today,s.reviews,s.average];if(values.some(n=>!Number.isFinite(n)||n<0))return;
+  $('totalVisits').textContent=s.total.toLocaleString('th-TH');$('todayVisits').textContent=s.today.toLocaleString('th-TH');$('totalReviews').textContent=s.reviews.toLocaleString('th-TH');$('averageRating').textContent=s.reviews?s.average.toFixed(1)+'/5':'—';
+  $('statsStatusText').textContent='ยอดเข้าชมรวมจากทุกคน · นับใหม่เมื่อกลับมาหลัง 30 นาที';$('refreshStatsBtn').classList.remove('hidden');
+}
+async function serviceWrite(payload){
+  const endpoint=communityEndpoint();if(!endpoint)throw new Error('not_configured');
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+  try{await fetch(endpoint,{method:'POST',mode:'no-cors',credentials:'omit',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({...payload,site:APP_CONFIG.siteKey}),signal:controller.signal,redirect:'follow'});}catch{/* The receipt below resolves an uncertain POST result. */}finally{clearTimeout(timer);}
+  for(let attempt=0;attempt<3;attempt++){
+    const data=await serviceRead({action:'receipt',kind:payload.kind,id:payload.id});
+    if(data.saved){applyCommunityStats(data);return data;}
+    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,1200));
+  }
+  throw new Error('unconfirmed');
+}
+function feedbackMessage(message,error=false){$('feedbackResult').textContent=message;$('feedbackResult').classList.toggle('error',error);}
+async function refreshCommunityStats(){
+  if(!communityEndpoint())return;
+  $('refreshStatsBtn').disabled=true;
+  try{applyCommunityStats(await serviceRead({action:'stats'}));}catch{$('statsStatusText').textContent='โหลดสถิติไม่ได้ในขณะนี้ ลองอีกครั้งได้ครับ';$('refreshStatsBtn').classList.remove('hidden');}
+  finally{$('refreshStatsBtn').disabled=false;}
+}
+async function initCommunity(){
+  if(!communityEndpoint()){
+    $('statsStatusText').textContent='ยังไม่เปิดเก็บสถิติ';$('feedbackSubmitBtn').disabled=true;feedbackMessage('แบบรีวิวจะเปิดรับหลังเชื่อมต่อระบบเก็บข้อมูลครับ');return;
+  }
+  $('feedbackSubmitBtn').disabled=false;$('statsStatusText').textContent='กำลังโหลดสถิติ…';feedbackMessage('');
+  await refreshCommunityStats();const visit=communityVisit();
+  if(!visit.counted){try{await serviceWrite({kind:'visit',id:visit.id,tool:state.tool});visit.counted=true;STORAGE.set('srtCommunityVisit',visit);}catch{$('statsStatusText').textContent='ยังยืนยันยอดเข้าชมครั้งนี้ไม่ได้ ลองโหลดใหม่ได้ครับ';}}
+  if(STORAGE.get('srtCommunityReviewSent',null)===visit.id){$('feedbackSubmitBtn').disabled=true;feedbackMessage('ขอบคุณที่รีวิวแล้วครับ กลับมาใช้งานครั้งหน้าค่อยรีวิวใหม่ได้');}
+}
+async function submitCommunityReview(event){
+  event.preventDefault();if(communityState.busy||!communityEndpoint())return;
+  if($('feedbackWebsite').value)return;
+  const score=document.querySelector('input[name="feedbackRating"]:checked')?.value,accuracy=document.querySelector('input[name="feedbackAccuracy"]:checked')?.value,comment=$('feedbackComment').value.trim();
+  if(!score||!accuracy){feedbackMessage('เลือกความพอใจและความถูกต้องของข้อมูลก่อนส่งนะครับ',true);return;}
+  if(comment.length>500){feedbackMessage('ขอข้อเสนอแนะไม่เกิน 500 ตัวอักษรครับ',true);return;}
+  const visit=communityVisit(),draft={score:Number(score),accuracy,comment,tool:state.tool,visitId:visit.id};
+  const previous=STORAGE.get('srtCommunityPendingReview',null),fingerprint=JSON.stringify(draft);
+  const payload=previous?.fingerprint===fingerprint?previous.payload:{kind:'review',id:randomServiceId(),...draft};
+  STORAGE.set('srtCommunityPendingReview',{fingerprint,payload});
+  communityState.busy=true;$('feedbackSubmitBtn').disabled=true;$('feedbackSubmitBtn').textContent='กำลังส่ง…';feedbackMessage('กำลังบันทึกรีวิวครับ');
+  try{
+    await serviceWrite(payload);STORAGE.remove('srtCommunityPendingReview');STORAGE.set('srtCommunityReviewSent',visit.id);
+    $('feedbackFields').disabled=true;feedbackMessage('ขอบคุณครับ บันทึกรีวิวแล้ว หากข้อมูลผิดผมพร้อมปรับแก้ครับ');$('feedbackSubmitBtn').textContent='ส่งรีวิวแล้ว';
+  }catch{
+    feedbackMessage('ยังยืนยันการบันทึกไม่ได้ ลองส่งอีกครั้งได้ครับ ข้อความที่กรอกยังอยู่',true);$('feedbackSubmitBtn').disabled=false;$('feedbackSubmitBtn').textContent='ลองส่งอีกครั้ง';
+  }finally{communityState.busy=false;}
+}
+$('feedbackForm').addEventListener('submit',submitCommunityReview);$('refreshStatsBtn').addEventListener('click',refreshCommunityStats);
+
+
 /* =========================================================
    13) BOOT
    ========================================================= */
 (function boot(){
-  initLines();populateMonthlyStations();setMonthlyFareMode('auto',false);el.travelDate.min=bangkokToday();fillTrainOptions();renderFavorites();renderHistories();applyTheme(STORAGE.get('srtPremiumTheme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));updateMonthlyOptions();restoreFromUrl(initialSearch);if(!initialSearch){bookingEmpty();calculateMonthly()}routeBooting=false;syncUrl();
+  initLines();populateMonthlyStations();setMonthlyFareMode('auto',false);el.travelDate.min=bangkokToday();fillTrainOptions();renderFavorites();renderHistories();applyTheme(STORAGE.get('srtPremiumTheme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));updateMonthlyOptions();restoreFromUrl(initialSearch);if(!initialSearch){bookingEmpty();calculateMonthly()}routeBooting=false;syncUrl();syncDateControls();initCommunity();
   console.info(`SRT Ticket Tools ${APP_CONFIG.version} loaded`)
 })();
 </script>
