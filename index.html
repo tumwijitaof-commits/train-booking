@@ -328,7 +328,7 @@ const initialSearch=location.search;
    1) APP CONFIG + SINGLE SOURCE OF TRUTH
    ========================================================= */
 const APP_CONFIG = Object.freeze({
-  version: 'K2D Mobile Thai Calendar v4.2 Routes',
+  version: 'K2D Mobile Thai Calendar v4.3 D-Ticket Distances',
   buildDate: '18 ตุลาคม 2569',
   dticketUrl: 'https://dticket.railway.co.th/DTicketPublicWeb/home/Home',
   hotline: '1690',
@@ -412,21 +412,88 @@ const EAST_CLASS3_RATES = Object.freeze([0.215,0.180,0.160,0.145]);
 /* =========================================================
    2) DATA LAYER
    ========================================================= */
-/* ฐานระยะทาง (ตรวจ 18 ต.ค.2569 จากระบบ SRT Timetable):
-   หัวลำโพง–ชุมทางบางซื่อ 7 กม.; อภิวัฒน์–อยุธยา 64 กม.; อภิวัฒน์–เชียงใหม่ 744 กม.
-   ตารางเดิม: อยุธยา 71, เชียงใหม่ 751 => ฐานอภิวัฒน์เทียบตารางนี้ = 7.
-   การแสดงอภิวัฒน์เป็น กม.0 ต้องหักฐานเดียวกันจากสถานีอื่นในขบวนด้วย
-   https://www.railway.co.th/SRTTimetable/TrainDetail?StartStation=1000&DestStation=1222&TrainNo=9&TimeChange=
-   https://www.railway.co.th/SRTTimetable/TrainDetail?StartStation=1000&DestStation=1031&TrainNo=9&TimeChange=
-   https://www.railway.co.th/SRTTimetable/TrainDetail?StartStation=1001&DestStation=1007&TrainNo=201&TimeChange=
-   ข้อมูลสถานีเดิมอื่น ๆ ยังเป็นระยะจำนวนเต็ม ใช้คำนวณเบื้องต้น
+/* ระยะสะสมสำหรับคำนวณวันจอง: ภาพ TCTS123 / D-Ticket วันที่ 18 ต.ค.2569
+   สายเหนือ ขบวน 9; อีสานอุบลฯ ขบวน 23; อีสานหนองคาย ขบวน 25
+   สายใต้ ขบวน 37: ยืนยันเฉพาะแถวที่เห็นถึงชุมทางทุ่งสง
+   เก็บค่าอภิวัฒน์เป็น 0 และใช้ระยะสะสมรายสถานีที่ตรวจจากภาพก่อนเสมอ
+   สถานีที่ยังไม่มีในภาพใช้ตารางเดิมเทียบฐานจำนวนเต็ม 8 กม. (ยังไม่ได้ตรวจจากภาพ)
+   หัวลำโพง/ชุมทางบางซื่อใช้ฐานเดิมแยกกัน; สายตะวันออกคงข้อมูลเดิมทั้งหมด
+   ค่า fareReferenceKm เป็นฐานของตารางจำนวนเต็มในโค้ด ไม่ใช่หลัก กม.ทางวิศวกรรม
 */
+const APHIWAT_BOOKING_KM = Object.freeze({
+  north: Object.freeze({
+    "กรุงเทพ (อภิวัฒน์)": 0,
+    "ดอนเมือง": 14,
+    "รังสิต": 22,
+    "อยุธยา": 63,
+    "ลพบุรี 2 (ท่าวุ้ง)": 130,
+    "นครสวรรค์": 238,
+    "พิษณุโลก": 381,
+    "ศิลาอาสน์": 480,
+    "เด่นชัย": 526,
+    "นครลำปาง": 634,
+    "ขุนตาน": 675,
+    "ลำพูน": 721,
+    "เชียงใหม่": 743
+  }),
+  south: Object.freeze({
+    "กรุงเทพ (อภิวัฒน์)": 0,
+    "บางบำหรุ": 10,
+    "ศาลายา": 27,
+    "นครปฐม": 56,
+    "บ้านโป่ง": 76,
+    "ราชบุรี": 109,
+    "เพชรบุรี": 159,
+    "หัวหิน": 221,
+    "วังก์พง": 241,
+    "ประจวบคีรีขันธ์": 310,
+    "บางสะพานใหญ่": 385,
+    "ชุมพร": 477,
+    "สุราษฎร์ธานี": 643,
+    "ชุมทางทุ่งสง": 765
+  }),
+  esanUbon: Object.freeze({
+    "กรุงเทพ (อภิวัฒน์)": 0,
+    "ดอนเมือง": 14,
+    "รังสิต": 22,
+    "อยุธยา": 63,
+    "สระบุรี": 105,
+    "ปากช่อง": 172,
+    "นครราชสีมา": 256,
+    "ลำปลายมาศ": 338,
+    "บุรีรัมย์": 368,
+    "สุรินทร์": 412,
+    "ศีขรภูมิ": 444,
+    "อุทุมพรพิสัย": 486,
+    "ศรีสะเกษ": 507,
+    "กันทรารมย์": 534,
+    "อุบลราชธานี": 567
+  }),
+  esanNongkhai: Object.freeze({
+    "กรุงเทพ (อภิวัฒน์)": 0,
+    "ดอนเมือง": 14,
+    "รังสิต": 22,
+    "อยุธยา": 63,
+    "สระบุรี": 105,
+    "ชุมทางแก่งคอย": 117,
+    "ลำนารายณ์": 201,
+    "ชุมทางบัวใหญ่": 368,
+    "เมืองพล": 400,
+    "บ้านไผ่": 430,
+    "ขอนแก่น": 472,
+    "น้ำพอง": 506,
+    "กุมภวาปี": 555,
+    "อุดรธานี": 591,
+    "หนองคาย": 643
+  })
+});
+
 const trainData = {
                 north: {
                     name: "สายเหนือ (กทม.-เชียงใหม่)",
                     stations: [
                         { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "สามเสน", km: 5 }, { name: "ชุมทางบางซื่อ", km: 7 }, 
-                        { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
+                        { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 8 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
                         { name: "ดอนเมือง", km: 22 }, { name: "หลักหก", km: 26 }, { name: "รังสิต", km: 30 }, 
                         { name: "คลองหนึ่ง", km: 34 }, { name: "เชียงราก", km: 37 }, { name: "มหาวิทยาลัยธรรมศาสตร์", km: 40 },
                         { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, { name: "คลองพุทรา", km: 51 }, 
@@ -464,7 +531,7 @@ const trainData = {
                 south: {
                     name: "สายใต้ (กทม.-สุไหงโก-ลก/ปาดังเบซาร์)",
                     stations: [
-                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, 
+                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 8 }, 
                         { name: "ธนบุรี", km: 16 }, { name: "บางบำหรุ", km: 18 }, { name: "ชุมทางตลิ่งชัน", km: 22 }, 
                         { name: "ศาลายา", km: 35 }, { name: "วัดสุวรรณ", km: 39 }, { name: "คลองมหาสวัสดิ์", km: 43 }, 
                         { name: "วัดงิ้วราย", km: 47 }, { name: "นครชัยศรี", km: 51 }, { name: "ท่าแฉลบ", km: 56 }, 
@@ -541,7 +608,7 @@ const trainData = {
                     name: "สายอีสาน (ไปหนองคาย)",
                     stations: [
                         { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "สามเสน", km: 5 }, { name: "ชุมทางบางซื่อ", km: 7 }, 
-                        { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
+                        { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 8 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
                         { name: "ดอนเมือง", km: 22 }, { name: "รังสิต", km: 30 }, { name: "เชียงราก", km: 37 }, 
                         { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, { name: "บางปะอิน", km: 58 },
                         { name: "อยุธยา", km: 71 }, { name: "ชุมทางบ้านภาชี", km: 90 }, { name: "สระบุรี", km: 113 }, 
@@ -568,7 +635,7 @@ const trainData = {
                     name: "สายอีสาน (ไปอุบลราชธานี)",
                     stations: [
                         { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "รพ.รามาธิบดี", km: 3 }, { name: "สามเสน", km: 5 }, 
-                        { name: "ชุมทางบางซื่อ", km: 7 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, { name: "บางเขน", km: 13 }, 
+                        { name: "ชุมทางบางซื่อ", km: 7 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 8 }, { name: "บางเขน", km: 13 }, 
                         { name: "หลักสี่", km: 18 }, { name: "ดอนเมือง", km: 22 }, { name: "รังสิต", km: 30 }, 
                         { name: "เชียงราก", km: 37 }, { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, 
                         { name: "บางปะอิน", km: 58 }, { name: "อยุธยา", km: 71 }, { name: "บ้านดอนกลาง", km: 82 },
@@ -667,7 +734,7 @@ const trainSchedules = {
                     { id: "31/32", name: "31/32 ด่วนพิเศษทักษิณารัถย์", origin: "กรุงเทพ (อภิวัฒน์)", dest: "ชุมทางหาดใหญ่",
                       stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "บางสะพานใหญ่", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "พัทลุง", "ชุมทางหาดใหญ่"] },
                     { id: "37/38", name: "37/38 ด่วนพิเศษทักษิณ", origin: "กรุงเทพ (อภิวัฒน์)", dest: "สุไหงโก-ลก",
-                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "ประจวบคีรีขันธ์", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "เขาชัยสน", "พัทลุง", "ชุมทางหาดใหญ่", "จะนะ", "เทพา", "ปัตตานี (โคกโพธิ์)", "ยะลา", "รือเสาะ", "ตันหยงมัส", "สุไหงปาดี", "สุไหงโก-ลก"] },
+                      stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "ศาลายา", "นครปฐม", "บ้านโป่ง", "ราชบุรี", "เพชรบุรี", "หัวหิน", "วังก์พง", "ประจวบคีรีขันธ์", "บางสะพานใหญ่", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "เขาชัยสน", "พัทลุง", "ชุมทางหาดใหญ่", "จะนะ", "เทพา", "ปัตตานี (โคกโพธิ์)", "ยะลา", "รือเสาะ", "ตันหยงมัส", "สุไหงปาดี", "สุไหงโก-ลก"] },
                     { id: "45/46", name: "45/46 ด่วนพิเศษอินเตอร์เนชั่นแนล", origin: "กรุงเทพ (อภิวัฒน์)", dest: "ปาดังเบซาร์",
                       stops: ["กรุงเทพ (อภิวัฒน์)", "บางบำหรุ", "นครปฐม", "ราชบุรี", "เพชรบุรี", "หัวหิน", "ประจวบคีรีขันธ์", "ชุมพร", "สุราษฎร์ธานี", "ชุมทางทุ่งสง", "พัทลุง", "ชุมทางหาดใหญ่", "คลองแงะ", "ปาดังเบซาร์"] },
                     { id: "39/40", name: "39/40 ด่วนพิเศษ (ดีเซลราง)", origin: "กรุงเทพ (อภิวัฒน์)", dest: "สุราษฎร์ธานี",
@@ -724,6 +791,16 @@ function getReferenceKm(line,name){
   const station=(trainData[line]?.stations||[]).find(item=>item.name===name);
   return station?Number(station.fareReferenceKm??station.km):null;
 }
+function getRouteKm(line,name,trainOrigin,trainDest){
+  const usesAphiwat=[trainOrigin,trainDest].includes(BANGKOK_STATIONS.aphiwat);
+  if(usesAphiwat&&line!=='east'){
+    const measured=APHIWAT_BOOKING_KM[line];
+    if(measured&&Object.hasOwn(measured,name))return measured[name];
+    const km=getReferenceKm(line,name),base=getReferenceKm(line,BANGKOK_STATIONS.aphiwat);
+    return Number.isFinite(km)&&Number.isFinite(base)?km-base:null;
+  }
+  return getReferenceKm(line,name);
+}
 function incompatibleBangkokStations(a,b){
   const stations=[a,b],s=BANGKOK_STATIONS;
   return stations.includes(s.aphiwat)&&(stations.includes(s.huaLamphong)||stations.includes(s.bangSue));
@@ -732,7 +809,7 @@ function routeStationNames(line,origin,destination){
   const all=stationNames(line),s=BANGKOK_STATIONS;
   if(!origin||!destination)return all;
   if(incompatibleBangkokStations(origin,destination))return[];
-  const a=getReferenceKm(line,origin),b=getReferenceKm(line,destination);
+  const a=getRouteKm(line,origin,origin,destination),b=getRouteKm(line,destination,origin,destination);
   if(!Number.isFinite(a)||!Number.isFinite(b))return[];
   const usesAphiwat=[origin,destination].includes(s.aphiwat);
   const usesHuaLamphong=[origin,destination].includes(s.huaLamphong);
@@ -741,7 +818,7 @@ function routeStationNames(line,origin,destination){
     if(name===s.aphiwat&&!usesAphiwat)return false;
     if(usesAphiwat&&[s.huaLamphong,s.bangSue,'สามเสน','รพ.รามาธิบดี','ธนบุรี'].includes(name))return false;
     if(line==='south'&&(usesAphiwat||usesHuaLamphong)&&name==='ธนบุรี')return false;
-    const km=getReferenceKm(line,name);
+    const km=getRouteKm(line,name,origin,destination);
     return Number.isFinite(km)&&km>=Math.min(a,b)&&km<=Math.max(a,b);
   });
 }
@@ -754,7 +831,8 @@ function pickerStationKm(name){
   const choosingEndpoint=['trainOrigin','trainDest'].includes(stationPickerField);
   const origin=train?.origin||el.trainOrigin.value.trim();
   if(!choosingEndpoint&&exactStation(line,origin)){
-    const a=getReferenceKm(line,origin),b=getReferenceKm(line,name);
+    const destination=train?.dest||el.trainDest.value.trim();
+    const a=getRouteKm(line,origin,origin,destination),b=getRouteKm(line,name,origin,destination);
     if(Number.isFinite(a)&&Number.isFinite(b))return Math.abs(b-a);
   }
   return getKm(line,name);
@@ -841,7 +919,7 @@ function getBookingInputs(){
   const line=el.selectedLine.value,train=getTrain(line,el.selectedTrain.value);let total=NaN,passenger=NaN,routeValid=true;
   const origin=el.passOrigin.value.trim(),destination=el.passDest.value.trim();
   const trainOrigin=train?.origin||el.trainOrigin.value.trim(),trainDest=train?.dest||el.trainDest.value.trim();
-  const t1=getReferenceKm(line,trainOrigin),t2=getReferenceKm(line,trainDest),p1=getReferenceKm(line,origin),p2=getReferenceKm(line,destination);
+  const t1=getRouteKm(line,trainOrigin,trainOrigin,trainDest),t2=getRouteKm(line,trainDest,trainOrigin,trainDest),p1=getRouteKm(line,origin,trainOrigin,trainDest),p2=getRouteKm(line,destination,trainOrigin,trainDest);
   if([t1,t2].every(Number.isFinite))total=Math.abs(t2-t1);if([p1,p2].every(Number.isFinite))passenger=Math.abs(p2-p1);
   if(trainOrigin&&trainDest){const route=routeStationNames(line,trainOrigin,trainDest);routeValid=route.includes(origin)&&route.includes(destination);}
   return{mode:'station',travelDate,line,train,reservationType:train?getReservationType(train):el.reservationType.value,total,passenger,routeValid,origin,destination,trainOrigin,trainDest,p1,p2};
