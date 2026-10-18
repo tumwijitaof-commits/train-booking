@@ -132,6 +132,7 @@ h1,h2,h3{font-weight:600}.home-heading h1{font-weight:700}.menu-title{font-weigh
               </div>
               <datalist id="stationList"></datalist>
               <datalist id="activeStationList"></datalist>
+              <div class="note info hidden" id="bookingRouteNote" role="note"></div>
 
               <div class="favorite-strip" id="favoriteStrip">
                 <div class="favorite-strip-head"><span>⭐ สถานีที่บันทึกไว้</span><button class="text-btn" id="clearFavoritesBtn" type="button">ล้างทั้งหมด</button></div>
@@ -327,8 +328,8 @@ const initialSearch=location.search;
    1) APP CONFIG + SINGLE SOURCE OF TRUTH
    ========================================================= */
 const APP_CONFIG = Object.freeze({
-  version: 'K2D Mobile Thai Calendar v4.1',
-  buildDate: '7 ตุลาคม 2569',
+  version: 'K2D Mobile Thai Calendar v4.2 Routes',
+  buildDate: '18 ตุลาคม 2569',
   dticketUrl: 'https://dticket.railway.co.th/DTicketPublicWeb/home/Home',
   hotline: '1690',
   historyLimit: 8,
@@ -345,16 +346,33 @@ const BOOKING_RULES = Object.freeze({
   ],
   standardOpenTime: '08:30',
   nonReservedText: 'ซื้อในวันเดินทาง ก่อนขบวนรถออกไม่เกิน 2 ชั่วโมง',
-  special997998: {
-    ids: ['997/998'],
+  special887888: {
+    ids: ['887/888'],
     chachoengsaoKm: 61,
     chonburiKm: 108,
     terminalTimes: {
-      '997': { station: 'กรุงเทพ (หัวลำโพง)', time: '06:45' },
-      '998': { station: 'จุกเสม็ด', time: '15:30' }
+      '887': { station: 'กรุงเทพ (หัวลำโพง)', time: '06:45' },
+      '888': { station: 'จุกเสม็ด', time: '15:30' }
     }
   }
 });
+
+// รองรับลิงก์และประวัติจากเวอร์ชันก่อนเปลี่ยนหมายเลขขบวน
+const TRAIN_ID_ALIASES = Object.freeze({'997/998':'887/888'});
+const BANGKOK_STATIONS = Object.freeze({
+  huaLamphong:'กรุงเทพ (หัวลำโพง)',
+  aphiwat:'กรุงเทพ (อภิวัฒน์)',
+  bangSue:'ชุมทางบางซื่อ'
+});
+function normalizeTrainId(id){return TRAIN_ID_ALIASES[id]||id||'';}
+function migrateBookingHistory(items){
+  if(!Array.isArray(items))return[];
+  return items.map(item=>{
+    if(item?.restore?.line!=='east'||!TRAIN_ID_ALIASES[item.restore.train])return item;
+    const rename=value=>typeof value==='string'?value.replaceAll('997/998','887/888').replace(/ขบวน 997(?=\s|$)/g,'ขบวน 887').replace(/ขบวน 998(?=\s|$)/g,'ขบวน 888'):value;
+    return{...item,key:rename(item.key),title:rename(item.title),subtitle:rename(item.subtitle),restore:{...item.restore,train:normalizeTrainId(item.restore.train)}};
+  });
+}
 
 const MONTHLY_RULES = Object.freeze({
   week:{label:'รายสัปดาห์',normalDays:6,studentDays:5,generalRate:.75,halfRate:.50,studentRate:.50},
@@ -394,12 +412,21 @@ const EAST_CLASS3_RATES = Object.freeze([0.215,0.180,0.160,0.145]);
 /* =========================================================
    2) DATA LAYER
    ========================================================= */
+/* ฐานระยะทาง (ตรวจ 18 ต.ค.2569 จากระบบ SRT Timetable):
+   หัวลำโพง–ชุมทางบางซื่อ 7 กม.; อภิวัฒน์–อยุธยา 64 กม.; อภิวัฒน์–เชียงใหม่ 744 กม.
+   ตารางเดิม: อยุธยา 71, เชียงใหม่ 751 => ฐานอภิวัฒน์เทียบตารางนี้ = 7.
+   การแสดงอภิวัฒน์เป็น กม.0 ต้องหักฐานเดียวกันจากสถานีอื่นในขบวนด้วย
+   https://www.railway.co.th/SRTTimetable/TrainDetail?StartStation=1000&DestStation=1222&TrainNo=9&TimeChange=
+   https://www.railway.co.th/SRTTimetable/TrainDetail?StartStation=1000&DestStation=1031&TrainNo=9&TimeChange=
+   https://www.railway.co.th/SRTTimetable/TrainDetail?StartStation=1001&DestStation=1007&TrainNo=201&TimeChange=
+   ข้อมูลสถานีเดิมอื่น ๆ ยังเป็นระยะจำนวนเต็ม ใช้คำนวณเบื้องต้น
+*/
 const trainData = {
                 north: {
                     name: "สายเหนือ (กทม.-เชียงใหม่)",
                     stations: [
                         { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "สามเสน", km: 5 }, { name: "ชุมทางบางซื่อ", km: 7 }, 
-                        { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
+                        { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
                         { name: "ดอนเมือง", km: 22 }, { name: "หลักหก", km: 26 }, { name: "รังสิต", km: 30 }, 
                         { name: "คลองหนึ่ง", km: 34 }, { name: "เชียงราก", km: 37 }, { name: "มหาวิทยาลัยธรรมศาสตร์", km: 40 },
                         { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, { name: "คลองพุทรา", km: 51 }, 
@@ -437,7 +464,7 @@ const trainData = {
                 south: {
                     name: "สายใต้ (กทม.-สุไหงโก-ลก/ปาดังเบซาร์)",
                     stations: [
-                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, 
+                        { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, 
                         { name: "ธนบุรี", km: 16 }, { name: "บางบำหรุ", km: 18 }, { name: "ชุมทางตลิ่งชัน", km: 22 }, 
                         { name: "ศาลายา", km: 35 }, { name: "วัดสุวรรณ", km: 39 }, { name: "คลองมหาสวัสดิ์", km: 43 }, 
                         { name: "วัดงิ้วราย", km: 47 }, { name: "นครชัยศรี", km: 51 }, { name: "ท่าแฉลบ", km: 56 }, 
@@ -514,7 +541,7 @@ const trainData = {
                     name: "สายอีสาน (ไปหนองคาย)",
                     stations: [
                         { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "สามเสน", km: 5 }, { name: "ชุมทางบางซื่อ", km: 7 }, 
-                        { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
+                        { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, { name: "บางเขน", km: 13 }, { name: "หลักสี่", km: 18 }, 
                         { name: "ดอนเมือง", km: 22 }, { name: "รังสิต", km: 30 }, { name: "เชียงราก", km: 37 }, 
                         { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, { name: "บางปะอิน", km: 58 },
                         { name: "อยุธยา", km: 71 }, { name: "ชุมทางบ้านภาชี", km: 90 }, { name: "สระบุรี", km: 113 }, 
@@ -541,7 +568,7 @@ const trainData = {
                     name: "สายอีสาน (ไปอุบลราชธานี)",
                     stations: [
                         { name: "กรุงเทพ (หัวลำโพง)", km: 0 }, { name: "รพ.รามาธิบดี", km: 3 }, { name: "สามเสน", km: 5 }, 
-                        { name: "ชุมทางบางซื่อ", km: 7 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 8 }, { name: "บางเขน", km: 13 }, 
+                        { name: "ชุมทางบางซื่อ", km: 7 }, { name: "กรุงเทพ (อภิวัฒน์)", km: 0, fareReferenceKm: 7 }, { name: "บางเขน", km: 13 }, 
                         { name: "หลักสี่", km: 18 }, { name: "ดอนเมือง", km: 22 }, { name: "รังสิต", km: 30 }, 
                         { name: "เชียงราก", km: 37 }, { name: "นวนคร", km: 44 }, { name: "เชียงรากน้อย", km: 46 }, 
                         { name: "บางปะอิน", km: 58 }, { name: "อยุธยา", km: 71 }, { name: "บ้านดอนกลาง", km: 82 },
@@ -605,9 +632,12 @@ const trainSchedules = {
                       stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "อยุธยา", "ชุมทางบ้านภาชี", "ท่าเรือ", "บ้านหมอ", "ลพบุรี 2 (ท่าวุ้ง)", "บ้านหมี่", "จันเสน", "ช่องแค", "บ้านตาคลี", "หนองโพ", "นครสวรรค์", "ปากน้ำโพ", "ชุมแสง", "บางมูลนาก", "ตะพานหิน", "พิจิตร", "บางกระทุ่ม", "พิษณุโลก", "พรหมพิราม", "หนองตม", "พิชัย", "ชุมทางบ้านดารา", "ท่าสัก", "ตรอน", "อุตรดิตถ์", "ศิลาอาสน์", "เด่นชัย", "บ้านปิน", "แม่เมาะ", "นครลำปาง", "ขุนตาน", "ลำพูน", "เชียงใหม่"] },
                     { id: "111/112", name: "111/112 เร็ว", origin: "กรุงเทพ (อภิวัฒน์)", dest: "เด่นชัย",
                       stops: ["กรุงเทพ (อภิวัฒน์)", "ดอนเมือง", "รังสิต", "เชียงราก", "บางปะอิน", "อยุธยา", "มาบพระจันทร์", "พระแก้ว", "ชุมทางบ้านภาชี", "หนองวิวัฒน์", "ท่าเรือ", "บ้านหมอ", "หนองโดน", "ลพบุรี 2 (ท่าวุ้ง)", "บ้านหมี่", "จันเสน", "ช่องแค", "บ้านตาคลี", "หนองโพ", "นครสวรรค์", "ทับกฤช", "ปากน้ำโพ", "ชุมแสง", "บางมูลนาก", "ตะพานหิน", "หัวดง", "วังกรด", "พิจิตร", "บางกระทุ่ม", "พิษณุโลก", "พรหมพิราม", "หนองตม", "พิชัย", "ชุมทางบ้านดารา", "ท่าสัก", "ตรอน", "อุตรดิตถ์", "ศิลาอาสน์", "บ้านด่าน", "ปางต้นผึ้ง", "ห้วยไร่", "เด่นชัย"] },
-                    { id: "201/202", name: "201/202 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "พิษณุโลก" },
-                    { id: "207/208", name: "207/208 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "นครสวรรค์" },
-                    { id: "209/210", name: "209/210 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "บ้านตาคลี" }
+                    { id: "201/202", name: "201/202 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "พิษณุโลก",
+                      stops: ["กรุงเทพ (หัวลำโพง)", "สามเสน", "ชุมทางบางซื่อ", "ดอนเมือง", "รังสิต", "เชียงราก", "มหาวิทยาลัยธรรมศาสตร์", "เชียงรากน้อย", "คลองพุทรา", "บางปะอิน", "บ้านโพ", "อยุธยา", "มาบพระจันทร์", "พระแก้ว", "ชุมทางบ้านภาชี", "หนองวิวัฒน์", "ท่าเรือ", "บ้านหมอ", "หนองโดน", "บ้านกลับ", "บ้านป่าหวาย", "ลพบุรี", "ท่าแค", "โคกกระเทียม", "หนองเต่า", "หนองทรายขาว", "บ้านหมี่", "ไผ่ใหญ่", "จันเสน", "ช่องแค", "บ้านตาคลี", "ดงมะกุ", "หัวหวาย", "หนองโพ", "หัวงิ้ว", "เนินมะกอก", "เขาทอง", "นครสวรรค์", "ปากน้ำโพ", "ทับกฤช", "คลองปลากด", "ชุมแสง", "วังกร่าง", "บางมูลนาก", "หอไกร", "ดงตะขบ", "ตะพานหิน", "ห้วยเกตุ", "หัวดง", "วังกรด", "พิจิตร", "ท่าฬ่อ", "บางกระทุ่ม", "แม่เทียบ", "บ้านใหม่", "พิษณุโลก"] },
+                    { id: "207/208", name: "207/208 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "นครสวรรค์",
+                      stops: ["กรุงเทพ (หัวลำโพง)", "โรงพยาบาลรามาธิบดี", "สามเสน", "ชุมทางบางซื่อ", "ดอนเมือง", "รังสิต", "เชียงราก", "มหาวิทยาลัยธรรมศาสตร์", "เชียงรากน้อย", "คลองพุทรา", "บางปะอิน", "บ้านโพ", "อยุธยา", "บ้านม้า", "มาบพระจันทร์", "พระแก้ว", "ชุมทางบ้านภาชี", "ดอนหญ้านาง", "หนองวิวัฒน์", "ท่าเรือ", "บ้านหมอ", "หนองโดน", "บ้านกลับ", "บ้านป่าหวาย", "ลพบุรี", "ท่าแค", "โคกกระเทียม", "หนองเต่า", "หนองทรายขาว", "บ้านหมี่", "ห้วยแก้ว", "ไผ่ใหญ่", "จันเสน", "บ้านกกกว้าว", "ช่องแค", "โพนทอง", "บ้านตาคลี", "ดงมะกุ", "หัวหวาย", "หนองโพ", "หัวงิ้ว", "เนินมะกอก", "เขาทอง", "นครสวรรค์"] },
+                    { id: "209/210", name: "209/210 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "บ้านตาคลี",
+                      stops: ["กรุงเทพ (หัวลำโพง)", "สามเสน", "ชุมทางบางซื่อ", "ดอนเมือง", "รังสิต", "เชียงราก", "มหาวิทยาลัยธรรมศาสตร์", "เชียงรากน้อย", "คลองพุทรา", "บางปะอิน", "บ้านโพ", "อยุธยา", "บ้านม้า", "มาบพระจันทร์", "พระแก้ว", "ชุมทางบ้านภาชี", "ดอนหญ้านาง", "หนองวิวัฒน์", "บ้านปลักแรด", "ท่าเรือ", "บ้านหมอ", "หนองโดน", "บ้านกลับ", "บ้านป่าหวาย", "ลพบุรี", "ท่าแค", "โคกกระเทียม", "หนองเต่า", "หนองทรายขาว", "บ้านหมี่", "ห้วยแก้ว", "ไผ่ใหญ่", "จันเสน", "บ้านกกกว้าว", "ช่องแค", "โพนทอง", "บ้านตาคลี"] }
                 ],
                 esanNongkhai: [
                     { id: "25/26", name: "25/26 ด่วนพิเศษอีสานมรรคา", origin: "กรุงเทพ (อภิวัฒน์)", dest: "หนองคาย",
@@ -662,7 +692,7 @@ const trainSchedules = {
                     { id: "261/262", name: "261/262 ธรรมดา", origin: "กรุงเทพ (หัวลำโพง)", dest: "หัวหิน" }
                 ],
                 east: [
-                    { id: "997/998", name: "997/998 พิเศษโดยสาร (จองล่วงหน้าได้)", origin: "กรุงเทพ (หัวลำโพง)", dest: "จุกเสม็ด",
+                    { id: "887/888", name: "887/888 พิเศษโดยสาร (จองล่วงหน้าได้)", origin: "กรุงเทพ (หัวลำโพง)", dest: "จุกเสม็ด",
                       stops: ["กรุงเทพ (หัวลำโพง)", "มักกะสัน", "คลองตัน", "หัวหมาก", "ลาดกระบัง", "หัวตะเข้", "ชุมทางฉะเชิงเทรา", "ชลบุรี", "ชุมทางศรีราชา", "พัทยา", "ตลาดน้ำ 4 ภาค", "ญาณสังวราราม", "สวนนงนุช", "บ้านพลูตาหลวง", "อู่ตะเภา", "จุกเสม็ด"] }
                 ]
             };
@@ -689,10 +719,61 @@ function copyText(text){if(navigator.clipboard?.writeText){return navigator.clip
 function daysUntil(date){return Math.round((localDateOnly(date)-localDateOnly())/DAY_MS)}
 function exactStation(line, name){return Boolean((trainData[line]?.stations||[]).some(s=>s.name===name))}
 function getKm(line, stationName){const s=(trainData[line]?.stations||[]).find(item=>item.name===stationName);return s?Number(s.km):null}
-function getTrain(line, id){return (trainSchedules[line]||[]).find(t=>t.id===id)||null}
+function getTrain(line, id){return (trainSchedules[line]||[]).find(t=>t.id===normalizeTrainId(id))||null}
+function getReferenceKm(line,name){
+  const station=(trainData[line]?.stations||[]).find(item=>item.name===name);
+  return station?Number(station.fareReferenceKm??station.km):null;
+}
+function incompatibleBangkokStations(a,b){
+  const stations=[a,b],s=BANGKOK_STATIONS;
+  return stations.includes(s.aphiwat)&&(stations.includes(s.huaLamphong)||stations.includes(s.bangSue));
+}
+function routeStationNames(line,origin,destination){
+  const all=stationNames(line),s=BANGKOK_STATIONS;
+  if(!origin||!destination)return all;
+  if(incompatibleBangkokStations(origin,destination))return[];
+  const a=getReferenceKm(line,origin),b=getReferenceKm(line,destination);
+  if(!Number.isFinite(a)||!Number.isFinite(b))return[];
+  const usesAphiwat=[origin,destination].includes(s.aphiwat);
+  const usesHuaLamphong=[origin,destination].includes(s.huaLamphong);
+  return all.filter(name=>{
+    // อภิวัฒน์เป็นสถานีต้นทาง/ปลายทางอีกเส้นทางหนึ่ง ไม่ใช่จุดจอดถัดจากบางซื่อ
+    if(name===s.aphiwat&&!usesAphiwat)return false;
+    if(usesAphiwat&&[s.huaLamphong,s.bangSue,'สามเสน','รพ.รามาธิบดี','ธนบุรี'].includes(name))return false;
+    if(line==='south'&&(usesAphiwat||usesHuaLamphong)&&name==='ธนบุรี')return false;
+    const km=getReferenceKm(line,name);
+    return Number.isFinite(km)&&km>=Math.min(a,b)&&km<=Math.max(a,b);
+  });
+}
+function activeBookingStationNames(){
+  const line=el.selectedLine.value,train=getTrain(line,el.selectedTrain.value);
+  return train?activeStationNames(line,train):routeStationNames(line,el.trainOrigin.value.trim(),el.trainDest.value.trim());
+}
+function pickerStationKm(name){
+  const line=el.selectedLine.value,train=getTrain(line,el.selectedTrain.value);
+  const choosingEndpoint=['trainOrigin','trainDest'].includes(stationPickerField);
+  const origin=train?.origin||el.trainOrigin.value.trim();
+  if(!choosingEndpoint&&exactStation(line,origin)){
+    const a=getReferenceKm(line,origin),b=getReferenceKm(line,name);
+    if(Number.isFinite(a)&&Number.isFinite(b))return Math.abs(b-a);
+  }
+  return getKm(line,name);
+}
+function updateBookingRouteNote(d){
+  const box=$('bookingRouteNote'),s=BANGKOK_STATIONS;
+  const endpoints=[d.trainOrigin,d.trainDest];let text='';
+  if(d.mode==='station'&&endpoints.includes(s.aphiwat))text='กรุงเทพ (อภิวัฒน์) เป็น กม.0 ของเส้นทางนี้ ระยะสถานีอื่นเทียบจากต้นทางเดียวกัน และเป็นคนละสถานีกับชุมทางบางซื่อ';
+  else if(d.mode==='station'&&['north','esanNongkhai','esanUbon'].includes(d.line)&&endpoints.includes(s.huaLamphong))text='ขบวนจากกรุงเทพ (หัวลำโพง) ใช้เส้นทางผ่านชุมทางบางซื่อ ไม่เข้าไปจอดกรุงเทพ (อภิวัฒน์)';
+  box.textContent=text;box.classList.toggle('hidden',!text);
+}
 function getReservationType(train){if(!train)return '';return /(ธรรมดา|ชานเมือง|ท้องถิ่น|ที่นั่งอิสระ|non[-\s]?reserved)/i.test(`${train.id||''} ${train.name||''}`)?'nonreserved':'reserved'}
 function stationNames(line){return (trainData[line]?.stations||[]).map(s=>s.name)}
-function activeStationNames(line, train){if(!line)return[];const all=stationNames(line);if(!train)return all;if(Array.isArray(train.stops)&&train.stops.length)return train.stops.filter(name=>all.includes(name));return all.filter(name=>{const km=getKm(line,name),a=getKm(line,train.origin),b=getKm(line,train.dest);return Number.isFinite(km)&&Number.isFinite(a)&&Number.isFinite(b)&&km>=Math.min(a,b)&&km<=Math.max(a,b)})}
+function activeStationNames(line,train){
+  if(!line)return[];
+  if(!train)return stationNames(line);
+  const route=routeStationNames(line,train.origin,train.dest);
+  return Array.isArray(train.stops)&&train.stops.length?train.stops.filter(name=>route.includes(name)):route;
+}
 function bookingDaysFromPercentage(p){return p>=60?90:p>=25?30:1}
 function statusForOpenDate(openDate, openTime='08:30'){const now=new Date();const [h,m]=openTime.split(':').map(Number);const opensAt=bangkokInstant(toLocalISO(openDate),openTime);if(now>=opensAt)return{kind:'open',text:'เปิดจองแล้ว',detail:'สามารถตรวจสอบที่นั่งใน D-Ticket ได้'};const diff=daysUntil(openDate);if(diff===0)return{kind:'waiting',text:`เปิดวันนี้ ${openTime} น.`,detail:'ยังไม่ถึงเวลาเปิดจอง'};if(diff===1)return{kind:'waiting',text:`เปิดพรุ่งนี้ ${openTime} น.`,detail:'เตรียมทำรายการล่วงหน้าได้'};return{kind:'waiting',text:`อีกประมาณ ${Math.max(diff,0).toLocaleString('th-TH')} วัน`,detail:`เริ่มเปิด ${formatDate(openDate)} เวลา ${openTime} น.`}}
 
@@ -701,7 +782,7 @@ function statusForOpenDate(openDate, openTime='08:30'){const now=new Date();cons
    ========================================================= */
 const state={
   tool:'booking',bookingMode:'station',monthlyFareMode:'auto',lastStationField:'passOrigin',lastBookingResult:null,lastMonthlyResult:null,
-  bookingHistory:STORAGE.get('srtPremiumBookingHistory',[]),monthlyHistory:STORAGE.get('srtPremiumMonthlyHistory',[]),
+  bookingHistory:migrateBookingHistory(STORAGE.get('srtPremiumBookingHistory',[])),monthlyHistory:STORAGE.get('srtPremiumMonthlyHistory',[]),
   favorites:STORAGE.get('srtPremiumFavoriteStations',[]),deferredInstallPrompt:null
 };
 const el={
@@ -748,7 +829,7 @@ function setBookingMode(mode){state.bookingMode=mode;const station=mode==='stati
    ========================================================= */
 function saveFavorites(){STORAGE.set('srtPremiumFavoriteStations',state.favorites);renderFavorites()}
 function toggleFavorite(station){if(!station)return showToast('กรุณาเลือกสถานีก่อน');const line=el.selectedLine.value;if(!line||!exactStation(line,station))return showToast('กรุณาเลือกสถานีจากรายการ');const i=state.favorites.indexOf(station);if(i>=0){state.favorites.splice(i,1);showToast('นำออกจากสถานีโปรดแล้ว')}else{state.favorites.unshift(station);state.favorites=[...new Set(state.favorites)].slice(0,12);showToast('บันทึกสถานีโปรดแล้ว')}saveFavorites();renderFavoriteButtons()}
-function renderFavorites(){const box=$('favoriteChips');if(!state.favorites.length){box.innerHTML='<span class="chip">ยังไม่มีสถานีโปรด</span>';return}box.innerHTML=state.favorites.map(name=>`<button class="chip" type="button" data-favorite="${esc(name)}">${esc(name)}</button>`).join('');box.querySelectorAll('[data-favorite]').forEach(btn=>btn.addEventListener('click',()=>{const target=$(state.lastStationField)||el.passOrigin;target.value=btn.dataset.favorite;target.dispatchEvent(new Event('input',{bubbles:true}));target.focus()}))}
+function renderFavorites(){const box=$('favoriteChips');if(!state.favorites.length){box.innerHTML='<span class="chip">ยังไม่มีสถานีโปรด</span>';return}box.innerHTML=state.favorites.map(name=>`<button class="chip" type="button" data-favorite="${esc(name)}">${esc(name)}</button>`).join('');box.querySelectorAll('[data-favorite]').forEach(btn=>btn.addEventListener('click',()=>{const target=$(state.lastStationField)||el.passOrigin;if(['passOrigin','passDest'].includes(target.id)&&!activeBookingStationNames().includes(btn.dataset.favorite))return showToast('สถานีโปรดนี้ไม่อยู่ในเส้นทางของขบวนที่เลือก');target.value=btn.dataset.favorite;target.dispatchEvent(new Event('input',{bubbles:true}));target.focus()}))}
 function renderFavoriteButtons(){const a=state.favorites.includes(el.passOrigin.value),b=state.favorites.includes(el.passDest.value);$('favOriginBtn').classList.toggle('active',a);$('favOriginBtn').textContent=a?'★':'☆';$('favDestBtn').classList.toggle('active',b);$('favDestBtn').textContent=b?'★':'☆'}
 
 /* =========================================================
@@ -760,22 +841,25 @@ function getBookingInputs(){
   const line=el.selectedLine.value,train=getTrain(line,el.selectedTrain.value);let total=NaN,passenger=NaN,routeValid=true;
   const origin=el.passOrigin.value.trim(),destination=el.passDest.value.trim();
   const trainOrigin=train?.origin||el.trainOrigin.value.trim(),trainDest=train?.dest||el.trainDest.value.trim();
-  const t1=getKm(line,trainOrigin),t2=getKm(line,trainDest),p1=getKm(line,origin),p2=getKm(line,destination);
+  const t1=getReferenceKm(line,trainOrigin),t2=getReferenceKm(line,trainDest),p1=getReferenceKm(line,origin),p2=getReferenceKm(line,destination);
   if([t1,t2].every(Number.isFinite))total=Math.abs(t2-t1);if([p1,p2].every(Number.isFinite))passenger=Math.abs(p2-p1);
-  if([t1,t2,p1,p2].every(Number.isFinite)){const min=Math.min(t1,t2),max=Math.max(t1,t2);routeValid=p1>=min&&p1<=max&&p2>=min&&p2<=max}
+  if(trainOrigin&&trainDest){const route=routeStationNames(line,trainOrigin,trainDest);routeValid=route.includes(origin)&&route.includes(destination);}
   return{mode:'station',travelDate,line,train,reservationType:train?getReservationType(train):el.reservationType.value,total,passenger,routeValid,origin,destination,trainOrigin,trainDest,p1,p2};
 }
-function classify997998(p1,p2){if(!Number.isFinite(p1)||!Number.isFinite(p2))return null;const min=Math.min(p1,p2),max=Math.max(p1,p2),b=BOOKING_RULES.special997998;if(max<=b.chachoengsaoKm)return'special-48h';if(min<b.chachoengsaoKm&&max>=b.chonburiKm)return'standard-distance';return'special-1day'}
+function classify887888(p1,p2){if(!Number.isFinite(p1)||!Number.isFinite(p2))return null;const min=Math.min(p1,p2),max=Math.max(p1,p2),b=BOOKING_RULES.special887888;if(max<=b.chachoengsaoKm)return'special-48h';if(min<b.chachoengsaoKm&&max>=b.chonburiKm)return'standard-distance';return'special-1day'}
 function bookingError(message){state.lastBookingResult=null;el.distanceSummary.classList.add('hidden');el.bookingResult.innerHTML=`<div class="empty"><div class="empty-icon">⚠️</div><h3>ตรวจสอบข้อมูล</h3><p>${esc(message)}</p></div>`}
 function bookingEmpty(message='เลือกวันที่ สายทาง และสถานีให้ครบ'){state.lastBookingResult=null;el.distanceSummary.classList.add('hidden');el.bookingResult.innerHTML=`<div class="empty"><div class="empty-icon">🧮</div><h3>พร้อมคำนวณ</h3><p>${esc(message)}<br>ผลลัพธ์จะแสดงอัตโนมัติ</p></div>`}
 function updateDistanceSummary(total,passenger){const valid=Number.isFinite(total)&&Number.isFinite(passenger)&&total>0&&passenger>0;if(!valid||state.bookingMode!=='station'){el.distanceSummary.classList.add('hidden');return}const p=(passenger/total)*100;el.distanceSummary.classList.remove('hidden');el.totalKmText.textContent=`${money(total)} กม.`;el.passengerKmText.textContent=`${money(passenger)} กม.`;el.percentageText.textContent=`${p.toFixed(2)}%`}
 function calculateBooking(){
-  syncDateControls();renderFavoriteButtons();const d=getBookingInputs();
+  syncDateControls();renderFavoriteButtons();const d=getBookingInputs();updateBookingRouteNote(d);fillDatalist(el.activeStationList,activeBookingStationNames());
   if(!d.travelDate)return bookingEmpty();if(d.travelDate<localDateOnly())return bookingError('วันที่เดินทางผ่านไปแล้ว กรุณาเลือกวันนี้หรือวันในอนาคต');
   if(d.mode==='station'&&!d.line)return bookingEmpty('กรุณาเลือกสายทาง');
   if(d.mode==='station'){
     if(!d.origin||!d.destination)return bookingEmpty('กรุณาเลือกสถานีขึ้นและสถานีลง');
     if(!exactStation(d.line,d.origin)||!exactStation(d.line,d.destination))return bookingError('กรุณาเลือกสถานีขึ้นและสถานีลงจากรายการค้นหา');
+    if(d.origin===d.destination)return bookingError('สถานีขึ้นและสถานีลงต้องเป็นคนละสถานี');
+    if(incompatibleBangkokStations(d.origin,d.destination))return bookingError('กรุงเทพ (อภิวัฒน์) กับหัวลำโพง/ชุมทางบางซื่อเป็นคนละเส้นทางของขบวนรถ กรุณาเลือกสถานีตามขบวนที่เดินทาง');
+    if(!d.routeValid)return bookingError('สถานีขึ้นและสถานีลงต้องอยู่ในเส้นทางต้นทาง–ปลายทางของขบวนรถ');
     if(d.train){
       const stops=activeStationNames(d.line,d.train);
       if(!stops.includes(d.origin)||!stops.includes(d.destination))return bookingError('สถานีที่เลือกไม่อยู่ในรายการจอดของขบวนรถนี้');
@@ -787,8 +871,8 @@ function calculateBooking(){
   if(d.mode==='station'&&!d.train&&(!exactStation(d.line,d.trainOrigin)||!exactStation(d.line,d.trainDest)))return bookingError('ต้นทาง/ปลายทางของขบวนต้องเลือกจากรายการสถานี');
   if(!Number.isFinite(d.total)||!Number.isFinite(d.passenger))return bookingEmpty('กรุณาระบุข้อมูลระยะทางให้ครบ');if(!d.routeValid)return bookingError('สถานีขึ้นและสถานีลงต้องอยู่ภายในช่วงต้นทาง–ปลายทางของขบวนรถ');if(d.total<=0||d.passenger<=0)return bookingError('ต้นทางและปลายทางต้องไม่เป็นสถานีเดียวกัน');if(d.passenger>d.total)return bookingError('ระยะทางผู้โดยสารต้องไม่เกินระยะทางวิ่งทั้งหมดของขบวน');
   updateDistanceSummary(d.total,d.passenger);
-  if(d.mode==='station'&&d.train&&BOOKING_RULES.special997998.ids.includes(d.train.id)){
-    const rule=classify997998(d.p1,d.p2);if(rule==='special-48h')return renderSpecial48Result(d);if(rule==='special-1day')return renderSpecialOneDayResult(d);if(rule==='standard-distance')return renderStandardBooking(d,'ขบวน 997/998 ช่วงฝั่งกรุงเทพไปตั้งแต่ชลบุรีขึ้นไป ใช้เกณฑ์ระยะทาง 1 / 30 / 90 วัน');
+  if(d.mode==='station'&&d.train&&BOOKING_RULES.special887888.ids.includes(d.train.id)){
+    const rule=classify887888(d.p1,d.p2);if(rule==='special-48h')return renderSpecial48Result(d);if(rule==='special-1day')return renderSpecialOneDayResult(d);if(rule==='standard-distance')return renderStandardBooking(d,'ขบวน 887/888 ช่วงฝั่งกรุงเทพไปตั้งแต่ชลบุรีขึ้นไป ใช้เกณฑ์ระยะทาง 1 / 30 / 90 วัน');
   }
   return renderStandardBooking(d);
 }
@@ -803,11 +887,11 @@ function renderStandardBooking(d,routeNote=''){
   el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">${esc(d.train?.name||'ขบวนสำรองที่นั่ง')}</div><h3>${esc(d.origin)} → ${esc(d.destination)}</h3></div><span class="status ${status.kind}">${status.kind==='open'?'✓':'⏳'} ${esc(status.text)}</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>สามารถซื้อตั๋วล่วงหน้าได้</span><strong>${days} วัน</strong><small>คำนวณจากระยะทางการเดินทาง ${percentage.toFixed(2)}% ของระยะทางขบวนรถ</small></div><div class="date-panel"><div class="label">วันแรกที่สามารถซื้อตั๋วได้</div><div class="date">${formatDate(bookingDate)}</div><div class="time">เวลา ${BOOKING_RULES.standardOpenTime} น. เป็นต้นไป</div></div><div class="result-grid"><div class="result-mini"><span>ระยะขบวน</span><strong>${money(d.total)} กม.</strong></div><div class="result-mini"><span>ระยะผู้โดยสาร</span><strong>${money(d.passenger)} กม.</strong></div></div>${routeNote?`<div class="note info">${esc(routeNote)}</div>`:''}<div class="note warning">${esc(status.detail)} · ทั้งนี้ขึ้นอยู่กับที่นั่งว่างและเงื่อนไขของขบวนรถ</div>${bookingActions()}</div></div>`;afterBookingRender(result)
 }
 function renderSpecialOneDayResult(d){
-  const bookingDate=new Date(d.travelDate);bookingDate.setDate(bookingDate.getDate()-1);const status=statusForOpenDate(bookingDate,'08:30');const result={...makeBookingResultBase(d,'special-1day'),days:1,bookingDate:toLocalISO(bookingDate),openTime:'08:30',headline:'ขบวน 997/998 • ล่วงหน้า 1 วัน',summary:`เริ่มทำรายการ ${formatDate(bookingDate)} เวลา 08:30 น.`,copyText:`ขบวน 997/998\n${d.origin} → ${d.destination}\nเดินทางวันที่ ${formatDate(d.travelDate)}\nช่วงนี้เปิดขายล่วงหน้า 1 วันตามผลทดสอบ D-Ticket\nเริ่ม ${formatDate(bookingDate)} เวลา 08:30 น.\nโปรดตรวจสอบ D-Ticket อีกครั้ง`};state.lastBookingResult=result;
-  el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">ขบวน 997/998 • เงื่อนไขพิเศษ</div><h3>${esc(d.origin)} → ${esc(d.destination)}</h3></div><span class="status ${status.kind}">${status.kind==='open'?'✓':'⏳'} ${esc(status.text)}</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>สามารถซื้อตั๋วล่วงหน้าได้</span><strong>1 วัน</strong><small>ช่วงฉะเชิงเทราไปทางชลบุรี/พัทยา/สัตหีบ และภายในฝั่งดังกล่าว</small></div><div class="date-panel"><div class="label">วันแรกที่สามารถซื้อตั๋วได้</div><div class="date">${formatDate(bookingDate)}</div><div class="time">ระบบคำนวณที่เวลา 08:30 น. โปรดตรวจ D-Ticket อีกครั้ง</div></div><div class="note warning">เงื่อนไขนี้อ้างอิงผลทดสอบ D-Ticket ที่ผู้จัดทำบันทึกไว้ ไม่ใช่การยืนยันที่นั่งหรือการเปิดขายแบบเรียลไทม์</div>${bookingActions()}</div></div>`;afterBookingRender(result)
+  const bookingDate=new Date(d.travelDate);bookingDate.setDate(bookingDate.getDate()-1);const status=statusForOpenDate(bookingDate,'08:30');const result={...makeBookingResultBase(d,'special-1day'),days:1,bookingDate:toLocalISO(bookingDate),openTime:'08:30',headline:'ขบวน 887/888 • ล่วงหน้า 1 วัน',summary:`เริ่มทำรายการ ${formatDate(bookingDate)} เวลา 08:30 น.`,copyText:`ขบวน 887/888\n${d.origin} → ${d.destination}\nเดินทางวันที่ ${formatDate(d.travelDate)}\nช่วงนี้เปิดขายล่วงหน้า 1 วันตามผลทดสอบ D-Ticket\nเริ่ม ${formatDate(bookingDate)} เวลา 08:30 น.\nโปรดตรวจสอบ D-Ticket อีกครั้ง`};state.lastBookingResult=result;
+  el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">ขบวน 887/888 • เงื่อนไขพิเศษ</div><h3>${esc(d.origin)} → ${esc(d.destination)}</h3></div><span class="status ${status.kind}">${status.kind==='open'?'✓':'⏳'} ${esc(status.text)}</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>สามารถซื้อตั๋วล่วงหน้าได้</span><strong>1 วัน</strong><small>ช่วงฉะเชิงเทราไปทางชลบุรี/พัทยา/สัตหีบ และภายในฝั่งดังกล่าว</small></div><div class="date-panel"><div class="label">วันแรกที่สามารถซื้อตั๋วได้</div><div class="date">${formatDate(bookingDate)}</div><div class="time">ระบบคำนวณที่เวลา 08:30 น. โปรดตรวจ D-Ticket อีกครั้ง</div></div><div class="note warning">เงื่อนไขนี้อ้างอิงผลทดสอบ D-Ticket ที่ผู้จัดทำบันทึกไว้ ไม่ใช่การยืนยันที่นั่งหรือการเปิดขายแบบเรียลไทม์</div>${bookingActions()}</div></div>`;afterBookingRender(result)
 }
 function renderSpecial48Result(d){
-  const b=BOOKING_RULES.special997998,trainNo=d.p2>d.p1?'997':'998',terminal=b.terminalTimes[trainNo],saleDate=new Date(d.travelDate);saleDate.setDate(saleDate.getDate()-2);const known=Boolean(terminal&&d.origin===terminal.station);let status={kind:'info',text:'ตรวจเวลาเปิดขาย'};if(known)status=statusForOpenDate(saleDate,terminal.time);const weekend=[0,6].includes(d.travelDate.getDay());
+  const b=BOOKING_RULES.special887888,trainNo=d.p2>d.p1?'887':'888',terminal=b.terminalTimes[trainNo],saleDate=new Date(d.travelDate);saleDate.setDate(saleDate.getDate()-2);const known=Boolean(terminal&&d.origin===terminal.station);let status={kind:'info',text:'ตรวจเวลาเปิดขาย'};if(known)status=statusForOpenDate(saleDate,terminal.time);const weekend=[0,6].includes(d.travelDate.getDay());
   const opening=known?`${formatDate(saleDate)} เวลา ${terminal.time} น.`:`${formatDate(saleDate)} ณ เวลาเดียวกับเวลาขบวนออกจากสถานี ${d.origin}`;const result={...makeBookingResultBase(d,'special-48h'),trainNo,saleDate:toLocalISO(saleDate),openTime:known?terminal.time:null,headline:`ขบวน ${trainNo} • ภายใน 48 ชั่วโมง`,summary:opening,copyText:`ขบวน ${trainNo} เงื่อนไข 48 ชั่วโมง\n${d.origin} → ${d.destination}\nเดินทางวันที่ ${formatDate(d.travelDate)}\nเริ่มทำรายการได้เร็วที่สุด: ${opening}\nโปรดตรวจเวลาขบวนออกจากสถานีขึ้นและ D-Ticket อีกครั้ง`};state.lastBookingResult=result;
   el.bookingResult.innerHTML=`<div class="result-card" id="bookingResultCard"><div class="result-top"><div><div class="kicker">ขบวน ${trainNo} • ช่วงอัตราพิเศษ</div><h3>${esc(d.origin)} → ${esc(d.destination)}</h3></div><span class="status ${status.kind}">${known?(status.kind==='open'?'✓':'⏳'):'ℹ️'} ${esc(status.text)}</span></div><div class="result-main">${routeMarkup(d)}<div class="big-result"><span>เริ่มซื้อตั๋วได้ภายใน</span><strong>48 ชม.</strong><small>ก่อนรถออกจากสถานีขึ้น</small></div><div class="date-panel"><div class="label">วันและเวลาแรกที่สามารถซื้อตั๋วได้</div><div class="date">${esc(opening)}</div>${known?`<div class="time">อ้างอิงเวลาต้นทางขบวน ${terminal.time} น.</div>`:'<div class="time">ต้องตรวจเวลาขบวนออกจากสถานีขึ้นเพื่อระบุเวลาให้ตรง 48 ชั่วโมง</div>'}</div>${weekend?'':'<div class="note warning">วันเดินทางที่เลือกไม่ใช่วันเสาร์–อาทิตย์ ตามข้อมูลตารางที่ผู้จัดทำใช้อ้างอิง โปรดตรวจสอบตารางเดินรถอีกครั้ง</div>'}<div class="note info">เงื่อนไขนี้ใช้กับช่วงกรุงเทพ–ชุมทางฉะเชิงเทรา และควรตรวจสอบข้อความใน D-Ticket ก่อนออกตั๋วทุกครั้ง</div>${bookingActions()}</div></div>`;afterBookingRender(result)
 }
@@ -937,7 +1021,7 @@ function saveBookingHistory(r){if(!r)return;const key=[r.type,r.travelDate,r.ori
 function saveMonthlyHistory(r){if(!r)return;const key=[r.fareMode,r.origin,r.destination,r.fare,r.trips,r.passenger,r.period,r.finalPrice].join('|');state.monthlyHistory=state.monthlyHistory.filter(x=>x.key!==key);const route=r.origin&&r.destination?`${r.origin} → ${r.destination}`:'กรอกค่าโดยสารเอง';state.monthlyHistory.unshift({key,createdAt:r.createdAt,title:`${money(r.finalPrice)} บาท`,subtitle:`${route} • ${r.summary} • ${money(r.fare)} บาท/เที่ยว`,restore:getMonthlySnapshot()});state.monthlyHistory=state.monthlyHistory.slice(0,APP_CONFIG.historyLimit);STORAGE.set('srtPremiumMonthlyHistory',state.monthlyHistory);renderHistories()}
 function renderHistories(){el.bookingHistory.innerHTML=state.bookingHistory.length?state.bookingHistory.map((x,i)=>`<button type="button" class="history-item" data-booking-history="${i}"><b>${esc(x.title)}</b><span>${esc(x.subtitle)}</span></button>`).join(''):'<div class="note info">ยังไม่มีประวัติการคำนวณ</div>';el.monthlyHistory.innerHTML=state.monthlyHistory.length?state.monthlyHistory.map((x,i)=>`<button type="button" class="history-item" data-monthly-history="${i}"><b>${esc(x.title)}</b><span>${esc(x.subtitle)}</span></button>`).join(''):'<div class="note info">ยังไม่มีประวัติการคำนวณ</div>';el.bookingHistory.querySelectorAll('[data-booking-history]').forEach(b=>b.addEventListener('click',()=>restoreBooking(state.bookingHistory[Number(b.dataset.bookingHistory)].restore)));el.monthlyHistory.querySelectorAll('[data-monthly-history]').forEach(b=>b.addEventListener('click',()=>restoreMonthly(state.monthlyHistory[Number(b.dataset.monthlyHistory)].restore)))}
 function getBookingSnapshot(){return{mode:state.bookingMode,date:el.travelDate.value,line:el.selectedLine.value,train:el.selectedTrain.value,reservation:el.reservationType.value,trainOrigin:el.trainOrigin.value,trainDest:el.trainDest.value,origin:el.passOrigin.value,dest:el.passDest.value,manualReservation:el.manualReservationType.value,total:el.totalDistance.value,passenger:el.passengerDistance.value}}
-function restoreBooking(s){if(!s)return;setTool('booking');setBookingMode(s.mode||'station');el.travelDate.value=s.date||'';el.selectedLine.value=s.line||'';fillTrainOptions();el.selectedTrain.value=s.train||'';fillStationData();updateCustomTrainVisibility();el.reservationType.value=s.reservation||'';el.trainOrigin.value=s.trainOrigin||'';el.trainDest.value=s.trainDest||'';el.passOrigin.value=s.origin||'';el.passDest.value=s.dest||'';el.manualReservationType.value=s.manualReservation||'';el.totalDistance.value=s.total||'';el.passengerDistance.value=s.passenger||'';calculateBooking();showToast('เรียกคืนรายการแล้ว')}
+function restoreBooking(s){if(!s)return;setTool('booking');setBookingMode(s.mode||'station');el.travelDate.value=s.date||'';el.selectedLine.value=s.line||'';fillTrainOptions();el.selectedTrain.value=normalizeTrainId(s.train);fillStationData();updateCustomTrainVisibility();el.reservationType.value=s.reservation||'';el.trainOrigin.value=s.trainOrigin||'';el.trainDest.value=s.trainDest||'';el.passOrigin.value=s.origin||'';el.passDest.value=s.dest||'';el.manualReservationType.value=s.manualReservation||'';el.totalDistance.value=s.total||'';el.passengerDistance.value=s.passenger||'';calculateBooking();showToast('เรียกคืนรายการแล้ว')}
 function getMonthlySnapshot(){return{fareMode:state.monthlyFareMode,origin:el.monthlyOrigin.value,dest:el.monthlyDest.value,fare:el.monthlyFare.value,trips:el.monthlyTrips.value,passenger:el.monthlyPassenger.value,period:el.monthlyPeriod.value}}
 function restoreMonthly(s){if(!s)return;setTool('monthly');setMonthlyFareMode(s.fareMode||'auto',false);el.monthlyOrigin.value=s.origin||'คลองบางพระ';el.monthlyDest.value=s.dest||'';el.monthlyFare.value=s.fare||'';el.monthlyTrips.value=s.trips||'1';el.monthlyPassenger.value=s.passenger||'general';el.monthlyPeriod.value=s.period||'week';calculateMonthly();showToast('เรียกคืนรายการแล้ว')}
 
@@ -945,7 +1029,7 @@ function restoreMonthly(s){if(!s)return;setTool('monthly');setMonthlyFareMode(s.
    10) URL SHARE STATE
    ========================================================= */
 function syncUrl(){if(routeBooting)return;if(state.tool==='home'){try{history.replaceState(null,'',location.pathname)}catch{}return}const p=new URLSearchParams();p.set('tool',state.tool);if(state.tool==='booking'){const s=getBookingSnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}else{const s=getMonthlySnapshot();Object.entries(s).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,String(v))})}try{history.replaceState(null,'',`${location.pathname}${p.toString()?`?${p}`:''}${location.hash}`)}catch{}}
-function restoreFromUrl(search=location.search){const p=new URLSearchParams(search),tool=p.get('tool');if(tool==='home'||!p.size){setTool('home');return;}if(tool==='monthly'){setTool('monthly');setMonthlyFareMode(p.get('fareMode')||'auto',false);el.monthlyOrigin.value=p.get('origin')||'คลองบางพระ';el.monthlyDest.value=p.get('dest')||'';el.monthlyFare.value=p.get('fare')||'';el.monthlyTrips.value=p.get('trips')||'1';el.monthlyPassenger.value=p.get('passenger')||'general';el.monthlyPeriod.value=p.get('period')||'week';calculateMonthly();return}if(tool==='booking'||p.size){setTool('booking');setBookingMode(p.get('mode')||'station');el.travelDate.value=p.get('date')||'';el.selectedLine.value=p.get('line')||'';fillTrainOptions();el.selectedTrain.value=p.get('train')||'';fillStationData();updateCustomTrainVisibility();el.reservationType.value=p.get('reservation')||'';el.trainOrigin.value=p.get('trainOrigin')||'';el.trainDest.value=p.get('trainDest')||'';el.passOrigin.value=p.get('origin')||'';el.passDest.value=p.get('dest')||'';el.manualReservationType.value=p.get('manualReservation')||'';el.totalDistance.value=p.get('total')||'';el.passengerDistance.value=p.get('passenger')||'';calculateBooking()}}
+function restoreFromUrl(search=location.search){const p=new URLSearchParams(search),tool=p.get('tool');if(tool==='home'||!p.size){setTool('home');return;}if(tool==='monthly'){setTool('monthly');setMonthlyFareMode(p.get('fareMode')||'auto',false);el.monthlyOrigin.value=p.get('origin')||'คลองบางพระ';el.monthlyDest.value=p.get('dest')||'';el.monthlyFare.value=p.get('fare')||'';el.monthlyTrips.value=p.get('trips')||'1';el.monthlyPassenger.value=p.get('passenger')||'general';el.monthlyPeriod.value=p.get('period')||'week';calculateMonthly();return}if(tool==='booking'||p.size){setTool('booking');setBookingMode(p.get('mode')||'station');el.travelDate.value=p.get('date')||'';el.selectedLine.value=p.get('line')||'';fillTrainOptions();el.selectedTrain.value=normalizeTrainId(p.get('train'));fillStationData();updateCustomTrainVisibility();el.reservationType.value=p.get('reservation')||'';el.trainOrigin.value=p.get('trainOrigin')||'';el.trainDest.value=p.get('trainDest')||'';el.passOrigin.value=p.get('origin')||'';el.passDest.value=p.get('dest')||'';el.manualReservationType.value=p.get('manualReservation')||'';el.totalDistance.value=p.get('total')||'';el.passengerDistance.value=p.get('passenger')||'';calculateBooking()}}
 
 /* =========================================================
    11) THEME / PRINT / INSTALL
@@ -1056,12 +1140,7 @@ let stationPickerField = null;
 const STATION_FIELD_LABELS = {trainOrigin:'ต้นทางขบวน',trainDest:'ปลายทางขบวน',passOrigin:'สถานีขึ้น',passDest:'สถานีลง'};
 function pickerStationNames(field) {
   const line=el.selectedLine.value,train=getTrain(line,el.selectedTrain.value);
-  let names=field==='trainOrigin'||field==='trainDest'?stationNames(line):activeStationNames(line,train);
-  if(!train&&(field==='passOrigin'||field==='passDest')){
-    const a=getKm(line,el.trainOrigin.value),b=getKm(line,el.trainDest.value);
-    if(Number.isFinite(a)&&Number.isFinite(b))names=names.filter(n=>{const km=getKm(line,n);return km>=Math.min(a,b)&&km<=Math.max(a,b);});
-  }
-  return names;
+  return field==='trainOrigin'||field==='trainDest'?stationNames(line):activeBookingStationNames();
 }
 function openStationPicker(field) {
   if(!STATION_FIELD_LABELS[field])return;
@@ -1069,7 +1148,7 @@ function openStationPicker(field) {
   stationPickerField=field;state.lastStationField=field;
   $('stationPickerTitle').textContent='เลือก'+STATION_FIELD_LABELS[field];
   const train=getTrain(el.selectedLine.value,el.selectedTrain.value);
-  $('stationPickerContext').textContent=train?train.name:trainData[el.selectedLine.value].name;
+  $('stationPickerContext').textContent=(train?train.name:trainData[el.selectedLine.value].name)+(!['trainOrigin','trainDest'].includes(field)&&exactStation(el.selectedLine.value,train?.origin||el.trainOrigin.value)?' · ระยะจากต้นทางขบวน':' · ระยะอ้างอิง');
   $('stationSearch').value='';renderStationPicker();$('stationPickerDialog').showModal();
   const selected=$('stationOptions').querySelector('[aria-pressed="true"]');
   if(selected?.scrollIntoView)selected.scrollIntoView({block:'nearest'});
@@ -1080,7 +1159,7 @@ function renderStationPicker() {
   const names=all.filter(n=>n.toLocaleLowerCase('th-TH').includes(query));
   const favorites=names.filter(n=>state.favorites.includes(n)),remaining=names.filter(n=>!favorites.includes(n));
   const selected=$(stationPickerField).value;
-  function option(n){return '<button type="button" class="station-option" data-station="'+esc(n)+'" aria-pressed="'+(n===selected)+'"><span>'+esc(n)+'</span><small>'+(n===selected?'✓ เลือกอยู่':money(getKm(el.selectedLine.value,n))+' กม.')+'</small></button>';}
+  function option(n){return '<button type="button" class="station-option" data-station="'+esc(n)+'" aria-pressed="'+(n===selected)+'"><span>'+esc(n)+'</span><small>'+(money(pickerStationKm(n))+' กม.'+(n===selected?' · ✓ เลือกอยู่':''))+'</small></button>';}
   $('stationOptions').innerHTML=names.length?(favorites.length?'<div class="station-group">สถานีที่บันทึกไว้</div>'+favorites.map(option).join('')+'<div class="station-group">สถานีในเส้นทาง</div>':'')+remaining.map(option).join(''):'<div class="station-no-results">'+(all.length?'ไม่พบสถานี ลองค้นหาด้วยชื่อสั้น ๆ':'ยังไม่มีรายชื่อสถานีสำหรับเส้นทางนี้')+'</div>';
   $('stationCount').textContent=query?'พบ '+names.length+' จาก '+all.length+' สถานี':all.length+' สถานี · เลื่อนแล้วกดเลือกได้เลย';
   $('clearStationSearchBtn').classList.toggle('hidden',!query);
